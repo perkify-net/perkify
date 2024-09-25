@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35201.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CF9F232C-2441-494C-B5B0-E71400629730}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Core", "src\Perkify.Core\Perkify.Core.csproj", "{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{2ECF4EF3-B291-4DAE-AD0F-5BA381A1E47F}"
+	ProjectSection(SolutionItems) = preProject
+		Roadmap.zhcn.md = Roadmap.zhcn.md
+		doc\Todo.zhcn.md = doc\Todo.zhcn.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Demo", "src\Perkify.Demo\Perkify.Demo.csproj", "{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Core.Tests", "src\Perkify.Core.Tests\Perkify.Core.Tests.csproj", "{1C6DB32F-707D-47E2-A498-4FE3565AFC37}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C6DB32F-707D-47E2-A498-4FE3565AFC37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C6DB32F-707D-47E2-A498-4FE3565AFC37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C6DB32F-707D-47E2-A498-4FE3565AFC37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C6DB32F-707D-47E2-A498-4FE3565AFC37}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03} = {CF9F232C-2441-494C-B5B0-E71400629730}
+		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B} = {CF9F232C-2441-494C-B5B0-E71400629730}
+		{1C6DB32F-707D-47E2-A498-4FE3565AFC37} = {CF9F232C-2441-494C-B5B0-E71400629730}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9DA52DDC-7CD5-4CA9-A3E9-FA468904E909}
+	EndGlobalSection
+EndGlobal
