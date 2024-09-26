@@ -3,37 +3,10 @@
     using NodaTime;
     using NodaTime.Text;
 
-    /// <summary>
-    /// Expiry time for eligibility.
-    /// </summary>
-    public class Expiry : IExpiry, IEligible
+    /// <summary>Expiry time for eligibility.</summary>
+    public class Expiry : INowUtc, IEligible, IExpiry<Expiry>
     {
-        #region System Clock Dependency
-
-        private readonly IClock clock;
-
-        public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
-
-        #endregion
-
-        /// <summary>
-        /// The expiry time in UTC.
-        /// </summary>
-        public DateTime ExpiryUtc { get; private set; }
-
-        /// <summary>
-        /// Grace period.
-        /// </summary>
-        public TimeSpan GracePeriod { get; private set; }
-
-        /// <summary>
-        /// The deadline time in UTC.
-        /// </summary>
-        public DateTime DeadlineUtc => this.ExpiryUtc + this.GracePeriod;
-
-        /// <summary>
-        /// Create the expiry time for eligibility.
-        /// </summary>
+        /// <summary>Create the expiry time for eligibility.</summary>
         /// <param name="expiryUtc">Expiry time in UTC.</param>
         /// <param name="grace">Grace period.</param>
         /// <param name="clock">System clock abstraction for testability.</param>
@@ -46,9 +19,7 @@
             this.suspensionUtc = null;
         }
 
-        /// <summary>
-        /// Specify the suspension time.
-        /// </summary>
+        /// <summary>Specify the suspension time.</summary>
         /// <param name="suspensionUtc"></param>
         /// <returns>The expiry time after suspension.</returns>
         /// <exception cref="InvalidOperationException">Resuspending is not allowed.</exception>
@@ -65,25 +36,35 @@
                 throw new ArgumentOutOfRangeException(nameof(suspensionUtc), "The suspension time must be earlier with the current time"); 
             }
 
-            this.suspensionUtc = suspensionUtc < this.DeadlineUtc ? suspensionUtc : this.DeadlineUtc;
+            this.suspensionUtc = suspensionUtc < this.GetDeadlineUtc() ? suspensionUtc : this.GetDeadlineUtc();
             return this;
         }
+
+        #region Implements INowUtc interface
+
+        private readonly IClock clock;
+
+        public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
+
+        #endregion
 
         #region Implements IEligible interface
 
         /// <summary>
         /// See also in IEligible interface.
         /// </summary>
-        public bool IsEligible => !this.suspensionUtc.HasValue && this.NowUtc < this.DeadlineUtc;
+        public bool IsEligible => !this.suspensionUtc.HasValue && this.NowUtc < this.GetDeadlineUtc();
 
         #endregion
 
-        #region Expired, Remaining & Overdue
+        #region Implements IExpiry<T> interface
+
+        #region IsExpired, Remaining & Overdue
 
         /// <summary>
-        /// Boolean flag to identify if the expiry time is expired.
+        /// Grace period.
         /// </summary>
-        public bool Expired => (this.suspensionUtc ?? this.NowUtc) >= this.ExpiryUtc;
+        public TimeSpan GracePeriod { get; private set; }
 
         /// <summary>
         /// The remaining portion.
@@ -102,7 +83,7 @@
                 else
                 {
                     var nowUtc = this.NowUtc;
-                    return nowUtc <= this.DeadlineUtc ? this.ExpiryUtc - nowUtc : this.GracePeriod.Negate();
+                    return nowUtc <= this.GetDeadlineUtc() ? this.ExpiryUtc - nowUtc : this.GracePeriod.Negate();
                 }
             }
         }
@@ -118,57 +99,31 @@
             : this.NowUtc switch
             {
                 var nowUtc when nowUtc <= this.ExpiryUtc => TimeSpan.Zero,
-                var nowUtc when nowUtc < this.DeadlineUtc => nowUtc - this.ExpiryUtc,
+                var nowUtc when nowUtc < this.GetDeadlineUtc() => nowUtc - this.ExpiryUtc,
                 var _ => this.GracePeriod
             };
 
         #endregion
 
-        #region Operations
-
         #region Renew
 
-        /// <summary>
-        /// Renew the expiry time with a positive time span.
-        /// </summary>
-        /// <param name="ts">The time span to renew the expiry time.</param>
-        /// <returns>The expiry time after renewal.</returns>
-        /// <remarks>The renewval time span is not ISO8601 compatible. The day of month and year are not well considered which may cause inaccurate expiry time after renewal.</remarks>
-        public Expiry Renew(TimeSpan ts)
-        {
-            if (ts.Ticks < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(ts), "Negative time span.");
-            }
+        /// <summary>The expiry time in UTC.</summary>
+        public DateTime ExpiryUtc { get; private set; }
 
-            if (!this.IsActive)
-            {
-                throw new InvalidOperationException("Suspended state.");
-            }
-
-            this.ExpiryUtc += ts;
-            return this;
-        }
+        /// <summary>The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
+        public Renewal Renewal { get; private set; }
 
         /// <summary>
         /// Renew the expiry time in timeline arithmetic or calendrical arithmetic.
         /// </summary>
-        /// <param name="duration">Time span in ISO8601 duration format (string).</param>
-        /// <param name="calendar">Boolean flag to identify if extending expiry time in calendar system.</param>
+        /// <param name="renewval">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
         /// <returns>The expiry time after renewal.</returns>
-        public Expiry Renew(string duration, bool calendar = false)
+        public Expiry Renew(Renewal? renewal = null)
         {
-            var result = PeriodPattern.NormalizingIso.Parse(duration);
-            if (!result.Success)
+            renewal ??= this.Renewal;
+            if(renewal == null)
             {
-                throw new FormatException("Incorrect ISO8601 duration string.", result.Exception);
-            }
-
-            var period = result.Value.Normalize();
-            if (!calendar)
-            {
-                var ts = period.ToDuration().ToTimeSpan();
-                return this.Renew(ts);
+                throw new ArgumentNullException(nameof(renewal), "Renewal period is required.");
             }
 
             if (!this.IsActive)
@@ -176,20 +131,21 @@
                 throw new InvalidOperationException("Suspended state.");
             }
 
-            var current = Instant.FromDateTimeUtc(this.ExpiryUtc).InZone(DateTimeZone.Utc).LocalDateTime;
-            var future = current.Plus(period);
-            if (current > future)
+            var previousExpiryUtc = this.ExpiryUtc;
+            var nextExpiryUtc = renewal.Renew(previousExpiryUtc);
+            if(nextExpiryUtc <= previousExpiryUtc)
             {
-                throw new ArgumentOutOfRangeException(nameof(duration), "Negative ISO8601 duration.");
+                throw new InvalidOperationException("Negative ISO8601 duration.");
             }
 
-            this.ExpiryUtc = future.InZoneStrictly(DateTimeZone.Utc).ToInstant().ToDateTimeUtc();
+            this.ExpiryUtc = nextExpiryUtc;
+            this.Renewal = renewal;
             return this;
         }
 
         #endregion
 
-        #region Suspend & Resume
+        #region Deactivate & Activate
 
         private DateTime? suspensionUtc;
 
@@ -199,16 +155,14 @@
         /// - Implicit Suspension Time (Deadline) when the expiry time is not eligible.
         /// - Null when the expiry time is eligible.
         /// </summary>
-        public DateTime? SuspensionUtc => this.suspensionUtc ?? (this.IsEligible ? null : this.DeadlineUtc);
+        public DateTime? SuspensionUtc => this.suspensionUtc ?? (this.IsEligible ? null : this.GetDeadlineUtc());
 
         /// <summary>
         /// Boolean flag to identify if the expiry time is suspended.
         /// </summary>
         public bool IsActive => !this.suspensionUtc.HasValue;
 
-        /// <summary>
-        /// Suspends the expiry time.
-        /// </summary>
+        /// <summary>Suspends the expiry time.</summary>
         /// <param name="suspendUtc">The suspend time in UTC.</param>
         /// <returns>The expiry time after suspension.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier than current time.</exception>
@@ -227,13 +181,12 @@
                 throw new ArgumentOutOfRangeException(nameof(suspensionUtc), "The suspension time must be earlier than current time.");
             }
 
-            this.suspensionUtc = finalSuspensionUtc < this.DeadlineUtc ? finalSuspensionUtc : this.DeadlineUtc;
+            var deadlineUtc = this.GetDeadlineUtc();
+            this.suspensionUtc = finalSuspensionUtc < deadlineUtc ? finalSuspensionUtc : deadlineUtc;
             return this;
         }
 
-        /// <summary>
-        /// Resume the expiry time.
-        /// </summary>
+        /// <summary>Resume the expiry time.</summary>
         /// <param name="resumptionUtc">The resume time in UTC.</param>
         /// <param name="extended">Boolean flag to extend the expiry time after resumption.</param>
         /// <returns>The expiry time after resumption.</returns>
