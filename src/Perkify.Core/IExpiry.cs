@@ -1,13 +1,9 @@
 ﻿namespace Perkify.Core
 {
     /// <summary>The interface to maintain an expiry time with grace period for eligibility.</summary>
-    public interface IExpiry
+    public interface IExpiry<T> where T: IExpiry<T>, INowUtc
     {
-        /// <summary>The current time in UTC.</summary>
-        public DateTime NowUtc { get; }
-
-        /// <summary>The expiry time in UTC.</summary>
-        public DateTime ExpiryUtc { get; }
+        #region IsExpired, Remaining & Overdue
 
         /// <summary>The Grace period as absolute time span.</summary>
         public TimeSpan GracePeriod { get; }
@@ -28,21 +24,24 @@
         /// </summary>
         public TimeSpan Overdue { get; }
 
-        /// <summary>
-        /// Renew the expiry time with a positive time span.
-        /// </summary>
-        /// <param name="ts">The time span to renew the expiry time.</param>
-        /// <returns>The expiry time after renewal.</returns>
-        /// <remarks>The renewval time span is not ISO8601 compatible. The day of month and year are not well considered which may cause inaccurate expiry time after renewal.</remarks>
-        public Expiry Renew(TimeSpan ts);
+        #endregion
 
-        /// <summary>
-        /// Renew the expiry time in timeline arithmetic or calendrical arithmetic.
-        /// </summary>
-        /// <param name="duration">Time span in ISO8601 duration format (string).</param>
-        /// <param name="calendar">Boolean flag to identify if extending expiry time in calendar system.</param>
+        #region Renew
+
+        /// <summary>The expiry time in UTC.</summary>
+        public DateTime ExpiryUtc { get; }
+
+        /// <summary>The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
+        public Renewal Renewal { get; }
+
+        /// <summary>Renew the expiry time in timeline arithmetic or calendrical arithmetic.</summary>
+        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
         /// <returns>The expiry time after renewal.</returns>
-        public Expiry Renew(string duration, bool calendar = false);
+        public T Renew(Renewal? renewal);
+
+        #endregion
+
+        #region Deactivate & Activate
 
         /// <summary>
         /// The suspend time in UTC.
@@ -59,22 +58,20 @@
         /// </summary>
         public bool IsActive { get; }
 
-        /// <summary>
-        /// Deactivate the expiry time.
-        /// </summary>
+        /// <summary>Deactivate the expiry time.</summary>
         /// <param name="suspendUtc">The suspension time in UTC.</param>
         /// <returns>The expiry time after suspension.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier than current time.</exception>
-        public Expiry Deactivate(DateTime? suspensionUtc = null);
+        public T Deactivate(DateTime? suspensionUtc = null);
 
-        /// <summary>
-        /// Activate the expiry time.
-        /// </summary>
+        /// <summary>Activate the expiry time.</summary>
         /// <param name="resumptionUtc">The resumption time in UTC.</param>
         /// <param name="extended">Boolean flag to extend the expiry time after resumption.</param>
         /// <returns>The expiry time after resumption.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Resume time must be greater than suspend time.</exception>
-        public Expiry Activate(DateTime? resumptionUtc = null, bool extended = false);
+        public T Activate(DateTime? resumptionUtc = null, bool extended = false);
+
+        #endregion
     }
 
     public static class ExpiryExtensions
@@ -82,11 +79,11 @@
         /// <summary>
         /// The deadline time in UTC.
         /// </summary>
-        public static DateTime GetDeadlineUtc<T>(T expiry) where T: IExpiry
+        public static DateTime GetDeadlineUtc<T>(this T expiry) where T: IExpiry<T>, INowUtc
             => expiry.ExpiryUtc + expiry.GracePeriod;
 
         /// <summary>The boolean flag to identify if the expiry time has been reached.</summary>
-        public static bool IsExpired<T>(T expiry) where T: IExpiry
-            => expiry.NowUtc > GetDeadlineUtc(expiry);
+        public static bool IsExpired<T>(this T expiry) where T: IExpiry<T>, INowUtc
+            => (expiry.SuspensionUtc ?? expiry.NowUtc) >= expiry.ExpiryUtc;
     }
 }

@@ -1,12 +1,15 @@
 ﻿namespace Perkify.Demo
 {
+    using System.Text.RegularExpressions;
+
     using CommandLine;
     using NodaTime;
     using NodaTime.Extensions;
     using NodaTime.Testing;
     using NodaTime.Text;
     using Spectre.Console;
-    using System.Text.RegularExpressions;
+
+    using Perkify.Core;
 
     public class DemoApp
     {
@@ -57,7 +60,7 @@
 
         public void CreateSubscription(CreateSubscriptionOptions opts)
         {
-            this.subscription = new Subscription(this.clock, opts.Duration, opts.Calendar, opts.Grace);
+            this.subscription = new Subscription(this.clock, new Renewal(opts.Duration, opts.Calendar), opts.Grace);
         }
 
         public void RenewSubscription(RenewSubscriptionOptions opts)
@@ -145,7 +148,8 @@
             AnsiConsole.MarkupLine($"Product ID: [yellow]{this.subscription.ProductId}[/]");
             AnsiConsole.MarkupLine($"Metadata: [yellow]{this.subscription.Metadata}[/]");
             AnsiConsole.MarkupLine($"Recurring Plan: [yellow]{this.subscription.RecurringPlan}[/]");
-            AnsiConsole.MarkupLine($"Interval: [yellow]{this.subscription.duration}[/]");
+            AnsiConsole.MarkupLine($"Duration: [yellow]{this.subscription.renewal.Duration}[/]");
+            AnsiConsole.MarkupLine($"Calendar: [yellow]{this.subscription.renewal.Calendar}[/]");
             AnsiConsole.MarkupLine($"Grace: [yellow]{this.subscription.grace}[/]");
             AnsiConsole.MarkupLine($"Expiry.ExpiryUtc: [yellow]{this.subscription.expiry.ExpiryUtc}[/]");
             AnsiConsole.MarkupLine($"Expiry.Eligible: [yellow]{this.subscription.expiry.IsEligible}[/]");

@@ -13,9 +13,7 @@
 
         public readonly long id;
 
-        public readonly string duration;
-
-        public readonly bool calendar;
+        public readonly Renewal renewal;
 
         public readonly string? grace;
 
@@ -36,24 +34,23 @@
 
         #endregion
 
-        public Subscription(IClock clock, string duration, bool calendar, string? grace)
+        public Subscription(IClock clock, Renewal renewal, string? grace)
         {
             this.clock = clock;
             this.id = Random.Shared.NextInt64(1001, 1999);
-            this.duration = duration;
-            this.calendar = calendar;
+            this.renewal = renewal;
             this.grace = grace;
             this.expiry = new Expiry
             (
                 expiryUtc: null,
                 grace: grace != null ? TimeSpan.Parse(grace) : null,
                 clock: clock
-            ).Renew(this.duration, this.calendar);
+            ).Renew(this.renewal);
         }
 
         public void Renew(int count = 1)
         {
-            Enumerable.Repeat(() => this.expiry.Renew(this.duration, this.calendar), count);
+            Enumerable.Repeat(() => this.expiry.Renew(this.renewal), count);
         }
 
         public void Deactivate()
@@ -71,7 +68,7 @@
             if (refund)
             {
                 var remaining = this.expiry.Remaining;
-                var duration = PeriodPattern.NormalizingIso.Parse(this.duration).Value;
+                var duration = PeriodPattern.NormalizingIso.Parse(this.renewal.Duration).Value;
                 var expiryUtc = this.expiry.ExpiryUtc.ToInstant().InUtc().LocalDateTime;
                 var originUtc = expiryUtc - duration;
                 var total = expiryUtc - originUtc;
@@ -80,7 +77,8 @@
                 var ratio = 1.0 * remaining.Days / total.Days;
                 AnsiConsole.MarkupLine($"Refunding started...");
                 AnsiConsole.MarkupLine($"Remaining: [yellow]{this.expiry.Remaining}[/]");
-                AnsiConsole.MarkupLine($"Duration: [yellow]{this.duration}[/]");
+                AnsiConsole.MarkupLine($"Duration: [yellow]{this.renewal.Duration}[/]");
+                AnsiConsole.MarkupLine($"Calendar: [yellow]{this.renewal.Calendar}[/]");
                 AnsiConsole.MarkupLine($"Ratio: [yellow]{ratio * 100}%[/]");
                 AnsiConsole.MarkupLine($"Price: [yellow]{price} {currency}[/]");
                 AnsiConsole.MarkupLine($"Refund: [yellow]{price * ratio} {currency}[/]");
