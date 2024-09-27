@@ -219,7 +219,7 @@ namespace Perkify.Core.UnitTests
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(outgoing, balance.Outgoing);
 
-            balance.Spend(spend, overspending: true);
+            balance.Deduct(spend, overspending: true);
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(expected, balance.Outgoing);
         }
@@ -236,7 +236,7 @@ namespace Perkify.Core.UnitTests
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(outgoing, balance.Outgoing);
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => balance.Spend(spend, overspending));
+            Assert.Throws<ArgumentOutOfRangeException>(() => balance.Deduct(spend, overspending));
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(outgoing, balance.Outgoing);
         }
@@ -254,7 +254,7 @@ namespace Perkify.Core.UnitTests
             Assert.Equal(outgoing, balance.Outgoing);
             Assert.False(balance.IsEligible);
 
-            Assert.Throws<InvalidOperationException>(() => balance.Spend(spend, overspending));
+            Assert.Throws<InvalidOperationException>(() => balance.Deduct(spend, overspending));
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(outgoing, balance.Outgoing);
             Assert.Equal(expected, balance.GetOverSpendingAmount());
@@ -270,7 +270,7 @@ namespace Perkify.Core.UnitTests
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(outgoing, balance.Outgoing);
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => balance.Spend(spend, false));
+            Assert.Throws<ArgumentOutOfRangeException>(() => balance.Deduct(spend, false));
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(outgoing, balance.Outgoing);
         }
@@ -285,7 +285,7 @@ namespace Perkify.Core.UnitTests
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(outgoing, balance.Outgoing);
 
-            Assert.Throws<OverflowException>(() => balance.Spend(spend, overspending: true));
+            Assert.Throws<OverflowException>(() => balance.Deduct(spend, overspending: true));
             Assert.Equal(incoming, balance.Incoming);
             Assert.Equal(outgoing, balance.Outgoing);
         }

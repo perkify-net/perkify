@@ -1,7 +1,6 @@
 ﻿namespace Perkify.Core
 {
     using NodaTime;
-    using NodaTime.Text;
 
     /// <summary>Expiry time for eligibility.</summary>
     public class Expiry : INowUtc, IEligible, IExpiry<Expiry>
@@ -15,6 +14,7 @@
             clock ??= SystemClock.Instance;
             this.ExpiryUtc = expiryUtc ?? clock.GetCurrentInstant().ToDateTimeUtc();
             this.GracePeriod = grace ?? TimeSpan.Zero;
+            this.Renewal = null;
             this.clock = clock;
             this.suspensionUtc = null;
         }
@@ -37,6 +37,15 @@
             }
 
             this.suspensionUtc = suspensionUtc < this.GetDeadlineUtc() ? suspensionUtc : this.GetDeadlineUtc();
+            return this;
+        }
+
+        /// <summary>Specify the renewal period.</summary>
+        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
+        /// <returns>The expiry time with specified renewal period.</returns>
+        public Expiry WithRenewal(Renewal renewal)
+        {
+            this.Renewal = renewal;
             return this;
         }
 
@@ -111,7 +120,7 @@
         public DateTime ExpiryUtc { get; private set; }
 
         /// <summary>The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
-        public Renewal Renewal { get; private set; }
+        public Renewal? Renewal { get; private set; }
 
         /// <summary>
         /// Renew the expiry time in timeline arithmetic or calendrical arithmetic.
