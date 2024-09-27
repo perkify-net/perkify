@@ -47,7 +47,7 @@
         /// <param name="overspending">The flag to allow over-spending the balance</param>
         /// <returns>The balance after spending the amount.</returns></returns>
         /// <exception cref="ArgumentOutOfRangeException">Raised when the amount is less than 0 or overspending.</exception>
-        public T Spend(long delta, bool overspending = true);
+        public T Deduct(long delta, bool overspending = true);
 
         /// <summary>
         /// Adjust the balance with incoming and outgoing amounts.

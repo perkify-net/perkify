@@ -3,7 +3,7 @@
     /// <summary>The interface to maintain an expiry time with grace period for eligibility.</summary>
     public interface IExpiry<T> where T: IExpiry<T>, INowUtc
     {
-        #region IsExpired, Remaining & Overdue
+        #region Remaining & Overdue
 
         /// <summary>The Grace period as absolute time span.</summary>
         public TimeSpan GracePeriod { get; }
@@ -32,7 +32,7 @@
         public DateTime ExpiryUtc { get; }
 
         /// <summary>The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
-        public Renewal Renewal { get; }
+        public Renewal? Renewal { get; }
 
         /// <summary>Renew the expiry time in timeline arithmetic or calendrical arithmetic.</summary>
         /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
