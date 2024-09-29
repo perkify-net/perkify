@@ -1,0 +1,34 @@
+name: Publish NuGet Packages
+
+on:
+  release:
+    types: [published]
+
+jobs:
+
+  release:
+    runs-on: ubuntu-18.04
+    env:
+      DOTNET_NOLOGO: true
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+    - name: Pack
+      run: |
+        mkdir nuget
+        dotnet pack -c Release -o ../nuget
+    - name: Push to NuGet
+      run: |
+        echo "Pushing to NuGet from GitHub disabled until we've got signing sorted"
+        exit 1
+        # for file in nuget/*.nupkg; do dotnet nuget push -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} $file; done
