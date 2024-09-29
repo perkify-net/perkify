@@ -14,27 +14,17 @@
     {
         private readonly AutoRenewalMode mode;
 
-        private Expiry? expiry;
+        private Balance balance;
 
-        private Balance? balance;
+        private Expiry? expiry;
 
         private IEligible? prerequesite;
 
-        public Entitlement(AutoRenewalMode mode = AutoRenewalMode.Default)
-        {
-            this.mode = mode;
-        }
-
-        public Entitlement WithBalance(Balance balance)
+        public Entitlement(Balance balance, Expiry? expiry = null, AutoRenewalMode mode = AutoRenewalMode.Default)
         {
             this.balance = balance;
-            return this;
-        }
-
-        public Entitlement WithExpiry(Expiry expiry)
-        {
             this.expiry = expiry;
-            return this;
+            this.mode = mode;
         }
 
         public Entitlement WithPrerequesite(IEligible prerequesite)
@@ -60,32 +50,31 @@
 
         public long Threshold => this.balance?.Threshold ?? 0;
 
-        public Entitlement Topup(long delta)
+        public void Topup(long delta)
         {
-            this.balance?.Topup(delta);
-            if(this.mode.HasFlag(AutoRenewalMode.Topup))
+            this.balance.Topup(delta);
+            if (this.expiry != null && this.mode.HasFlag(AutoRenewalMode.Topup))
             {
-                this.expiry?.Renew();
+                this.expiry.Renew();
             }
-            return this;
         }
 
-        public Entitlement Deduct(long delta, bool overspending = true)
+        public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
-            this.balance?.Deduct(delta, overspending);
-            if(this.mode.HasFlag(AutoRenewalMode.Deduct))
+            var result = this.balance.Deduct(delta, policy);
+            if (this.expiry != null && this.mode.HasFlag(AutoRenewalMode.Deduct))
             {
-                this.expiry?.Renew();
+                this.expiry.Renew();
             }
-            return this;
+            return result;
         }
 
         public Entitlement Adjust(long? incoming, long? outgoing)
         {
-            this.balance?.Adjust(incoming, outgoing);
-            if (this.mode.HasFlag(AutoRenewalMode.Adjust))
+            this.balance.Adjust(incoming, outgoing);
+            if (this.expiry != null && this.mode.HasFlag(AutoRenewalMode.Adjust))
             {
-                this.expiry?.Renew();
+                this.expiry.Renew();
             }
             return this;
         }

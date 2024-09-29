@@ -51,44 +51,26 @@
 
         #region Implements IBalance<T> interface
 
-        /// <summary>
-        /// All incoming revenue to the balance.
-        /// </summary>
+        /// <summary>See also in IBalance<T> interface.</summary>
         public long Incoming { get; private set; }
 
-        /// <summary>
-        /// All outgoing expenses from the balance.
-        /// </summary>
+        /// <summary>See also in IBalance<T> interface.</summary>
         public long Outgoing { get; private set; }
 
-        /// <summary>
-        /// The threshold amount for the balance.
-        /// </summary>
+        /// <summary>See also in IBalance<T> interface.</summary>
         public long Threshold { get; private set; }
 
-        /// <summary>
-        /// Topup the balance with incoming revenue.
-        /// </summary>
-        /// <param name="delta"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public Balance Topup(long delta)
+        /// <summary>See also in IBalance<T> interface.</summary>
+        public void Topup(long delta)
         {
             if (delta < 0)
                 throw new ArgumentOutOfRangeException(nameof(delta), "Amount must be greater than 0");
 
             checked { Incoming += delta; }
-            return this;
         }
 
-        /// <summary>
-        /// Spend the balance with outgoing expenses.
-        /// </summary>
-        /// <param name="delta">The amount to spend from the balance.</param>
-        /// <param name="overspending">The flag to allow over-spending the balance</param>
-        /// <returns>The balance after spending the amount.</returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException">Raised when the amount is less than 0 or overspending.</exception>
-        public Balance Deduct(long delta, bool overspending = true)
+        /// <summary>See also in IBalance<T> interface.</summary>
+        public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
             if (delta < 0)
             {
@@ -100,23 +82,14 @@
                 throw new InvalidOperationException("Ineligible state.");
             }
 
-            if (!overspending && this.GetBalanceAmount() - delta < Threshold)
-            {
-                throw new ArgumentOutOfRangeException(nameof(delta), "The amount is over-spending.");
-            }
-
-            checked { Outgoing += delta; }
-            return this;
+            var maximum = this.GetMaxDeductibleAmount(policy);
+            var processed = delta;
+            var remaining = policy.Deduct(ref processed, maximum);
+            checked { Outgoing += processed; }
+            return remaining;
         }
 
-        /// <summary>
-        /// Adjust the balance with incoming and outgoing amounts.
-        /// </summary>
-        /// <param name="incoming">The incoming amount to adjust the balance.</param>
-        /// <param name="outgoing">The outgoing amount to adjust the balance.</param>
-        /// <returns>The adjusted balance with incoming and outgoing amounts.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The incoming amount must be null or greater than or equal to 0.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The outgoing amount must be null or greater than or equal to 0.</exception>
+        /// <summary>See also in IBalance<T> interface.</summary>
         public Balance Adjust(long? incoming, long? outgoing)
         {
             if (incoming.HasValue && incoming.Value < 0L)
