@@ -1,7 +1,6 @@
-namespace Perkify.Core.UnitTests
+namespace Perkify.Core.Tests
 {
     using System.Globalization;
-    using NodaTime;
     using NodaTime.Extensions;
     using NodaTime.Testing;
     using NodaTime.Text;
@@ -300,60 +299,6 @@ namespace Perkify.Core.UnitTests
         #endregion
 
         #region Renew
-
-        /*
-        [Theory]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "01:00:00", "2024-06-09T17:00:00Z")]
-        [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "01:00:00", "2024-06-09T17:00:00Z")]
-        [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "01:00:00", "2024-06-09T17:00:00Z")]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "01:00:00", "2024-06-09T17:00:00Z")]
-        [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "01:00:00", "2024-06-09T17:00:00Z")]
-        [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "01:00:00", "2024-06-09T17:00:00Z")]
-        [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "01:00:00", "2024-06-09T17:00:00Z")]
-        [InlineData("2024-06-09T19:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "01:00:00", "2024-06-09T17:00:00Z")]
-        public void TestExpiryRenew(string nowUtc, string expiryUtcString, string graceString, string renewString, string expectedString)
-        {
-            var clock = nowUtc != null ? new FakeClock(InstantPattern.General.Parse(nowUtc).Value) : null;
-            var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = graceString != null ? TimeSpan.Parse(graceString, CultureInfo.InvariantCulture) : (TimeSpan?)null;
-            var renew = TimeSpan.Parse(renewString, CultureInfo.InvariantCulture);
-            var expected = InstantPattern.General.Parse(expectedString).Value.ToDateTimeUtc();
-
-            var expiry = new Expiry(expiryUtc, grace, clock);
-            expiry.Renew(renew);
-            Assert.Equal(expected, expiry.ExpiryUtc);
-        }
-
-        [Theory]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "-01:00:00")]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "-01:00:00")]
-        public void TestExpiryRenewNegativeTimeSpan(string nowUtc, string expiryUtcString, string graceString, string renewString)
-        {
-            var clock = nowUtc != null ? new FakeClock(InstantPattern.General.Parse(nowUtc).Value) : null;
-            var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = graceString != null ? TimeSpan.Parse(graceString, CultureInfo.InvariantCulture) : (TimeSpan?)null;
-            var renew = TimeSpan.Parse(renewString, CultureInfo.InvariantCulture);
-
-            var expiry = new Expiry(expiryUtc, grace, clock);
-            Assert.Throws<ArgumentOutOfRangeException>(() => expiry.Renew(renew));
-        }
-
-        [Theory]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z", "01:00:00")]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T15:00:00Z", "01:00:00")]
-        public void TestExpiryRenewSuspended(string nowUtc, string expiryUtcString, string graceString, string suspensionUtcStribng, string renewString)
-        {
-            var clock = nowUtc != null ? new FakeClock(InstantPattern.General.Parse(nowUtc).Value) : null;
-            var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = graceString != null ? TimeSpan.Parse(graceString, CultureInfo.InvariantCulture) : (TimeSpan?)null;
-            var suspensionUtc = InstantPattern.General.Parse(suspensionUtcStribng).Value.ToDateTimeUtc();
-            var renew = TimeSpan.Parse(renewString, CultureInfo.InvariantCulture);
-
-            var expiry = new Expiry(expiryUtc, grace, clock).WithSuspensionUtc(suspensionUtc);
-            Assert.False(expiry.IsActive);
-            Assert.Throws<InvalidOperationException>(() => expiry.Renew(renew));
-        }
-        */
 
         [Theory]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "PT1H", false, "2024-06-09T17:00:00Z")]

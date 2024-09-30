@@ -1,4 +1,4 @@
-namespace Perkify.Core.UnitTests
+namespace Perkify.Core.Tests
 {
     using Perkify.Core;
 
