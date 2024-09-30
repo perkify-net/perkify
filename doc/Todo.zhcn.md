@@ -11,12 +11,13 @@
 
 - 项目配置
 	- [x] 创建Github组织
-	- [ ] 创建Github团队
+	- [x] 创建Github团队
 	- [x] 创建Github项目看板
+	- [x] 创建Github讨论区
 	- [x] 创建Github仓库
 	- [x] 创建Github标签
 	- [x] 创建Github里程碑
-	- [ ] 配置Github访问权限
+	- [x] 创建Github问题模板：Bug, Feature
 
 - 项目构建
 	- [x] 源码结构：定义项目结构
@@ -29,7 +30,8 @@
 	- [x] 单元测试（CI）
 	- [ ] 测试覆盖率（CI）
 	- [ ] 安全检查（CI）
-	- [ ] 持续发布（CD）
+	- [ ] 代码复杂度（CI）
+	- [ ] 发布Nuget包（CD）
 
 ## 架构设计、技术栈与基础设施
 
@@ -40,10 +42,10 @@
   - [ ] 时序图
 
 - 核心模块和接口设计
-  - [ ] Eligible
-  - [ ] Balance & Expiry
-  - [ ] Entitlement
-  - [ ] Chain
+  - [x] Eligible
+  - [x] Balance & Expiry
+  - [x] Entitlement
+  - [x] Chain
   - [ ] Taxonomy
 
 - 基础设施、技术栈与工具链
@@ -86,10 +88,10 @@
 		- [x] Expiry单元测试
 	- Tier 2
 	  - Entitlement
-		- [ ] Entitlement类
+		- [x] Entitlement类
 		- [ ] Entitlement单元测试
 	  - Chain
-		- [ ] Chain类
+		- [x] Chain类
 		- [ ] Chain单元测试
 	  - Taxonomy
 		- [ ] Taxonomy类
@@ -101,7 +103,7 @@
   - [x] 自述文件
   - [x] 版权说明
   - [x] 待办事项 
-  - [ ] 里程碑
+  - [x] 里程碑
   - [ ] 构建说明
   - [ ] 使用说明
   - [ ] SDK文档
