@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Core", "src\Perkify
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{2ECF4EF3-B291-4DAE-AD0F-5BA381A1E47F}"
 	ProjectSection(SolutionItems) = preProject
-		Roadmap.zhcn.md = Roadmap.zhcn.md
+		doc\Roadmap.zhcn.md = doc\Roadmap.zhcn.md
 		doc\Todo.zhcn.md = doc\Todo.zhcn.md
 	EndProjectSection
 EndProject
@@ -27,9 +27,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{FAD4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{077518B8-FB58-4267-8BAD-D18AD9D434E3}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\dotnet-nuget.yaml = .github\workflows\dotnet-nuget.yaml
-		.github\workflows\dotnet-cov.yml = .github\workflows\dotnet-cov.yml
 		.github\workflows\dotnet-ci.yml = .github\workflows\dotnet-ci.yml
+		.github\workflows\dotnet-cov.yml = .github\workflows\dotnet-cov.yml
+		.github\workflows\dotnet-nuget.yaml = .github\workflows\dotnet-nuget.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{23453827-B73D-4D85-9175-176AE82F391B}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
+		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
 	EndProjectSection
 EndProject
 Global
@@ -60,6 +66,7 @@ Global
 		{1C6DB32F-707D-47E2-A498-4FE3565AFC37} = {CF9F232C-2441-494C-B5B0-E71400629730}
 		{FAD46B57-4758-4C75-8D00-BAAB43035C82} = {61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}
 		{077518B8-FB58-4267-8BAD-D18AD9D434E3} = {FAD46B57-4758-4C75-8D00-BAAB43035C82}
+		{23453827-B73D-4D85-9175-176AE82F391B} = {FAD46B57-4758-4C75-8D00-BAAB43035C82}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DA52DDC-7CD5-4CA9-A3E9-FA468904E909}

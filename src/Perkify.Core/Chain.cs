@@ -2,16 +2,14 @@
 {
     public class Chain : IEligible, IBalance<Chain>
     {
-        private readonly IList<Entitlement> entitlements;
+        private readonly List<Entitlement> entitlements;
 
         private readonly Func<long, Entitlement> entitlementBuilder;
 
-        public Chain(IEnumerable<Entitlement>? entitlements = null, Func<long, Entitlement> entitlementBuilder = null)
+        public Chain(IEnumerable<Entitlement>? entitlements = null, Func<long, Entitlement>? entitlementBuilder = null)
         {
             entitlements ??= Enumerable.Empty<Entitlement>();
-            this.entitlements = entitlements
-                .OrderBy(entitlement => entitlement.ExpiryUtc)
-                .ToList();
+            this.entitlements = [.. entitlements.OrderBy(entitlement => entitlement.ExpiryUtc)];
 
             entitlementBuilder ??= (delta) => new Entitlement(new Balance(delta));
             this.entitlementBuilder = entitlementBuilder;
@@ -44,12 +42,12 @@
                 .OrderBy(entitlement => entitlement.ExpiryUtc)
                 .ToList();
 
-            if(entitlements.Count == 0)
+            if (entitlements.Count == 0)
             {
                 throw new InvalidOperationException("Ineligible state.");
             }
 
-            foreach(var entitlement in entitlements)
+            foreach (var entitlement in entitlements)
             {
                 var processed = delta;
                 delta = entitlement.Deduct(processed, policy);
