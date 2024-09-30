@@ -83,9 +83,7 @@
 
     public static class ExpiryExtensions
     {
-        /// <summary>
-        /// The deadline time in UTC.
-        /// </summary>
+        /// <summary>The deadline time in UTC.</summary>
         public static DateTime GetDeadlineUtc<T>(this T expiry) where T: IExpiry<T>, INowUtc
             => expiry.ExpiryUtc + expiry.GracePeriod;
 
