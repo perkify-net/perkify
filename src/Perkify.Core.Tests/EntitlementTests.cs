@@ -13,14 +13,14 @@ namespace Perkify.Core.Tests
         (
             [CombinatorialValues(0, 100)] long balanceAmount,
             [CombinatorialValues("2024-10-09T15:00:00Z")] string expiryUtcString,
-            [CombinatorialValues(null, "02:00:00")] string? gracePeriodString,
+            [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving,
             [CombinatorialValues("3:00:00", "00:00:00", "-3:00:00")] string? nowUtcIfHaving,
             [CombinatorialValues(AutoRenewalMode.None, AutoRenewalMode.Default, AutoRenewalMode.All)] AutoRenewalMode autorenewal,
             [CombinatorialValues(null, true, false)] bool? prerequisiteIfHaving
         )
         {
-            var gracePeriod = gracePeriodString is null ? (TimeSpan?)null : TimeSpan.Parse(gracePeriodString, CultureInfo.InvariantCulture);
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
+            var gracePeriod = gracePeriodIfHaving is null ? (TimeSpan?)null : TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture);
             var nowUtc = nowUtcIfHaving is null ? (DateTime?)null : expiryUtc.Add(TimeSpan.Parse(nowUtcIfHaving, CultureInfo.InvariantCulture));
             var clock = nowUtc is null ? null : new FakeClock(nowUtc.Value.ToInstant());
 

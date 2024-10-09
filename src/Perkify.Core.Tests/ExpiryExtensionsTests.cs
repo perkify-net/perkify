@@ -62,7 +62,7 @@
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "2024-06-09T15:00:00Z", false)]
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", true)]
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "2024-06-09T17:00:00Z", true)]
-        public void TestIsExpired(string nowUtcString, string expiryUtcString, string suspensionUtcString, bool expected)
+        public void TestIsExpired(string nowUtcString, string expiryUtcString, string? suspensionUtcString, bool expected)
         {
             var nowUtc = DateTime.Parse(nowUtcString, CultureInfo.InvariantCulture).ToUniversalTime();
             var expiryUtc = DateTime.Parse(expiryUtcString, CultureInfo.InvariantCulture).ToUniversalTime();
