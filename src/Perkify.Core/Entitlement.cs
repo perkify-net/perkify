@@ -7,30 +7,32 @@
         Topup = 0x0001,
         Deduct = 0x0002,
         Adjust = 0x0004,
-        Default = Topup | Deduct
+        Default = Topup | Deduct,
+        All = Topup | Deduct | Adjust
     }
 
     public class Entitlement : IEligible, IBalance<Entitlement>, INowUtc, IExpiry<Entitlement>
     {
-        private readonly AutoRenewalMode mode;
+        public AutoRenewalMode AutoRenewalMode { get; private set; }
 
         private Balance balance;
 
         private Expiry? expiry;
 
-        private IEligible? prerequesite;
+        public IEligible? Prerequesite { get; init; }
 
-        public Entitlement(Balance balance, Expiry? expiry = null, AutoRenewalMode mode = AutoRenewalMode.Default)
+        public Entitlement(Balance balance, Expiry expiry, AutoRenewalMode mode = AutoRenewalMode.Default)
         {
             this.balance = balance;
             this.expiry = expiry;
-            this.mode = mode;
+            this.AutoRenewalMode = mode;
         }
 
-        public Entitlement WithPrerequesite(IEligible prerequesite)
+        public Entitlement(Balance balance)
         {
-            this.prerequesite = prerequesite;
-            return this;
+            this.balance = balance;
+            this.expiry = null;
+            this.AutoRenewalMode = AutoRenewalMode.None;
         }
 
         #region Implements IEligible interface
@@ -38,7 +40,7 @@
         public bool IsEligible =>
             (this.balance?.IsEligible ?? true) 
             && (this.expiry?.IsEligible ?? true) 
-            && (this.prerequesite?.IsEligible ?? true);
+            && (this.Prerequesite?.IsEligible ?? true);
 
         #endregion
 
@@ -53,7 +55,7 @@
         public void Topup(long delta)
         {
             this.balance.Topup(delta);
-            if (this.expiry != null && this.mode.HasFlag(AutoRenewalMode.Topup))
+            if (this.expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Topup))
             {
                 this.expiry.Renew();
             }
@@ -62,7 +64,7 @@
         public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
             var result = this.balance.Deduct(delta, policy);
-            if (this.expiry != null && this.mode.HasFlag(AutoRenewalMode.Deduct))
+            if (this.expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Deduct))
             {
                 this.expiry.Renew();
             }
@@ -72,7 +74,7 @@
         public Entitlement Adjust(long? incoming, long? outgoing)
         {
             this.balance.Adjust(incoming, outgoing);
-            if (this.expiry != null && this.mode.HasFlag(AutoRenewalMode.Adjust))
+            if (this.expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
             {
                 this.expiry.Renew();
             }

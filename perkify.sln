@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{2ECF4EF3-B291-4DAE-AD0F-5BA381A1E47F}"
 	ProjectSection(SolutionItems) = preProject
 		doc\Roadmap.zhcn.md = doc\Roadmap.zhcn.md
+		doc\Test.zhcn.md = doc\Test.zhcn.md
 		doc\Todo.zhcn.md = doc\Todo.zhcn.md
 	EndProjectSection
 EndProject
