@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Perkify.Core\Perkify.Core.csproj" />
-    <ProjectReference Include="..\Perkify.Test.Sdk\Perkify.Test.Sdk.csproj" />
   </ItemGroup>
 
   <ItemGroup>
