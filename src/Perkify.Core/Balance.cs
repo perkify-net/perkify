@@ -1,4 +1,6 @@
-﻿namespace Perkify.Core
+﻿using System.Runtime.InteropServices;
+
+namespace Perkify.Core
 {
     /// <summary>
     /// The balance amount with threshold for eligibility.
@@ -25,9 +27,7 @@
         /// <returns></returns>
         public static Balance Debit() => new Balance(threshold: 0);
 
-        /// <summary>
-        /// TODO
-        /// </summary>
+        /// <summary>TODO</summary>
         /// <param name="threshold"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -36,6 +36,27 @@
             if (threshold >= 0)
                 throw new ArgumentOutOfRangeException(nameof(threshold), "Threshold amount must be less than 0");
             return new Balance(threshold);
+        }
+
+        /// <summary>TODO</summary>
+        /// <param name="incoming"></param>
+        /// <param name="outgoing"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public Balance WithBalance(long incoming, long outgoing)
+        {
+            if (incoming < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(incoming), "Amount must be zero or positive");
+            }
+            if (outgoing < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(outgoing), "Amount must be zero or positive");
+            }
+
+            this.Incoming = incoming;
+            this.Outgoing = outgoing;
+            return this;
         }
 
         #endregion
