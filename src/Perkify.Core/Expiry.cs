@@ -183,15 +183,9 @@
                 return this;
             }
 
-            var nowUtc = this.NowUtc;
-            var finalSuspensionUtc = suspensionUtc ??= nowUtc;
-            if (finalSuspensionUtc > nowUtc)
-            {
-                throw new ArgumentOutOfRangeException(nameof(suspensionUtc), "The suspension time must be earlier than current time.");
-            }
-
+            suspensionUtc ??= this.ExpiryUtc;
             var deadlineUtc = this.GetDeadlineUtc();
-            this.suspensionUtc = finalSuspensionUtc < deadlineUtc ? finalSuspensionUtc : deadlineUtc;
+            this.suspensionUtc = suspensionUtc < deadlineUtc ? suspensionUtc : deadlineUtc;
             return this;
         }
 

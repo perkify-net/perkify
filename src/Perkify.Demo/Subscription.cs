@@ -6,6 +6,7 @@
     using Spectre.Console;
 
     using Perkify.Core;
+    using System.Globalization;
 
     public class Subscription
     {
@@ -43,7 +44,7 @@
             this.expiry = new Expiry
             (
                 expiryUtc: null,
-                grace: grace != null ? TimeSpan.Parse(grace) : null,
+                grace: grace != null ? TimeSpan.Parse(grace, CultureInfo.InvariantCulture) : null,
                 clock: clock
             ).Renew(this.renewal);
         }

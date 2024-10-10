@@ -1,7 +1,6 @@
 ﻿namespace Perkify.Demo
 {
     using System.Text.RegularExpressions;
-
     using CommandLine;
     using NodaTime;
     using NodaTime.Extensions;
@@ -15,7 +14,7 @@
     {
         private Mode mode = Mode.Subscription;
 
-        private Subscription? subscription = null;
+        private Subscription? subscription;
 
         private readonly FakeClock clock = new FakeClock(DateTime.UtcNow.ToInstant());
 

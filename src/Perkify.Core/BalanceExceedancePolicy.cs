@@ -13,6 +13,7 @@
         Overdraft = 2,
     }
 
+    /// <summary>The extension methods for the balance exceedance policy.</summary>
     public static class BalanceExceedancePolicyExtensions
     {
         public static long Deduct(this BalanceExceedancePolicy policy, ref long delta, long maximum)

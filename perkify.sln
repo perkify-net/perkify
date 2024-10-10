@@ -10,7 +10,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{2ECF4EF3-B291-4DAE-AD0F-5BA381A1E47F}"
 	ProjectSection(SolutionItems) = preProject
 		doc\Roadmap.zhcn.md = doc\Roadmap.zhcn.md
-		doc\Test.zhcn.md = doc\Test.zhcn.md
 		doc\Todo.zhcn.md = doc\Todo.zhcn.md
 	EndProjectSection
 EndProject
@@ -18,8 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Demo", "src\Perkify
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Core.Tests", "src\Perkify.Core.Tests\Perkify.Core.Tests.csproj", "{1C6DB32F-707D-47E2-A498-4FE3565AFC37}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "es", "es", "{61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -41,6 +43,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 		.github\ISSUE_TEMPLATE\bug_report.md = .github\ISSUE_TEMPLATE\bug_report.md
 		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{9D29E051-6B56-4A23-846B-E04CA9C356F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +75,7 @@ Global
 		{FAD46B57-4758-4C75-8D00-BAAB43035C82} = {61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}
 		{077518B8-FB58-4267-8BAD-D18AD9D434E3} = {FAD46B57-4758-4C75-8D00-BAAB43035C82}
 		{23453827-B73D-4D85-9175-176AE82F391B} = {FAD46B57-4758-4C75-8D00-BAAB43035C82}
+		{9D29E051-6B56-4A23-846B-E04CA9C356F2} = {61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DA52DDC-7CD5-4CA9-A3E9-FA468904E909}

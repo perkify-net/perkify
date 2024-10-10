@@ -31,7 +31,7 @@
         /// <summary>Spend the balance with outgoing expenses.</summary>
         /// <param name="delta">The amount to spend from the balance.</param>
         /// <param name="policy">The overflow processing policy when the balance is exceeded.</param>
-        /// <returns>The balance after spending the amount.</returns></returns>
+        /// <returns>The balance after spending the amount.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Raised when the amount is less than 0 or overspending.</exception>
         /// <returns>The overflowed/overspending amount when the balance is exceeded.</returns>
         public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject);
@@ -47,7 +47,7 @@
 
     public static class BalanceExtensions
     {
-        /// <summary>The current balance amount based on incoming & outcoming amount.</summary>
+        /// <summary>The current balance amount based on incoming &amp; outcoming amount.</summary>
         public static long GetBalanceAmount<T>(this T balance) where T : IBalance<T>
             => balance.Incoming - balance.Outgoing;
 
