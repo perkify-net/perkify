@@ -1,5 +1,6 @@
 ﻿namespace Perkify.Core
 {
+    /// <summary>The entitlement chain for eligibility.</summary>
     public class Chain : IEligible, IBalance<Chain>
     {
         private readonly List<Entitlement> entitlements;

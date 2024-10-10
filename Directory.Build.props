@@ -1,0 +1,29 @@
+<Project>
+
+  <!-- Build Targets -->
+  <PropertyGroup Label="Targets">
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- C# Language and related feature flags -->
+  <PropertyGroup Label="Language">
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- QA Cops to find out the potential code defects -->
+  <PropertyGroup Label="Cops">
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- Others -->
+  <PropertyGroup Label="Others">
+    
+  </PropertyGroup>
+
+</Project>

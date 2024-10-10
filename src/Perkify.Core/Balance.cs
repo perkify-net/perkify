@@ -9,11 +9,8 @@ namespace Perkify.Core
     {
         #region Factory Methods
 
-        /// <summary>
-        /// Create a new balance with threshold.
-        /// </summary>
-        /// <param name="amount"></param>
-        /// <param name="threshold"></param>
+        /// <summary>Create a new balance with threshold.</summary>
+        /// <param name="threshold">The threshold amount for the balance.</param>
         public Balance(long threshold)
         {
             this.Incoming = 0;
@@ -21,9 +18,7 @@ namespace Perkify.Core
             this.Threshold = threshold;
         }
 
-        /// <summary>
-        /// TODO
-        /// </summary>
+        /// <summary>TODO</summary>
         /// <returns></returns>
         public static Balance Debit() => new Balance(threshold: 0);
 
@@ -72,16 +67,16 @@ namespace Perkify.Core
 
         #region Implements IBalance<T> interface
 
-        /// <summary>See also in IBalance<T> interface.</summary>
+        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
         public long Incoming { get; private set; }
 
-        /// <summary>See also in IBalance<T> interface.</summary>
+        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
         public long Outgoing { get; private set; }
 
-        /// <summary>See also in IBalance<T> interface.</summary>
+        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
         public long Threshold { get; private set; }
 
-        /// <summary>See also in IBalance<T> interface.</summary>
+        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
         public void Topup(long delta)
         {
             if (delta < 0)
@@ -90,7 +85,7 @@ namespace Perkify.Core
             checked { Incoming += delta; }
         }
 
-        /// <summary>See also in IBalance<T> interface.</summary>
+        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
         public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
             if (delta < 0)
@@ -110,7 +105,7 @@ namespace Perkify.Core
             return remaining;
         }
 
-        /// <summary>See also in IBalance<T> interface.</summary>
+        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
         public Balance Adjust(long? incoming, long? outgoing)
         {
             if (incoming.HasValue && incoming.Value < 0L)
