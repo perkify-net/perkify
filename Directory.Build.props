@@ -23,14 +23,15 @@
   </PropertyGroup>
 
   <!-- QA Cops to find out the potential code defects -->
-  <PropertyGroup Label="BuildCops">
+  <PropertyGroup Label="BuildCops" Condition="$(ProjectDir.StartsWith('$(SourceDir)')) And !$(MSBuildProjectName.EndsWith('.Tests'))">
+    <!-- Runtime/Core Project -->
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <NoWarn></NoWarn>
   </PropertyGroup>
-  <PropertyGroup Label="BuildCops" Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
-    <!-- Test Project -->
+  <PropertyGroup Label="BuildCops" Condition="$(ProjectDir.StartsWith('$(SourceDir)')) And $(MSBuildProjectName.EndsWith('.Tests'))">
+    <!-- Unit Test Project -->
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
@@ -45,19 +46,35 @@
   </PropertyGroup>
 
   <!-- Prebuilt Items (Test Projects Only) -->
-  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+  <ItemGroup Condition="$(ProjectDir.StartsWith('$(SourceDir)')) And $(MSBuildProjectName.EndsWith('.Tests'))">
     <!-- Test Infrastrcuture -->
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="coverlet.collector" />
-    <PackageReference Include="coverlet.msbuild" />
-    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="ReportGenerator" />
     <!-- Test Utility -->
     <PackageReference Include="xunit" />
     <PackageReference Include="Xunit.Combinatorial" />
     <PackageReference Include="Moq" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Bogus" />
     <PackageReference Include="NodaTime" />
     <PackageReference Include="NodaTime.Testing" />
+    
     <!-- Implicit Using -->
     <Using Include="Xunit" />
   </ItemGroup>

@@ -3,5 +3,5 @@
   <ItemGroup>
     <ProjectReference Include="$(SourceDir)/Perkify.Core/Perkify.Core.csproj" />
   </ItemGroup>
-  
+
 </Project>

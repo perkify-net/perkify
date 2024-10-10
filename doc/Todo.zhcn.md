@@ -13,12 +13,12 @@
 	- [x] 创建Github组织
 	- [x] 创建Github团队
 	- [x] 创建Github项目看板
-	- [x] 创建Github讨论区
-	- [ ] 创建Github百科网站
 	- [x] 创建Github仓库
 	- [x] 创建Github标签
 	- [x] 创建Github里程碑
 	- [x] 创建Github问题模板：Bug, Feature
+	- [x] 创建Github讨论区
+	- [ ] 创建Github知识库
 
 - 项目构建
 	- [x] 源码结构：定义项目结构
@@ -33,8 +33,8 @@
 	- [x] 代码风格检查（CI）
 	- [x] 文档风格检查（CI）
 	- [x] 单元测试（CI）
-	- [ ] 代码复杂度（CI）
 	- [ ] 测试覆盖率（CI）
+	- [ ] 代码复杂度（CI）
 
 - 项目发布
 	- [ ] 发布Nuget包（CD）
