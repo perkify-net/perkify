@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <AnalysisLevel>latest-minimal</AnalysisLevel>
-    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +15,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Perkify.Core\Perkify.Core.csproj" />
+    <ProjectReference Include="$(SourceDir)/Perkify.Core/Perkify.Core.csproj" />
   </ItemGroup>
 
 </Project>

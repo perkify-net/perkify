@@ -1,5 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup Label="Nuget">
+    <IsPackable>true</IsPackable>
+    <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
+    <AssemblyTitle>Perkify</AssemblyTitle>
+    <Description>Perkify is a minimalist kernel written in C#, designed for the abstraction and underlying implementation of core functionalities related to various types of coupons, prepaid cards, subscription and membership.</Description>
+    <PackageTags>perkify;subscription;credit;coupon;entitlement;balance;expiry;</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="NodaTime" />
     <PackageReference Include="NodaTime.Testing" />
