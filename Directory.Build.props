@@ -1,5 +1,14 @@
 <Project>
 
+  <!-- Home Directory of this Git repository (Root) and its derived directories -->
+  <PropertyGroup Label="Targets">
+    <HomePlatformSpecific>$([System.IO.Path]::GetDirectoryName('$(MSBuildThisFileDirectory)'))</HomePlatformSpecific>
+    <Home>$(HomePlatformSpecific.Replace('\', '/'))</Home>
+    <SourceDir>$(Home)/src</SourceDir>
+    <ToolsDir>$(Home)/tools</ToolsDir>
+    <ProjectDir>$(MSBuildProjectDirectory.Replace('\', '/'))</ProjectDir>
+  </PropertyGroup>
+
   <!-- Build Targets -->
   <PropertyGroup Label="Targets">
     <TargetFramework>net8.0</TargetFramework>
@@ -14,11 +23,65 @@
   </PropertyGroup>
 
   <!-- QA Cops to find out the potential code defects -->
-  <PropertyGroup Label="Cops">
+  <PropertyGroup Label="BuildCops">
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
-    <AnalysisLevel>latest-all</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <NoWarn></NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildCops" Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+    <!-- Test Project -->
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <NoWarn></NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Label="BuildCops" Condition="$(ProjectDir.StartsWith('$(ToolsDir)'))">
+    <!-- Tool Project -->
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-minimal</AnalysisLevel>
+    <NoWarn></NoWarn>
+  </PropertyGroup>
+
+  <!-- Prebuilt Items (Test Projects Only) -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+    <!-- Test Infrastrcuture -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="coverlet.msbuild" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <!-- Test Utility -->
+    <PackageReference Include="xunit" />
+    <PackageReference Include="Xunit.Combinatorial" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NodaTime" />
+    <PackageReference Include="NodaTime.Testing" />
+    <!-- Implicit Using -->
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Nuget Package Metadata & Assembly Info -->
+  <PropertyGroup Label="Nuget">
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <!-- Versioning -->
+    <Version>0.1.0</Version>
+    <VersionPrefix></VersionPrefix>
+    <VersionSuffix>alpha</VersionSuffix>
+    <!-- Project Information -->
+    <Authors>@nemossi</Authors>
+    <Company></Company>
+    <PackageProjectUrl>https://github.com/perkify-net/perkify</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/perkify-net/perkify</RepositoryUrl>
+    <!-- Source Likning & Documentation -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- License Information -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <!-- Others -->

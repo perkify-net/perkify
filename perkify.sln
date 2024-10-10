@@ -13,11 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{2ECF4EF3-B29
 		doc\Todo.zhcn.md = doc\Todo.zhcn.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Demo", "src\Perkify.Demo\Perkify.Demo.csproj", "{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Core.Tests", "src\Perkify.Core.Tests\Perkify.Core.Tests.csproj", "{1C6DB32F-707D-47E2-A498-4FE3565AFC37}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "es", "es", "{61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".es", ".es", "{61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
@@ -28,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "es", "es", "{61FF7EC3-2449-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{FAD46B57-4758-4C75-8D00-BAAB43035C82}"
 	ProjectSection(SolutionItems) = preProject
+		.github\CODEOWNERS = .github\CODEOWNERS
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 	EndProjectSection
 EndProject
@@ -44,7 +43,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{9D29E051-6B56-4A23-846B-E04CA9C356F2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{8B93DCF6-465A-48AC-B82A-ECC4CF99400E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Playground", "tools\Perkify.Playground\Perkify.Playground.csproj", "{39EB5154-9FFD-451B-B2E8-E8DCE20CA9E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,26 +57,25 @@ Global
 		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1C6DB32F-707D-47E2-A498-4FE3565AFC37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1C6DB32F-707D-47E2-A498-4FE3565AFC37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C6DB32F-707D-47E2-A498-4FE3565AFC37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C6DB32F-707D-47E2-A498-4FE3565AFC37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39EB5154-9FFD-451B-B2E8-E8DCE20CA9E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39EB5154-9FFD-451B-B2E8-E8DCE20CA9E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39EB5154-9FFD-451B-B2E8-E8DCE20CA9E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39EB5154-9FFD-451B-B2E8-E8DCE20CA9E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ED7FB647-DEAD-4404-BB2A-EB479E0EFA03} = {CF9F232C-2441-494C-B5B0-E71400629730}
-		{C5AA059E-64DF-48A5-8180-C9B1AE34BA7B} = {CF9F232C-2441-494C-B5B0-E71400629730}
 		{1C6DB32F-707D-47E2-A498-4FE3565AFC37} = {CF9F232C-2441-494C-B5B0-E71400629730}
 		{FAD46B57-4758-4C75-8D00-BAAB43035C82} = {61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}
 		{077518B8-FB58-4267-8BAD-D18AD9D434E3} = {FAD46B57-4758-4C75-8D00-BAAB43035C82}
 		{23453827-B73D-4D85-9175-176AE82F391B} = {FAD46B57-4758-4C75-8D00-BAAB43035C82}
-		{9D29E051-6B56-4A23-846B-E04CA9C356F2} = {61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}
+		{39EB5154-9FFD-451B-B2E8-E8DCE20CA9E2} = {8B93DCF6-465A-48AC-B82A-ECC4CF99400E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DA52DDC-7CD5-4CA9-A3E9-FA468904E909}

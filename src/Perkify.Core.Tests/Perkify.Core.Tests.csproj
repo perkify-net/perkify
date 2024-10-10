@@ -1,32 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-    <AnalysisLevel>latest-recommended</AnalysisLevel>
-    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="NodaTime" />
-    <PackageReference Include="NodaTime.Testing" />
+    <ProjectReference Include="$(SourceDir)/Perkify.Core/Perkify.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="coverlet.collector" />
-    <PackageReference Include="coverlet.msbuild" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="Xunit.Combinatorial" />
-    <PackageReference Include="xunit.runner.visualstudio" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Perkify.Core\Perkify.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="Xunit" />
-  </ItemGroup>
-
+  
 </Project>
