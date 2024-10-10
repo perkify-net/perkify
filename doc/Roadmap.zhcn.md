@@ -9,10 +9,10 @@
 | 里程碑 | 起始日期 | 结束日期 | 历时 | 核心目标 | 主要发布 |
 | :-- | :-- | :-- | :-- | :-- | :-- |
 | H  | 2024-09-29 | 2024-10-19 | 3周 | Balance, Expiry, Entitlement, Chain | Perkify.Core v0.1 |
-| He | 2024-10-20 | 2024-11-09 | 3周 | Stablization, Perf & Doc       	   | Perkify.Core v0.2 |
+| He | 2024-10-20 | 2024-11-09 | 3周 | Stablization, Benckmark & Doc    	   | Perkify.Core v0.2 |
 | Li | 2024-11-10 | 2024-11-23 | 2周 | Taxonomy, Journals                  | Perkify.Core v0.3 |
 | Be | 2024-11-24 | 2024-12-07 | 2周 | Stablization, Thread-safe           | Perkify.Core v0.4 |
-| B  | 2024-12-08 | 2024-12-31 | 3周 | Doc/Example, Nuget				   | Perkify.Core v1.0 |
+| B  | 2024-12-08 | 2024-12-31 | 3周 | Doc/Playground, Nuget				   | Perkify.Core v1.0 |
 
 ## 2025Q1
 
