@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Perkify.Core.Tests
 {
     public class BalanceTests
@@ -107,86 +109,48 @@ namespace Perkify.Core.Tests
 
         #endregion
 
-        #region Adjust & Clear Balance Tests
+        #region Adjust & Clear Balance
 
-        [Theory]
-        [InlineData(0, 100, 100)]
-        [InlineData(0, 100, 50)]
-        [InlineData(0, 50, 100)]
-        [InlineData(-10, 100, 100)]
-        [InlineData(-10, 100, 50)]
-        [InlineData(-10, 50, 100)]
-        public void TestAdjustBalance(long threshold, long incoming, long outgoing)
+        [Theory, CombinatorialData]
+        public void TestAdjustBalance
+        (
+            [CombinatorialValues(0L, -10L)] long threshold,
+            [CombinatorialValues(0L, 100L, -100L)] long? amount,
+            [CombinatorialValues(true, false)] bool isIncomingAdjusted,
+            [CombinatorialValues(true, false)] bool isOutgoingAdjusted
+        )
         {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
+            var balance = new Balance(threshold).WithBalance(1000L, 500L);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(1000L);
+            balance.Outgoing.Should().Be(500L);
+
+            var dic = isIncomingAdjusted ? amount : null;
+            var dog = isOutgoingAdjusted ? amount : null;
+            balance.Adjust(incoming:dic, outgoing:dog);
+
+            var incoming = isIncomingAdjusted ? 1000L + dic : 1000L;
+            var outgoing = isOutgoingAdjusted ? 500L + dog : 500L;
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
         }
 
-        [Theory]
-        [InlineData(0, 100)]
-        [InlineData(0, 50)]
-        [InlineData(0, 0)]
-        [InlineData(-10, 100)]
-        [InlineData(-10, 50)]
-        [InlineData(-10, 0)]
-        public void TestAdjustBalanceIncomingOnly(long threshold, long incoming)
+        [Theory, CombinatorialData]
+        public void TestClearBalance
+        (
+            [CombinatorialValues(0, -10)] long threshold,
+            [CombinatorialValues(0, 50, 100)] long incoming,
+            [CombinatorialValues(0, 50, 100)] long outgoing
+        )
         {
-            var balance = new Balance(threshold).Adjust(100, 50);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(100, balance.Incoming);
-            Assert.Equal(50, balance.Outgoing);
-            balance.Adjust(incoming, null);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(50, balance.Outgoing);
-        }
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
 
-        [Theory]
-        [InlineData(0, 100)]
-        [InlineData(0, 50)]
-        [InlineData(0, 0)]
-        [InlineData(-10, 100)]
-        [InlineData(-10, 50)]
-        [InlineData(-10, 0)]
-        public void TestAdjustBalanceOutgoingOnly(long threshold, long outgoing)
-        {
-            var balance = new Balance(threshold).Adjust(100, 50);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(100, balance.Incoming);
-            Assert.Equal(50, balance.Outgoing);
-            balance.Adjust(null, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(100, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
-        }
-
-        [Theory]
-        [InlineData(0, -100, -100)]
-        [InlineData(0, -100, 100)]
-        [InlineData(0, 100, -100)]
-        [InlineData(-10, -100, -100)]
-        [InlineData(-10, -100, 100)]
-        [InlineData(-10, 100, -100)]
-        public void TestAdjustBalanceAmountOutofRange(long threshold, long incoming, long outgoing)
-        {
-            var balance = new Balance(threshold);
-            Assert.Throws<ArgumentOutOfRangeException>(() => balance.Adjust(incoming, outgoing));
-        }
-
-        [Theory]
-        [InlineData(0, 100, 100)]
-        [InlineData(0, 100, 50)]
-        [InlineData(0, 50, 100)]
-        [InlineData(-10, 100, 100)]
-        [InlineData(-10, 100, 50)]
-        [InlineData(-10, 50, 100)]
-        public void TestClearBalance(long threshold, long incoming, long outgoing)
-        {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing).Clear();
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(0L, balance.Incoming);
-            Assert.Equal(0L, balance.Outgoing);
+            balance.Clear();
+            balance.Incoming.Should().Be(0);
+            balance.Outgoing.Should().Be(0);
         }
 
         #endregion
