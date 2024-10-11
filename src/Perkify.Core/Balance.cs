@@ -4,18 +4,16 @@
 
 namespace Perkify.Core
 {
-    /// <summary>The balance amount with threshold for eligibility.</summary>
-    public class Balance : IEligible, IBalance<Balance>
+    /// <summary>
+    /// The balance amount with threshold for eligibility.</summary>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="Balance"/> class.Create a new balance with threshold.</remarks>
+    /// <param name="threshold">The threshold amount for the balance.</param>
+    public partial class Balance(long threshold)
+        : IEligible
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Balance"/> class.Create a new balance with threshold.</summary>
-        /// <param name="threshold">The threshold amount for the balance.</param>
-        public Balance(long threshold)
-        {
-            this.Incoming = 0;
-            this.Outgoing = 0;
-            this.Threshold = threshold;
-        }
+        /// <inheritdoc/>
+        public bool IsEligible => this.GetBalanceAmount() >= this.Threshold;
 
         /// <summary>
         /// Creates a new balance with a threshold of 0.
@@ -62,81 +60,5 @@ namespace Perkify.Core
             this.Outgoing = outgoing;
             return this;
         }
-
-        #region Implements IEligible interface
-
-        /// <inheritdoc/>
-        public bool IsEligible => this.GetBalanceAmount() >= this.Threshold;
-
-        #endregion
-
-        #region Implements IBalance<T> interface
-
-        /// <inheritdoc/>
-        public long Incoming { get; private set; }
-
-        /// <inheritdoc/>
-        public long Outgoing { get; private set; }
-
-        /// <inheritdoc/>
-        public long Threshold { get; private set; }
-
-        /// <inheritdoc/>
-        public void Topup(long delta)
-        {
-            if (delta < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(delta), "Amount must be greater than 0");
-            }
-
-            checked
-            {
-                this.Incoming += delta;
-            }
-        }
-
-        /// <inheritdoc/>
-        public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
-        {
-            if (delta < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(delta), "The Amount must be greater than 0.");
-            }
-
-            if (!this.IsEligible)
-            {
-                throw new InvalidOperationException("Ineligible state.");
-            }
-
-            var maximum = this.GetMaxDeductibleAmount(policy);
-            var processed = delta;
-            var remaining = policy.Deduct(ref processed, maximum);
-            checked
-            {
-                this.Outgoing += processed;
-            }
-
-            return remaining;
-        }
-
-        /// <inheritdoc/>
-        public Balance Adjust(long? incoming, long? outgoing)
-        {
-            if (incoming.HasValue && incoming.Value < 0L)
-            {
-                throw new ArgumentOutOfRangeException(nameof(incoming), "The incoming/outgoing amount must be null or greater than or equal to 0");
-            }
-
-            if (outgoing.HasValue && outgoing.Value < 0L)
-            {
-                throw new ArgumentOutOfRangeException(nameof(outgoing), "The incoming/outgoing amount must be null or greater than or equal to 0");
-            }
-
-            this.Incoming = incoming ?? this.Incoming;
-            this.Outgoing = outgoing ?? this.Outgoing;
-            return this;
-        }
-
-        #endregion
     }
 }

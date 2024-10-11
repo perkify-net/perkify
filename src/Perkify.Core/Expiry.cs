@@ -6,8 +6,10 @@ namespace Perkify.Core
 {
     using NodaTime;
 
-    /// <summary>Expiry time for eligibility.</summary>
-    public class Expiry : INowUtc, IEligible, IExpiry<Expiry>
+    /// <summary>
+    /// Expiry time for eligibility.
+    /// </summary>
+    public partial class Expiry : IEligible
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Expiry"/> class.Create the expiry time for eligibility.</summary>
@@ -23,6 +25,9 @@ namespace Perkify.Core
             this.clock = clock;
             this.suspensionUtc = null;
         }
+
+        /// <inheritdoc/>
+        public bool IsEligible => !this.suspensionUtc.HasValue && this.NowUtc < this.GetDeadlineUtc();
 
         /// <summary>Specify the suspension time.</summary>
         /// <param name="suspensionUtc">The suspension time in UTC.</param>
@@ -53,145 +58,5 @@ namespace Perkify.Core
             this.Renewal = renewal;
             return this;
         }
-
-        #region Implements INowUtc interface
-
-        private readonly IClock clock;
-
-        /// <inheritdoc/>
-        public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
-
-        #endregion
-
-        #region Implements IEligible interface
-
-        /// <inheritdoc/>
-        public bool IsEligible => !this.suspensionUtc.HasValue && this.NowUtc < this.GetDeadlineUtc();
-
-        #endregion
-
-        #region Implements IExpiry<T> interface
-
-        #region IsExpired, Remaining & Overdue
-
-        /// <inheritdoc/>
-        public TimeSpan GracePeriod { get; private set; }
-
-        /// <inheritdoc/>
-        public TimeSpan Remaining
-        {
-            get
-            {
-                if (this.suspensionUtc.HasValue)
-                {
-                    return this.ExpiryUtc - this.suspensionUtc.Value;
-                }
-                else
-                {
-                    var nowUtc = this.NowUtc;
-                    return nowUtc <= this.GetDeadlineUtc() ? this.ExpiryUtc - nowUtc : this.GracePeriod.Negate();
-                }
-            }
-        }
-
-        /// <inheritdoc/>
-        public TimeSpan Overdue => this.suspensionUtc.HasValue
-            ? this.suspensionUtc.Value > this.ExpiryUtc ? this.suspensionUtc.Value - this.ExpiryUtc : TimeSpan.Zero
-            : this.NowUtc switch
-            {
-                var nowUtc when nowUtc <= this.ExpiryUtc => TimeSpan.Zero,
-                var nowUtc when nowUtc < this.GetDeadlineUtc() => nowUtc - this.ExpiryUtc,
-                var _ => this.GracePeriod
-            };
-
-        #endregion
-
-        #region Renew
-
-        /// <inheritdoc/>
-        public DateTime ExpiryUtc { get; private set; }
-
-        /// <inheritdoc/>
-        public Renewal? Renewal { get; private set; }
-
-        /// <inheritdoc/>
-        public Expiry Renew(Renewal? renewal = null)
-        {
-            renewal ??= this.Renewal;
-            if (renewal == null)
-            {
-                throw new ArgumentNullException(nameof(renewal), "Renewal period is required.");
-            }
-
-            if (!this.IsActive)
-            {
-                throw new InvalidOperationException("Suspended state.");
-            }
-
-            var previousExpiryUtc = this.ExpiryUtc;
-            var nextExpiryUtc = renewal.Renew(previousExpiryUtc);
-            if (nextExpiryUtc <= previousExpiryUtc)
-            {
-                throw new InvalidOperationException("Negative ISO8601 duration.");
-            }
-
-            this.ExpiryUtc = nextExpiryUtc;
-            this.Renewal = renewal;
-            return this;
-        }
-
-        #endregion
-
-        #region Deactivate & Activate
-
-        private DateTime? suspensionUtc;
-
-        /// <inheritdoc/>
-        public DateTime? SuspensionUtc => this.suspensionUtc ?? (this.IsEligible ? null : this.GetDeadlineUtc());
-
-        /// <inheritdoc/>
-        public bool IsActive => !this.suspensionUtc.HasValue;
-
-        /// <inheritdoc/>
-        public Expiry Deactivate(DateTime? suspensionUtc = null)
-        {
-            // Keep idempotent if resubmitting suspending requests.
-            if (this.suspensionUtc.HasValue)
-            {
-                return this;
-            }
-
-            suspensionUtc ??= this.ExpiryUtc;
-            var deadlineUtc = this.GetDeadlineUtc();
-            this.suspensionUtc = suspensionUtc < deadlineUtc ? suspensionUtc : deadlineUtc;
-            return this;
-        }
-
-        /// <inheritdoc/>
-        public Expiry Activate(DateTime? resumptionUtc = null, bool extended = false)
-        {
-            if (!this.suspensionUtc.HasValue)
-            {
-                return this;
-            }
-
-            var finalResumptionUtc = resumptionUtc ??= this.NowUtc;
-            if (finalResumptionUtc < this.suspensionUtc.Value)
-            {
-                throw new ArgumentOutOfRangeException(nameof(resumptionUtc), "Resume time must be greater than suspend time.");
-            }
-
-            if (extended)
-            {
-                this.ExpiryUtc = finalResumptionUtc + this.Remaining;
-            }
-
-            this.suspensionUtc = null;
-            return this;
-        }
-
-        #endregion
-
-        #endregion
     }
 }
