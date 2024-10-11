@@ -10,11 +10,7 @@ namespace Perkify.Core
     public class Delegation(Func<bool> fn)
         : IEligible
     {
-        #region Implement IEligible interface
-
-        /// <summary>Gets a value indicating whether see also in IEligible interface.</summary>
+        /// <inheritdoc/>
         public bool IsEligible => fn!();
-
-        #endregion
     }
 }

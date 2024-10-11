@@ -7,8 +7,6 @@ namespace Perkify.Core
     /// <summary>The balance amount with threshold for eligibility.</summary>
     public class Balance : IEligible, IBalance<Balance>
     {
-        #region Factory Methods
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Balance"/> class.Create a new balance with threshold.</summary>
         /// <param name="threshold">The threshold amount for the balance.</param>
@@ -25,10 +23,12 @@ namespace Perkify.Core
         /// <returns>A new instance of the <see cref="Balance"/> class.</returns>
         public static Balance Debit() => new (threshold: 0);
 
-        /// <summary>TODO.</summary>
+        /// <summary>
+        /// Creates a new balance with a specified threshold.
+        /// </summary>
         /// <param name="threshold">The threshold amount for the balance.</param>
+        /// <returns>A new instance of the <see cref="Balance"/> class.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the threshold amount is greater than or equal to 0.</exception>
-        /// <returns></returns>
         public static Balance Credit(long threshold)
         {
             if (threshold >= 0)
@@ -37,8 +37,7 @@ namespace Perkify.Core
             }
 
             return new Balance(threshold);
-        }
-
+        }
         /// <summary>
         /// Sets the incoming and outgoing amounts for the balance.
         /// </summary>
@@ -64,30 +63,25 @@ namespace Perkify.Core
             return this;
         }
 
-        #endregion
-
         #region Implements IEligible interface
 
-        /// <summary>
-        /// Gets a value indicating whether see also in IEligible interface.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsEligible => this.GetBalanceAmount() >= this.Threshold;
 
         #endregion
 
         #region Implements IBalance<T> interface
 
-        /// <summary>Gets see also in `IBalance&lt;T&gt;` interface.</summary>
+        /// <inheritdoc/>
         public long Incoming { get; private set; }
 
-        /// <summary>Gets see also in `IBalance&lt;T&gt;` interface.</summary>
+        /// <inheritdoc/>
         public long Outgoing { get; private set; }
 
-        /// <summary>Gets see also in `IBalance&lt;T&gt;` interface.</summary>
+        /// <inheritdoc/>
         public long Threshold { get; private set; }
 
-        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
-        /// <param name="delta">The amount to be added to the balance.</param>
+        /// <inheritdoc/>
         public void Topup(long delta)
         {
             if (delta < 0)
@@ -101,12 +95,7 @@ namespace Perkify.Core
             }
         }
 
-        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
-        /// <param name="delta">The amount to be deducted.</param>
-        /// <param name="policy">The policy to apply if the balance exceeds the threshold.</param>
-        /// <returns>The remaining amount after deduction.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when the delta is less than 0.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the balance is ineligible for deduction.</exception>
+        /// <inheritdoc/>
         public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
             if (delta < 0)
@@ -130,13 +119,7 @@ namespace Perkify.Core
             return remaining;
         }
 
-        /// <summary>
-        /// Adjusts the balance with the specified incoming and outgoing amounts.
-        /// </summary>
-        /// <param name="incoming">The incoming amount to set. Must be null or greater than or equal to 0.</param>
-        /// <param name="outgoing">The outgoing amount to set. Must be null or greater than or equal to 0.</param>
-        /// <returns>The adjusted balance.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when the incoming or outgoing amount is less than 0.</exception>
+        /// <inheritdoc/>
         public Balance Adjust(long? incoming, long? outgoing)
         {
             if (incoming.HasValue && incoming.Value < 0L)

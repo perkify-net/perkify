@@ -4,12 +4,20 @@
 
 namespace Perkify.Core
 {
+    /// <summary>
+    /// Represents an entitlement with balance and expiry management.
+    /// </summary>
     public class Entitlement : IEligible, IBalance<Entitlement>, INowUtc, IExpiry<Entitlement>
     {
         private readonly Balance balance;
-
         private readonly Expiry? expiry;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Entitlement"/> class with balance, expiry, and auto-renewal mode.
+        /// </summary>
+        /// <param name="balance">The balance associated with the entitlement.</param>
+        /// <param name="expiry">The expiry associated with the entitlement.</param>
+        /// <param name="mode">The auto-renewal mode.</param>
         public Entitlement(Balance balance, Expiry expiry, AutoRenewalMode mode = AutoRenewalMode.Default)
         {
             this.balance = balance;
@@ -17,6 +25,10 @@ namespace Perkify.Core
             this.AutoRenewalMode = mode;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Entitlement"/> class with balance and default auto-renewal mode.
+        /// </summary>
+        /// <param name="balance">The balance associated with the entitlement.</param>
         public Entitlement(Balance balance)
         {
             this.balance = balance;
@@ -24,12 +36,19 @@ namespace Perkify.Core
             this.AutoRenewalMode = AutoRenewalMode.None;
         }
 
+        /// <summary>
+        /// Gets the auto-renewal mode.
+        /// </summary>
         public AutoRenewalMode AutoRenewalMode { get; private set; }
 
+        /// <summary>
+        /// Gets the prerequisite eligibility.
+        /// </summary>
         public IEligible? Prerequesite { get; init; }
 
         #region Implements IEligible interface
 
+        /// <inheritdoc/>
         public bool IsEligible =>
             (this.balance?.IsEligible ?? true)
             && (this.expiry?.IsEligible ?? true)
@@ -39,12 +58,16 @@ namespace Perkify.Core
 
         #region Implements IBalance<T> interface
 
+        /// <inheritdoc/>
         public long Incoming => this.balance?.Incoming ?? 0;
 
+        /// <inheritdoc/>
         public long Outgoing => this.balance?.Outgoing ?? 0;
 
+        /// <inheritdoc/>
         public long Threshold => this.balance?.Threshold ?? 0;
 
+        /// <inheritdoc/>
         public void Topup(long delta)
         {
             this.balance.Topup(delta);
@@ -54,6 +77,7 @@ namespace Perkify.Core
             }
         }
 
+        /// <inheritdoc/>
         public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
             var result = this.balance.Deduct(delta, policy);
@@ -65,6 +89,7 @@ namespace Perkify.Core
             return result;
         }
 
+        /// <inheritdoc/>
         public Entitlement Adjust(long? incoming, long? outgoing)
         {
             this.balance.Adjust(incoming, outgoing);
@@ -80,6 +105,7 @@ namespace Perkify.Core
 
         #region Implements INowUtc interface
 
+        /// <inheritdoc/>
         public DateTime NowUtc => this.expiry?.NowUtc ?? DateTime.UtcNow;
 
         #endregion
@@ -88,38 +114,26 @@ namespace Perkify.Core
 
         #region Remaining & Overdue
 
-        /// <summary>Gets the Grace period as absolute time span.</summary>
+        /// <inheritdoc/>
         public TimeSpan GracePeriod => this.expiry?.GracePeriod ?? TimeSpan.Zero;
 
-        /// <summary>
-        /// Gets the remaining portion.
-        /// - If suspended, the remaining portion is the time between suspend time and expiry time.
-        /// - If eligible, the remaining portion is the current time between now and expiry time.
-        /// - If ineligible (after grace period), the remaining portion is negative grace period.
-        /// </summary>
+        /// <inheritdoc/>
         public TimeSpan Remaining => this.expiry?.Remaining ?? TimeSpan.MaxValue;
 
-        /// <summary>
-        /// Gets the overdue portion.
-        /// - Suspended: The overdue portion is the time between suspend time and expiry time. Zero if suspend time is earlier than expiry time.
-        /// - Eligible: The overdue portion is the time between expiry time and now. Zero if now is earlier than expiry time.
-        /// - Ineligible (after grace period): The overdue portion is the grace period.
-        /// </summary>
+        /// <inheritdoc/>
         public TimeSpan Overdue => this.expiry?.Overdue ?? TimeSpan.Zero;
 
         #endregion
 
         #region Renew
 
-        /// <summary>Gets the expiry time in UTC.</summary>
+        /// <inheritdoc/>
         public DateTime ExpiryUtc => this.expiry?.ExpiryUtc ?? DateTime.MaxValue;
 
-        /// <summary>Gets the renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
+        /// <inheritdoc/>
         public Renewal? Renewal => this.expiry?.Renewal;
 
-        /// <summary>Renew the expiry time in timeline arithmetic or calendrical arithmetic.</summary>
-        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
-        /// <returns>The expiry time after renewal.</returns>
+        /// <inheritdoc/>
         public Entitlement Renew(Renewal? renewal)
         {
             this.expiry?.Renew(renewal);
@@ -130,36 +144,20 @@ namespace Perkify.Core
 
         #region Deactivate & Activate
 
-        /// <summary>
-        /// Gets the suspend time in UTC.
-        /// - Explicit suspension time (smaller or equals to deadline time) if any suspension is applied.
-        /// - Implicit suspension time (equals to deadline time) when the expiry time is ineligible.
-        /// - Null when the expiry time is eligible (and no suspension is applied).
-        /// </summary>
+        /// <inheritdoc/>
         public DateTime? SuspensionUtc => this.expiry?.SuspensionUtc;
 
-        /// <summary>
-        /// Gets a value indicating whether boolean flag to identify if the expiry time is active.
-        /// - True if the expiry time is deactivated (suspended).
-        /// - False if the expiry time is activated (not suspended).
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsActive => this.expiry?.IsActive ?? true;
 
-        /// <summary>Deactivate the expiry time.</summary>
-        /// <param name="suspensionUtc">The suspension time in UTC.</param>
-        /// <returns>The expiry time after suspension.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier than current time.</exception>
+        /// <inheritdoc/>
         public Entitlement Deactivate(DateTime? suspensionUtc = null)
         {
             this.expiry?.Deactivate(suspensionUtc);
             return this;
         }
 
-        /// <summary>Activate the expiry time.</summary>
-        /// <param name="resumptionUtc">The resumption time in UTC.</param>
-        /// <param name="extended">Boolean flag to extend the expiry time after resumption.</param>
-        /// <returns>The expiry time after resumption.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Resume time must be greater than suspend time.</exception>
+        /// <inheritdoc/>
         public Entitlement Activate(DateTime? resumptionUtc = null, bool extended = false)
         {
             this.expiry?.Activate(resumptionUtc, extended);

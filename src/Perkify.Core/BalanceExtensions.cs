@@ -4,6 +4,9 @@
 
 namespace Perkify.Core
 {
+    /// <summary>
+    /// Provides extension methods for balance operations.
+    /// </summary>
     public static class BalanceExtensions
     {
         /// <summary>
