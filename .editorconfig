@@ -1,0 +1,11 @@
+# .editorconfig file to define coding style for source files
+# See in https://editorConfig.org
+root = true
+
+# Define file header for all C# files
+[*.cs]
+file_header_template = """
+// <copyright file="{FileName}" company="{Company}">
+// Copyright (c) {Company}. All rights reserved.
+// </copyright>
+"""

@@ -1,11 +1,16 @@
-﻿namespace Perkify.Core
+﻿// <copyright file="Expiry.cs" company="Microsoft">
+// Copyright (c) Microsoft. All rights reserved.
+// </copyright>
+
+namespace Perkify.Core
 {
     using NodaTime;
 
     /// <summary>Expiry time for eligibility.</summary>
     public class Expiry : INowUtc, IEligible, IExpiry<Expiry>
     {
-        /// <summary>Create the expiry time for eligibility.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Expiry"/> class.Create the expiry time for eligibility.</summary>
         /// <param name="expiryUtc">Expiry time in UTC.</param>
         /// <param name="grace">Grace period.</param>
         /// <param name="clock">System clock abstraction for testability.</param>
@@ -26,14 +31,14 @@
         /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier with the current time.</exception>
         public Expiry WithSuspensionUtc(DateTime suspensionUtc)
         {
-            if(this.suspensionUtc.HasValue)
+            if (this.suspensionUtc.HasValue)
             {
                 throw new InvalidOperationException("Resuspending is not allowed.");
             }
 
-            if(suspensionUtc > this.NowUtc)
+            if (suspensionUtc > this.NowUtc)
             {
-                throw new ArgumentOutOfRangeException(nameof(suspensionUtc), "The suspension time must be earlier with the current time"); 
+                throw new ArgumentOutOfRangeException(nameof(suspensionUtc), "The suspension time must be earlier with the current time");
             }
 
             this.suspensionUtc = suspensionUtc < this.GetDeadlineUtc() ? suspensionUtc : this.GetDeadlineUtc();
@@ -60,7 +65,7 @@
         #region Implements IEligible interface
 
         /// <summary>
-        /// See also in IEligible interface.
+        /// Gets a value indicating whether see also in IEligible interface.
         /// </summary>
         public bool IsEligible => !this.suspensionUtc.HasValue && this.NowUtc < this.GetDeadlineUtc();
 
@@ -71,12 +76,12 @@
         #region IsExpired, Remaining & Overdue
 
         /// <summary>
-        /// Grace period.
+        /// Gets grace period.
         /// </summary>
         public TimeSpan GracePeriod { get; private set; }
 
         /// <summary>
-        /// The remaining portion.
+        /// Gets the remaining portion.
         /// - If suspended, the remaining portion is the time between suspend time and expiry time.
         /// - If eligible, the remaining portion is the current time between now and expiry time.
         /// - If ineligible (after grace period), the remaining portion is negative grace period.
@@ -98,7 +103,7 @@
         }
 
         /// <summary>
-        /// The overdue portion.
+        /// Gets the overdue portion.
         /// - Suspended: The overdue portion is the time between suspend time and expiry time. Zero if suspend time is earlier than expiry time.
         /// - Eligible: The overdue portion is the time between expiry time and now. Zero if now is earlier than expiry time.
         /// - Ineligible (after grace period): The overdue portion is the grace period.
@@ -116,10 +121,10 @@
 
         #region Renew
 
-        /// <summary>The expiry time in UTC.</summary>
+        /// <summary>Gets the expiry time in UTC.</summary>
         public DateTime ExpiryUtc { get; private set; }
 
-        /// <summary>The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
+        /// <summary>Gets the renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
         public Renewal? Renewal { get; private set; }
 
         /// <summary>
@@ -130,7 +135,7 @@
         public Expiry Renew(Renewal? renewal = null)
         {
             renewal ??= this.Renewal;
-            if(renewal == null)
+            if (renewal == null)
             {
                 throw new ArgumentNullException(nameof(renewal), "Renewal period is required.");
             }
@@ -142,7 +147,7 @@
 
             var previousExpiryUtc = this.ExpiryUtc;
             var nextExpiryUtc = renewal.Renew(previousExpiryUtc);
-            if(nextExpiryUtc <= previousExpiryUtc)
+            if (nextExpiryUtc <= previousExpiryUtc)
             {
                 throw new InvalidOperationException("Negative ISO8601 duration.");
             }
@@ -159,7 +164,7 @@
         private DateTime? suspensionUtc;
 
         /// <summary>
-        /// The suspend time in UTC.
+        /// Gets the suspend time in UTC.
         /// - Explicit Suspension Time (Suspend)
         /// - Implicit Suspension Time (Deadline) when the expiry time is not eligible.
         /// - Null when the expiry time is eligible.
@@ -167,7 +172,7 @@
         public DateTime? SuspensionUtc => this.suspensionUtc ?? (this.IsEligible ? null : this.GetDeadlineUtc());
 
         /// <summary>
-        /// Boolean flag to identify if the expiry time is suspended.
+        /// Gets a value indicating whether boolean flag to identify if the expiry time is suspended.
         /// </summary>
         public bool IsActive => !this.suspensionUtc.HasValue;
 

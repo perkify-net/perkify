@@ -1,4 +1,8 @@
-﻿namespace Perkify.Core
+﻿// <copyright file="Renewal.cs" company="Microsoft">
+// Copyright (c) Microsoft. All rights reserved.
+// </copyright>
+
+namespace Perkify.Core
 {
     using NodaTime;
     using NodaTime.Text;
@@ -8,13 +12,14 @@
     {
         private Period period;
 
-        /// <summary>The ISO8601 duration string.</summary>
+        /// <summary>Gets the ISO8601 duration string.</summary>
         public string Duration { get; private set; }
 
-        /// <summary>The flag to identify calendar arithmetic.</summary>
+        /// <summary>Gets a value indicating whether to run date/time calculationc in calendar arithmetic.</summary>
         public bool Calendar { get; private set; }
 
-        /// <summary>Create a renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Renewal"/> class.Create a renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
         /// <param name="duration">The ISO8601 duration string.</param>
         /// <param name="calendar">The flag to identify calendar arithmetic.</param>
         public Renewal(string duration, bool calendar = false)
@@ -24,8 +29,8 @@
             {
                 throw new FormatException("Incorrect ISO8601 duration string.", result.Exception);
             }
-            this.period = result.Value.Normalize();
 
+            this.period = result.Value.Normalize();
             this.Duration = duration;
             this.Calendar = calendar;
         }
@@ -38,7 +43,7 @@
             if (this.Calendar)
             {
                 var current = Instant.FromDateTimeUtc(expiryUtc).InZone(DateTimeZone.Utc).LocalDateTime;
-                var future = current + period;
+                var future = current + this.period;
                 return future.InZoneStrictly(DateTimeZone.Utc).ToInstant().ToDateTimeUtc();
             }
             else

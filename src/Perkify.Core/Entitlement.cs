@@ -1,4 +1,8 @@
-﻿namespace Perkify.Core
+﻿// <copyright file="Entitlement.cs" company="Microsoft">
+// Copyright (c) Microsoft. All rights reserved.
+// </copyright>
+
+namespace Perkify.Core
 {
     [Flags]
     public enum AutoRenewalMode
@@ -8,7 +12,7 @@
         Deduct = 0x0002,
         Adjust = 0x0004,
         Default = Topup | Deduct,
-        All = Topup | Deduct | Adjust
+        All = Topup | Deduct | Adjust,
     }
 
     public class Entitlement : IEligible, IBalance<Entitlement>, INowUtc, IExpiry<Entitlement>
@@ -38,8 +42,8 @@
         #region Implements IEligible interface
 
         public bool IsEligible =>
-            (this.balance?.IsEligible ?? true) 
-            && (this.expiry?.IsEligible ?? true) 
+            (this.balance?.IsEligible ?? true)
+            && (this.expiry?.IsEligible ?? true)
             && (this.Prerequesite?.IsEligible ?? true);
 
         #endregion
@@ -68,6 +72,7 @@
             {
                 this.expiry.Renew();
             }
+
             return result;
         }
 
@@ -78,6 +83,7 @@
             {
                 this.expiry.Renew();
             }
+
             return this;
         }
 
@@ -93,11 +99,11 @@
 
         #region Remaining & Overdue
 
-        /// <summary>The Grace period as absolute time span.</summary>
+        /// <summary>Gets the Grace period as absolute time span.</summary>
         public TimeSpan GracePeriod => this.expiry?.GracePeriod ?? TimeSpan.Zero;
 
         /// <summary>
-        /// The remaining portion.
+        /// Gets the remaining portion.
         /// - If suspended, the remaining portion is the time between suspend time and expiry time.
         /// - If eligible, the remaining portion is the current time between now and expiry time.
         /// - If ineligible (after grace period), the remaining portion is negative grace period.
@@ -105,7 +111,7 @@
         public TimeSpan Remaining => this.expiry?.Remaining ?? TimeSpan.MaxValue;
 
         /// <summary>
-        /// The overdue portion.
+        /// Gets the overdue portion.
         /// - Suspended: The overdue portion is the time between suspend time and expiry time. Zero if suspend time is earlier than expiry time.
         /// - Eligible: The overdue portion is the time between expiry time and now. Zero if now is earlier than expiry time.
         /// - Ineligible (after grace period): The overdue portion is the grace period.
@@ -116,10 +122,10 @@
 
         #region Renew
 
-        /// <summary>The expiry time in UTC.</summary>
+        /// <summary>Gets the expiry time in UTC.</summary>
         public DateTime ExpiryUtc => this.expiry?.ExpiryUtc ?? DateTime.MaxValue;
 
-        /// <summary>The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
+        /// <summary>Gets the renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
         public Renewal? Renewal => this.expiry?.Renewal;
 
         /// <summary>Renew the expiry time in timeline arithmetic or calendrical arithmetic.</summary>
@@ -136,7 +142,7 @@
         #region Deactivate & Activate
 
         /// <summary>
-        /// The suspend time in UTC.
+        /// Gets the suspend time in UTC.
         /// - Explicit suspension time (smaller or equals to deadline time) if any suspension is applied.
         /// - Implicit suspension time (equals to deadline time) when the expiry time is ineligible.
         /// - Null when the expiry time is eligible (and no suspension is applied).
@@ -144,7 +150,7 @@
         public DateTime? SuspensionUtc => this.expiry?.SuspensionUtc;
 
         /// <summary>
-        /// Boolean flag to identify if the expiry time is active.
+        /// Gets a value indicating whether boolean flag to identify if the expiry time is active.
         /// - True if the expiry time is deactivated (suspended).
         /// - False if the expiry time is activated (not suspended).
         /// </summary>

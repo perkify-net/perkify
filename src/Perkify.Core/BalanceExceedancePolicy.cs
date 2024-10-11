@@ -1,4 +1,8 @@
-﻿namespace Perkify.Core
+﻿// <copyright file="BalanceExceedancePolicy.cs" company="Microsoft">
+// Copyright (c) Microsoft. All rights reserved.
+// </copyright>
+
+namespace Perkify.Core
 {
     /// <summary>The overflow processing policy when the balance is exceeded.</summary>
     public enum BalanceExceedancePolicy

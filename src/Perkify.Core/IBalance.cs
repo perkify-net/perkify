@@ -1,4 +1,8 @@
-﻿namespace Perkify.Core
+﻿// <copyright file="IBalance.cs" company="Microsoft">
+// Copyright (c) Microsoft. All rights reserved.
+// </copyright>
+
+namespace Perkify.Core
 {
     /// <summary>The balance type: debit or credit.</summary>
     public enum BalanceType
@@ -22,18 +26,17 @@
     public interface IBalance<T>
         where T : IBalance<T>
     {
-        /// <summary>All incoming revenue to the balance.</summary>
+        /// <summary>Gets all incoming revenue to the balance.</summary>
         public long Incoming { get; }
 
-        /// <summary>All outgoing expenses from the balance.</summary>
+        /// <summary>Gets all outgoing expenses from the balance.</summary>
         public long Outgoing { get; }
 
-        /// <summary>The threshold amount for the balance.</summary>
+        /// <summary>Gets the threshold amount for the balance.</summary>
         public long Threshold { get; }
 
         /// <summary>Topup the balance with incoming revenue.</summary>
         /// <param name="delta"></param>
-        /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public void Topup(long delta);
 
@@ -57,26 +60,35 @@
     public static class BalanceExtensions
     {
         /// <summary>The current balance amount based on incoming &amp; outcoming amount.</summary>
-        public static long GetBalanceAmount<T>(this T balance) where T : IBalance<T>
+        /// <returns></returns>
+        public static long GetBalanceAmount<T>(this T balance)
+            where T : IBalance<T>
             => balance.Incoming - balance.Outgoing;
 
         /// <summary>The upper limit amount that can be deducted from the account balance.</summary>
-        public static long GetMaxDeductibleAmount<T>(this T balance, BalanceExceedancePolicy policy) where T : IBalance<T>
+        /// <returns></returns>
+        public static long GetMaxDeductibleAmount<T>(this T balance, BalanceExceedancePolicy policy)
+            where T : IBalance<T>
             => policy != BalanceExceedancePolicy.Overdraft
             ? balance.GetBalanceAmount() - balance.Threshold
             : long.MaxValue;
 
         /// <summary>The balance type: debit or credit.</summary>
-        public static BalanceType GetBalanceType<T>(this T balance) where T : IBalance<T>
+        /// <returns></returns>
+        public static BalanceType GetBalanceType<T>(this T balance)
+            where T : IBalance<T>
             => balance.Threshold >= 0 ? BalanceType.Debit : BalanceType.Credit;
 
         /// <summary>The over spending amount.</summary>
-        public static long GetOverSpendingAmount<T>(this T balance) where T : IBalance<T>
+        /// <returns></returns>
+        public static long GetOverSpendingAmount<T>(this T balance)
+            where T : IBalance<T>
             => balance.GetBalanceAmount() >= balance.Threshold ? 0 : balance.Threshold - balance.GetBalanceAmount();
 
         /// <summary>Clear the balance with zero amount.</summary>
         /// <returns>The cleared balance with zero amount.</returns>
-        public static T Clear<T>(this T balance) where T : IBalance<T>
+        public static T Clear<T>(this T balance)
+            where T : IBalance<T>
             => balance.Adjust(0, 0);
     }
 }

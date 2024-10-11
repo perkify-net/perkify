@@ -4,6 +4,7 @@
   <PropertyGroup Label="Targets">
     <HomePlatformSpecific>$([System.IO.Path]::GetDirectoryName('$(MSBuildThisFileDirectory)'))</HomePlatformSpecific>
     <Home>$(HomePlatformSpecific.Replace('\', '/'))</Home>
+    <BuildDir>$(Home)/.build</BuildDir>
     <SourceDir>$(Home)/src</SourceDir>
     <ToolsDir>$(Home)/tools</ToolsDir>
     <ProjectDir>$(MSBuildProjectDirectory.Replace('\', '/'))</ProjectDir>
@@ -36,6 +37,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <AdditionalFiles Include="$(BuildDir)/stylecop.json" />    
     <PackageReference Include="Microsoft.CodeAnalysis.Metrics" />
   </ItemGroup>
   <PropertyGroup Label="BuildCops" Condition="$(ProjectDir.StartsWith('$(SourceDir)')) And $(MSBuildProjectName.EndsWith('.Tests'))">
