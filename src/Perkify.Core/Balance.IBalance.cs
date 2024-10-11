@@ -14,7 +14,7 @@ namespace Perkify.Core
         public long Outgoing { get; private set; }
 
         /// <inheritdoc/>
-        public long Threshold { get; private set; } = threshold;
+        public long Threshold { get; } = threshold;
 
         /// <inheritdoc/>
         public void Topup(long delta)
