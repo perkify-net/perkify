@@ -51,15 +51,5 @@ namespace Perkify.Core
         public static long GetOverSpendingAmount<T>(this T balance)
             where T : IBalance<T>
             => balance.GetBalanceAmount() >= balance.Threshold ? 0 : balance.Threshold - balance.GetBalanceAmount();
-
-        /// <summary>
-        /// Clear the balance with zero amount.
-        /// </summary>
-        /// <typeparam name="T">The type of the balance.</typeparam>
-        /// <param name="balance">The balance instance.</param>
-        /// <returns>The cleared balance with zero amount.</returns>
-        public static T Clear<T>(this T balance)
-            where T : IBalance<T>
-            => balance.Adjust(0, 0);
     }
 }

@@ -54,5 +54,12 @@ namespace Perkify.Core
         {
             throw new InvalidOperationException("Please adjust in specific entitlement or balance.");
         }
+
+        /// <inheritdoc/>
+        public Chain Clear()
+        {
+            this.entitlements.ForEach(entitlement => entitlement.Clear());
+            return this;
+        }
     }
 }

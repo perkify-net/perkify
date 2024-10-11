@@ -57,18 +57,20 @@ namespace Perkify.Core
         /// <inheritdoc/>
         public Balance Adjust(long? incoming, long? outgoing)
         {
-            if (incoming.HasValue && incoming.Value < 0L)
+            checked
             {
-                throw new ArgumentOutOfRangeException(nameof(incoming), "The incoming/outgoing amount must be null or greater than or equal to 0");
+                this.Incoming += incoming ?? 0;
+                this.Outgoing += outgoing ?? 0;
             }
 
-            if (outgoing.HasValue && outgoing.Value < 0L)
-            {
-                throw new ArgumentOutOfRangeException(nameof(outgoing), "The incoming/outgoing amount must be null or greater than or equal to 0");
-            }
+            return this;
+        }
 
-            this.Incoming = incoming ?? this.Incoming;
-            this.Outgoing = outgoing ?? this.Outgoing;
+        /// <inheritdoc/>
+        public Balance Clear()
+        {
+            this.Incoming = 0;
+            this.Outgoing = 0;
             return this;
         }
     }

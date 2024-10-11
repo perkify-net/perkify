@@ -49,5 +49,17 @@ namespace Perkify.Core
 
             return this;
         }
+
+        /// <inheritdoc/>
+        public Entitlement Clear()
+        {
+            this.balance.Clear();
+            if (this.expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
+            {
+                this.expiry.Renew();
+            }
+
+            return this;
+        }
     }
 }
