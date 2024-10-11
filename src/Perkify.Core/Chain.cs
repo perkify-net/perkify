@@ -26,25 +26,28 @@ namespace Perkify.Core
             this.entitlementBuilder = entitlementBuilder;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the chain is eligible.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsEligible => this.entitlements.Any(entitlement => entitlement.IsEligible);
 
         #region Implements IBalance<T> interface
 
+        /// <inheritdoc/>
         public long Incoming => this.entitlements.Sum(entitlement => entitlement.Incoming);
 
+        /// <inheritdoc/>
         public long Outgoing => this.entitlements.Sum(entitlement => entitlement.Outgoing);
 
+        /// <inheritdoc/>
         public long Threshold => this.entitlements.Sum(entitlement => entitlement.Threshold);
 
+        /// <inheritdoc/>
         public void Topup(long delta)
         {
             var entitlement = this.entitlementBuilder.Invoke(delta);
             this.entitlements.Add(entitlement);
         }
 
+        /// <inheritdoc/>
         public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
             var entitlements = this.entitlements
@@ -70,6 +73,7 @@ namespace Perkify.Core
             return delta;
         }
 
+        /// <inheritdoc/>
         public Chain Adjust(long? incoming, long? outgoing)
         {
             throw new InvalidOperationException("Please adjust in specific entitlement or balance.");

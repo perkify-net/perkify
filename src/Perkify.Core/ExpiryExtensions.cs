@@ -4,6 +4,9 @@
 
 namespace Perkify.Core
 {
+    /// <summary>
+    /// Provides extension methods for expiry-related operations.
+    /// </summary>
     public static class ExpiryExtensions
     {
         /// <summary>

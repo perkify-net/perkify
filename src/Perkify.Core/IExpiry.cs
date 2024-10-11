@@ -9,8 +9,6 @@ namespace Perkify.Core
     public interface IExpiry<T>
         where T : IExpiry<T>, INowUtc
     {
-        #region Remaining & Overdue
-
         /// <summary>Gets the Grace period as absolute time span.</summary>
         public TimeSpan GracePeriod { get; }
 
@@ -30,24 +28,11 @@ namespace Perkify.Core
         /// </summary>
         public TimeSpan Overdue { get; }
 
-        #endregion
-
-        #region Renew
-
         /// <summary>Gets the expiry time in UTC.</summary>
         public DateTime ExpiryUtc { get; }
 
         /// <summary>Gets the renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
         public Renewal? Renewal { get; }
-
-        /// <summary>Renew the expiry time in timeline arithmetic or calendrical arithmetic.</summary>
-        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
-        /// <returns>The expiry time after renewal.</returns>
-        public T Renew(Renewal? renewal);
-
-        #endregion
-
-        #region Deactivate & Activate
 
         /// <summary>
         /// Gets the suspend time in UTC.
@@ -64,6 +49,11 @@ namespace Perkify.Core
         /// </summary>
         public bool IsActive { get; }
 
+        /// <summary>Renew the expiry time in timeline arithmetic or calendrical arithmetic.</summary>
+        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
+        /// <returns>The expiry time after renewal.</returns>
+        public T Renew(Renewal? renewal);
+
         /// <summary>Deactivate the expiry time.</summary>
         /// <param name="suspensionUtc">The suspension time in UTC.</param>
         /// <returns>The expiry time after suspension.</returns>
@@ -76,7 +66,5 @@ namespace Perkify.Core
         /// <returns>The expiry time after resumption.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Resume time must be greater than suspend time.</exception>
         public T Activate(DateTime? resumptionUtc = null, bool extended = false);
-
-        #endregion
     }
 }

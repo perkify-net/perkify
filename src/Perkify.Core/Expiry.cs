@@ -58,15 +58,14 @@ namespace Perkify.Core
 
         private readonly IClock clock;
 
+        /// <inheritdoc/>
         public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
 
         #endregion
 
         #region Implements IEligible interface
 
-        /// <summary>
-        /// Gets a value indicating whether see also in IEligible interface.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsEligible => !this.suspensionUtc.HasValue && this.NowUtc < this.GetDeadlineUtc();
 
         #endregion
@@ -75,17 +74,10 @@ namespace Perkify.Core
 
         #region IsExpired, Remaining & Overdue
 
-        /// <summary>
-        /// Gets grace period.
-        /// </summary>
+        /// <inheritdoc/>
         public TimeSpan GracePeriod { get; private set; }
 
-        /// <summary>
-        /// Gets the remaining portion.
-        /// - If suspended, the remaining portion is the time between suspend time and expiry time.
-        /// - If eligible, the remaining portion is the current time between now and expiry time.
-        /// - If ineligible (after grace period), the remaining portion is negative grace period.
-        /// </summary>
+        /// <inheritdoc/>
         public TimeSpan Remaining
         {
             get
@@ -102,12 +94,7 @@ namespace Perkify.Core
             }
         }
 
-        /// <summary>
-        /// Gets the overdue portion.
-        /// - Suspended: The overdue portion is the time between suspend time and expiry time. Zero if suspend time is earlier than expiry time.
-        /// - Eligible: The overdue portion is the time between expiry time and now. Zero if now is earlier than expiry time.
-        /// - Ineligible (after grace period): The overdue portion is the grace period.
-        /// </summary>
+        /// <inheritdoc/>
         public TimeSpan Overdue => this.suspensionUtc.HasValue
             ? this.suspensionUtc.Value > this.ExpiryUtc ? this.suspensionUtc.Value - this.ExpiryUtc : TimeSpan.Zero
             : this.NowUtc switch
@@ -121,17 +108,13 @@ namespace Perkify.Core
 
         #region Renew
 
-        /// <summary>Gets the expiry time in UTC.</summary>
+        /// <inheritdoc/>
         public DateTime ExpiryUtc { get; private set; }
 
-        /// <summary>Gets the renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
+        /// <inheritdoc/>
         public Renewal? Renewal { get; private set; }
 
-        /// <summary>
-        /// Renew the expiry time in timeline arithmetic or calendrical arithmetic.
-        /// </summary>
-        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
-        /// <returns>The expiry time after renewal.</returns>
+        /// <inheritdoc/>
         public Expiry Renew(Renewal? renewal = null)
         {
             renewal ??= this.Renewal;
@@ -163,23 +146,13 @@ namespace Perkify.Core
 
         private DateTime? suspensionUtc;
 
-        /// <summary>
-        /// Gets the suspend time in UTC.
-        /// - Explicit Suspension Time (Suspend)
-        /// - Implicit Suspension Time (Deadline) when the expiry time is not eligible.
-        /// - Null when the expiry time is eligible.
-        /// </summary>
+        /// <inheritdoc/>
         public DateTime? SuspensionUtc => this.suspensionUtc ?? (this.IsEligible ? null : this.GetDeadlineUtc());
 
-        /// <summary>
-        /// Gets a value indicating whether boolean flag to identify if the expiry time is suspended.
-        /// </summary>
+        /// <inheritdoc/>
         public bool IsActive => !this.suspensionUtc.HasValue;
 
-        /// <summary>Suspends the expiry time.</summary>
-        /// <param name="suspensionUtc">The suspend time in UTC.</param>
-        /// <returns>The expiry time after suspension.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier than current time.</exception>
+        /// <inheritdoc/>
         public Expiry Deactivate(DateTime? suspensionUtc = null)
         {
             // Keep idempotent if resubmitting suspending requests.
@@ -194,11 +167,7 @@ namespace Perkify.Core
             return this;
         }
 
-        /// <summary>Resume the expiry time.</summary>
-        /// <param name="resumptionUtc">The resume time in UTC.</param>
-        /// <param name="extended">Boolean flag to extend the expiry time after resumption.</param>
-        /// <returns>The expiry time after resumption.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Resume time must be greater than suspend time.</exception>
+        /// <inheritdoc/>
         public Expiry Activate(DateTime? resumptionUtc = null, bool extended = false)
         {
             if (!this.suspensionUtc.HasValue)
