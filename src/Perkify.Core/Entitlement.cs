@@ -4,26 +4,11 @@
 
 namespace Perkify.Core
 {
-    [Flags]
-    public enum AutoRenewalMode
-    {
-        None = 0x0000,
-        Topup = 0x0001,
-        Deduct = 0x0002,
-        Adjust = 0x0004,
-        Default = Topup | Deduct,
-        All = Topup | Deduct | Adjust,
-    }
-
     public class Entitlement : IEligible, IBalance<Entitlement>, INowUtc, IExpiry<Entitlement>
     {
-        public AutoRenewalMode AutoRenewalMode { get; private set; }
+        private readonly Balance balance;
 
-        private Balance balance;
-
-        private Expiry? expiry;
-
-        public IEligible? Prerequesite { get; init; }
+        private readonly Expiry? expiry;
 
         public Entitlement(Balance balance, Expiry expiry, AutoRenewalMode mode = AutoRenewalMode.Default)
         {
@@ -38,6 +23,10 @@ namespace Perkify.Core
             this.expiry = null;
             this.AutoRenewalMode = AutoRenewalMode.None;
         }
+
+        public AutoRenewalMode AutoRenewalMode { get; private set; }
+
+        public IEligible? Prerequesite { get; init; }
 
         #region Implements IEligible interface
 

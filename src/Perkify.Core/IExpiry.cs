@@ -4,14 +4,8 @@
 
 namespace Perkify.Core
 {
-    /// <summary>Maintain the current time in UTC.</summary>
-    public interface INowUtc
-    {
-        /// <summary>Gets the current time in UTC.</summary>
-        public DateTime NowUtc { get; }
-    }
-
     /// <summary>The interface to maintain an expiry time with grace period for eligibility.</summary>
+    /// <typeparam name="T">The type that implements the IExpiry interface.</typeparam>
     public interface IExpiry<T>
         where T : IExpiry<T>, INowUtc
     {
@@ -84,20 +78,5 @@ namespace Perkify.Core
         public T Activate(DateTime? resumptionUtc = null, bool extended = false);
 
         #endregion
-    }
-
-    public static class ExpiryExtensions
-    {
-        /// <summary>The deadline time in UTC.</summary>
-        /// <returns></returns>
-        public static DateTime GetDeadlineUtc<T>(this T expiry)
-            where T : IExpiry<T>, INowUtc
-            => expiry.ExpiryUtc + expiry.GracePeriod;
-
-        /// <summary>The boolean flag to identify if the expiry time has been reached.</summary>
-        /// <returns></returns>
-        public static bool IsExpired<T>(this T expiry)
-            where T : IExpiry<T>, INowUtc
-            => (expiry.SuspensionUtc ?? expiry.NowUtc) >= expiry.ExpiryUtc;
     }
 }

@@ -12,12 +12,6 @@ namespace Perkify.Core
     {
         private Period period;
 
-        /// <summary>Gets the ISO8601 duration string.</summary>
-        public string Duration { get; private set; }
-
-        /// <summary>Gets a value indicating whether to run date/time calculationc in calendar arithmetic.</summary>
-        public bool Calendar { get; private set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Renewal"/> class.Create a renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</summary>
         /// <param name="duration">The ISO8601 duration string.</param>
@@ -34,6 +28,12 @@ namespace Perkify.Core
             this.Duration = duration;
             this.Calendar = calendar;
         }
+
+        /// <summary>Gets the ISO8601 duration string.</summary>
+        public string Duration { get; private set; }
+
+        /// <summary>Gets a value indicating whether to run date/time calculationc in calendar arithmetic.</summary>
+        public bool Calendar { get; private set; }
 
         /// <summary>Renew the expiry time in timeline arithmetic or calendrical arithmetic.</summary>
         /// <param name="expiryUtc">The original expiry time in UTC.</param>
