@@ -17,6 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Core.Tests", "src\P
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".es", ".es", "{61FF7EC3-2449-4589-BC0B-7A2E8349F3EB}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
@@ -49,6 +50,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Playground", "tools
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{9C9E6228-7CE2-402E-8034-5D3A677D3621}"
 	ProjectSection(SolutionItems) = preProject
+		.build\stylecop.json = .build\stylecop.json
 		.build\xunit.coverlet.runsettings = .build\xunit.coverlet.runsettings
 	EndProjectSection
 EndProject

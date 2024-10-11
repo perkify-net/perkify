@@ -2,7 +2,6 @@
 
   <PropertyGroup Label="Nuget">
     <IsPackable>true</IsPackable>
-    <!--TODO: <GenerateDocumentationFile>true</GenerateDocumentationFile>-->
     <AssemblyTitle>Perkify</AssemblyTitle>
     <Description>Perkify is a minimalist kernel written in C#, designed for the abstraction and underlying implementation of core functionalities related to various types of coupons, prepaid cards, subscription and membership.</Description>
     <PackageTags>perkify;subscription;credit;coupon;entitlement;balance;expiry;</PackageTags>
