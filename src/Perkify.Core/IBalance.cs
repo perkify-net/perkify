@@ -3,15 +3,24 @@
     /// <summary>The balance type: debit or credit.</summary>
     public enum BalanceType
     {
-        // Threshold = 0, Amount >= Threshold
+        /// <summary>
+        /// Debit points.
+        /// - Threshold is zero.
+        /// - Amount should beyond Threshold.
+        /// </summary>
         Debit = 0,
 
-        // Threshold < 0, Amount >= Threshold 
+        /// <summary>
+        /// Credit points.
+        /// - Threshold is negative.
+        /// - Amount should beyond Threshold.
+        /// </summary>
         Credit = 1,
     }
 
     /// <summary>The interface to maintain a balance amount with threshold for eligibility.</summary>
-    public interface IBalance<T> where T : IBalance<T>
+    public interface IBalance<T>
+        where T : IBalance<T>
     {
         /// <summary>All incoming revenue to the balance.</summary>
         public long Incoming { get; }

@@ -151,7 +151,7 @@
         public bool IsActive => this.expiry?.IsActive ?? true;
 
         /// <summary>Deactivate the expiry time.</summary>
-        /// <param name="suspendUtc">The suspension time in UTC.</param>
+        /// <param name="suspensionUtc">The suspension time in UTC.</param>
         /// <returns>The expiry time after suspension.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier than current time.</exception>
         public Entitlement Deactivate(DateTime? suspensionUtc = null)

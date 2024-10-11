@@ -66,7 +66,7 @@
         public bool IsActive { get; }
 
         /// <summary>Deactivate the expiry time.</summary>
-        /// <param name="suspendUtc">The suspension time in UTC.</param>
+        /// <param name="suspensionUtc">The suspension time in UTC.</param>
         /// <returns>The expiry time after suspension.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier than current time.</exception>
         public T Deactivate(DateTime? suspensionUtc = null);

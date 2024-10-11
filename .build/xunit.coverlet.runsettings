@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<RunSettings>
+  <!-- See instruction in https://learn.microsoft.com/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file#runconfiguration-element -->
+  <RunConfiguration>
+    <!-- Controle the level of parallelism on process-level. O means no limit. -->
+    <MaxCpuCount>4</MaxCpuCount>
+    <!-- Specify a Boolean value, which defines the exit code when no tests are discovered. If the value is true and no tests are discovered, a nonzero exit code is returned. Otherwise, zero is returned. -->
+    <TreatNoTestsAsError>true</TreatNoTestsAsError>
+    <EnvironmentVariables>
+      <!-- Changes the default timeout in VSTest for shutdown to 1000ms instead of 100ms which can cause intermittent failures in CI. -->
+      <VSTEST_TESTHOST_SHUTDOWN_TIMEOUT>1000</VSTEST_TESTHOST_SHUTDOWN_TIMEOUT>
+    </EnvironmentVariables>
+  </RunConfiguration>
+  <!-- See instruction in https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file?view=vs-2022#datacollectors-element-diagnostic-data-adapters -->
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="Perkify Code Coverage">
+        <Configuration>
+          <!-- Test coverage for all runtime/core projects under SourceDir -->
+          <Include>
+			      <ModulePath>.*\\src\\.*.dll</ModulePath>
+			      <ModulePath>.*\\src\\.*.exe</ModulePath>
+          </Include>
+          <!-- Ignore Unit Test projects, Integration/Benchmark Test projects and Tool projects -->
+          <Exclude>
+            <ModulePath>.*\\.*\.Test[s]?</ModulePath>
+            <ModulePath>.*\\test\\.*</ModulePath>
+            <ModulePath>.*\\tools\\.*</ModulePath>
+          </Exclude>
+          <!-- Ignore deprecated codes and auto-generated codes -->
+          <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+  
+  <!-- See instruction in https://xunit.net/docs/runsettings -->
+  <xUnit>
+    <!-- Set this value to true to include diagnostic information during test discovery and execution. -->
+    <!-- Each runner has a unique method of presenting diagnostic messages. -->
+    <DiagnosticMessages>true</DiagnosticMessages>
+    <!-- Each runner has a unique method of presenting diagnostic messages. -->
+    <!-- Internal diagnostics often include information that is only useful when debugging the test framework itself.-->
+    <!-- - true: to include internals diagnostic information during test discovery and execution. -->
+    <!-- - false: to ignore internals disgnosis. -->
+    <InternalDiagnosticMessages>false</InternalDiagnosticMessages>
+    <!-- Switch to show message from ITestOutputHelper living during the test run. -->
+    <!-- - true: to show ITestOutputHelper messages in living mode. -->
+    <!-- - false: to show ITestOutputHelper messages after the test has completed. -->
+    <!-- NOTE: -->
+    <!-- When using dotnet test, you may need to pass an extra command line option with "-logger console;verbosity=normal"). -->
+    <!-- xUnit.net messages are hidden by default. -->
+    <ShowLiveOutput>false</ShowLiveOutput>
+    
+    <!-- Set this value to enable long-running (hung) test detection. -->
+    <!-- - 0: to disable the feature -->
+    <!-- - 1+: to enable the feature (time in seconds). -->
+    <!-- NOTE: When the runner is idle waiting for tests to finished, it will report that fact once the timeout has passed. -->
+    <LongRunningTestSeconds>120</LongRunningTestSeconds>
+    
+    <!-- Set this to override the maximum number of threads to be used when parallelizing tests within this assembly. -->
+    <!-- - 0 or "default": to indicate that you would like the default behavior -->
+    <!-- - -1 or "unlimited": to indicate that you do not wish to limit the number of threads used for parallelization. -->
+    <MaxParallelThreads>4</MaxParallelThreads>
+    <!-- Set this to true if this assembly is willing to participate in parallelization with other assemblies. -->
+    <!-- Test runners can use this information to automatically enable parallelization across assemblies if all the assemblies agree to it. -->
+    <ParallelizeAssembly>false</ParallelizeAssembly>
+    <!-- - true:  The assembly is willing to run tests inside this assembly in parallel against each other. -->
+    <!--   - Tests in the same test collection will be run sequentially against each other. -->
+    <!--   - Tests in different test collections will be run in parallel against each other. -->
+    <!-- - false: to disable all parallelization within this test assembly. -->
+    <ParallelizeTestCollections>false</ParallelizeTestCollections>
+    <!-- Set this to determine the parallelization algorithm used. -->
+    <!-- - conservative: to run tests in a way that is known to work in most cases. -->
+    <!-- - aggresive: to run tests in a way that is known to work in most cases. -->
+    <!-- NOTE: Note that the algorithm only applies when test collection parallelism with limited number of threads (not unlimited or -1).-->
+    <ParallelAlgorithm>conservative</ParallelAlgorithm>
+
+    <!-- Set this value to determine whether xUnit.net should report test results to the build server. -->
+    <!-- - true: skipped tests to be treated as errors. -->
+    <!-- - false: ignore skipped tests in the report. -->
+    <FailSkips>false</FailSkips>
+    <!-- Switch to determine if xunit should stop running tests after the first test failure. -->
+    <!-- - true: to stop running further tests once a test has failed. -->
+    <!-- - false: to continue running tests even after a test has failed. -->
+    <!-- NOTE: -->
+    <!-- Because of the asynchronous nature of test execution, this will not necessarily happen immediately. -->
+    <!-- Any test that is already in flight may complete, which may result in multiple test failures reported. -->
+    <StopOnFail>false</StopOnFail>
+
+    <!-- Set this value to determine whether App Domains are used. -->
+    <!-- - ifAvailble: It will leverage app domains isolation if availble -->
+    <!-- - required: It will require that app domains are available -->
+    <!-- - denied: It will not use app domains. -->
+    <!-- NOTE: App Domains are only supported with .NET Framework tests, and only with tests linked against xUnit.net framework v1 or v2. -->
+    <AppDomain>denied</AppDomain>
+    <!-- Flag for shadow copying when running tests in separate App Domains. -->
+    <!-- - true: to use shadow copying when running tests in separate App Domains. -->
+    <!-- - false: to run tests without shadow copying. --> 
+    <!-- NOTE: When running tests without App Domains, this value is ignored. -->
+    <ShadowCopy>false</ShadowCopy>
+    
+    <!-- BUG: slow performance on discovery/running due to discovering TestReporters -->
+    <!-- - Bug-fix PR: https://github.com/xunit/visualstudio.xunit/issues/317 -->
+    <!-- - Mitigation: https://github.com/xunit/xunit/issues/2549. -->
+    <NoAutoReporters>true</NoAutoReporters>
+  </xUnit>
+</RunSettings>
