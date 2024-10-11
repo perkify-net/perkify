@@ -1,12 +1,8 @@
 namespace Perkify.Core.Tests
 {
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Perkify.Core;
-    using Xunit.Sdk;
-
     public class BalanceTests
     {
-        #region Create Balance Tests
+        #region Create & Initialize Balance
 
         [Theory]
         [InlineData(10)]
@@ -72,10 +68,6 @@ namespace Perkify.Core.Tests
                 .WithParameterName(parameter)
                 .WithMessage($"Threshold amount must be negative (Parameter '{parameter}')");
         }
-
-        #endregion
-
-        #region With Balance Tests
 
         [Theory, CombinatorialData]
         public void TestWithBalance
