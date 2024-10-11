@@ -1,54 +1,108 @@
 namespace Perkify.Core.Tests
 {
-    using Perkify.Core;
-
     public class BalanceTests
     {
-        #region Create Balance Tests
+        #region Create & Initialize Balance
 
         [Theory]
-        [InlineData(10, BalanceType.Debit)]
-        [InlineData(0, BalanceType.Debit)]
-        [InlineData(-10, BalanceType.Credit)]
-        public void TestCreateBalance(long threshold, BalanceType type)
+        [InlineData(10)]
+        [InlineData(0)]
+        public void TestCreateBalanceWithZeroOrPositiveThreshold(long threshold)
         {
             var balance = new Balance(threshold);
-            Assert.Equal(0, balance.Incoming);
-            Assert.Equal(0, balance.Outgoing);
-            Assert.Equal(0, balance.GetBalanceAmount());
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(type, balance.GetBalanceType());
-        }
 
-        [Fact]
-        public void TestCreateDebitBalance()
-        {
-            var debit = Balance.Debit();
-            Assert.Equal(0, debit.Incoming);
-            Assert.Equal(0, debit.Outgoing);
-            Assert.Equal(0, debit.GetBalanceAmount());
-            Assert.Equal(0, debit.Threshold);
-            Assert.Equal(BalanceType.Debit, debit.GetBalanceType());
+            balance.Incoming.Should().Be(0);
+            balance.Outgoing.Should().Be(0);
+            balance.GetBalanceAmount().Should().Be(0);
+            balance.Threshold.Should().Be(threshold);
+            balance.GetBalanceType().Should().Be(BalanceType.Debit);
         }
 
         [Theory]
         [InlineData(-10)]
-        public void TestCreateCreditBalance(long threshold)
+        public void TestCreateBalanceWithNegativeThreshold(long threshold)
+        {
+            var balance = new Balance(threshold);
+
+            balance.Incoming.Should().Be(0);
+            balance.Outgoing.Should().Be(0);
+            balance.GetBalanceAmount().Should().Be(0);
+            balance.Threshold.Should().Be(threshold);
+            balance.GetBalanceType().Should().Be(BalanceType.Credit);
+        }
+
+        [Fact]
+        public void TestCreateDebitBalanceDirectly()
+        {
+            var debit = Balance.Debit();
+            debit.Incoming.Should().Be(0);
+            debit.Outgoing.Should().Be(0);
+            debit.GetBalanceAmount().Should().Be(0);
+            debit.Threshold.Should().Be(0);
+            debit.GetBalanceType().Should().Be(BalanceType.Debit);
+        }
+
+        [Theory]
+        [InlineData(-10)]
+        public void TestCreateCreditBalanceDirectly(long threshold)
         {
             var credit = Balance.Credit(threshold);
-            Assert.Equal(0, credit.Incoming);
-            Assert.Equal(0, credit.Outgoing);
-            Assert.Equal(0, credit.GetBalanceAmount());
-            Assert.Equal(threshold, credit.Threshold);
-            Assert.Equal(BalanceType.Credit, credit.GetBalanceType());
+            credit.Incoming.Should().Be(0);
+            credit.Outgoing.Should().Be(0);
+            credit.GetBalanceAmount().Should().Be(0);
+            credit.Threshold.Should().Be(threshold);
+            credit.GetBalanceType().Should().Be(BalanceType.Credit);
         }
 
         [Theory]
         [InlineData(0)]
         [InlineData(10)]
-        public void TestCreateCreditBalancedInvalidThreshold(long threshold)
+        public void TestCreateCreditBalanceDirectlyWithInvalidThreshold(long threshold)
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => Balance.Credit(threshold));
+            var parameter = nameof(threshold);
+            var action = () => Balance.Credit(threshold);
+
+            action
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .WithParameterName(parameter)
+                .WithMessage($"Threshold amount must be negative (Parameter '{parameter}')");
+        }
+
+        [Theory, CombinatorialData]
+        public void TestWithBalance
+        (
+            [CombinatorialValues(0, 100, 200)] long incoming,
+            [CombinatorialValues(0, 100, 200)] long outgoing
+        )
+        {
+            var balance = Balance.Debit().WithBalance(incoming, outgoing);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
+        }
+
+        [Theory, CombinatorialData]
+        public void TestWithBalanceInNegativeAmount
+        (
+            [CombinatorialValues(-100)] long amount,
+            [CombinatorialValues(null, true, false)] bool? incomingOrOutgoing
+        )
+        {
+            var isIncomingNegative = incomingOrOutgoing ?? true;
+            var isOutgoingNegative = !(incomingOrOutgoing ?? false);
+            var incoming = isIncomingNegative ? amount : 0L;
+            var outgoing = isOutgoingNegative ? amount : 0L;
+            var parameter = isIncomingNegative ? "incoming" : "outgoing";
+            var balance = Balance.Debit();
+            var action = () => balance.WithBalance(incoming, outgoing);
+
+            action
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .WithParameterName(parameter)
+                .WithMessage($"Amount must be zero or positive (Parameter '{parameter}')");
+            balance.Incoming.Should().Be(0);
+            balance.Outgoing.Should().Be(0);
         }
 
         #endregion

@@ -1,7 +1,5 @@
 namespace Perkify.Core.Tests
 {
-    using Perkify.Core;
-
     public class EligibleTests
     {
         [Theory]

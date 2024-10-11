@@ -31,11 +31,12 @@ namespace Perkify.Core
         {
             if (threshold >= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(threshold), "Threshold amount must be less than 0");
+                throw new ArgumentOutOfRangeException(nameof(threshold), "Threshold amount must be negative");
             }
 
             return new Balance(threshold);
-        }
+        }
+
         /// <summary>
         /// Sets the incoming and outgoing amounts for the balance.
         /// </summary>

@@ -1,7 +1,6 @@
 ﻿namespace Perkify.Core.Tests
 {
     using System.Globalization;
-    using Perkify.Core;
 
     public class MockExpiry : INowUtc, IExpiry<MockExpiry>
     {
