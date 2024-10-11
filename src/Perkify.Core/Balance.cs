@@ -19,14 +19,16 @@ namespace Perkify.Core
             this.Threshold = threshold;
         }
 
-        /// <summary>TODO.</summary>
-        /// <returns></returns>
-        public static Balance Debit() => new Balance(threshold: 0);
+        /// <summary>
+        /// Creates a new balance with a threshold of 0.
+        /// </summary>
+        /// <returns>A new instance of the <see cref="Balance"/> class.</returns>
+        public static Balance Debit() => new (threshold: 0);
 
         /// <summary>TODO.</summary>
-        /// <param name="threshold"></param>
+        /// <param name="threshold">The threshold amount for the balance.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the threshold amount is greater than or equal to 0.</exception>
         /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public static Balance Credit(long threshold)
         {
             if (threshold >= 0)
@@ -37,11 +39,14 @@ namespace Perkify.Core
             return new Balance(threshold);
         }
 
-        /// <summary>TODO.</summary>
-        /// <param name="incoming"></param>
-        /// <param name="outgoing"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <summary>
+        /// Sets the incoming and outgoing amounts for the balance.
+        /// </summary>
+        /// <param name="incoming">The incoming amount to set.</param>
+        /// <param name="outgoing">The outgoing amount to set.</param>
+        /// <returns>The updated balance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the incoming amount is less than 0.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the outgoing amount is less than 0.</exception>
         public Balance WithBalance(long incoming, long outgoing)
         {
             if (incoming < 0)
@@ -82,6 +87,7 @@ namespace Perkify.Core
         public long Threshold { get; private set; }
 
         /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
+        /// <param name="delta">The amount to be added to the balance.</param>
         public void Topup(long delta)
         {
             if (delta < 0)
@@ -96,7 +102,11 @@ namespace Perkify.Core
         }
 
         /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
-        /// <returns></returns>
+        /// <param name="delta">The amount to be deducted.</param>
+        /// <param name="policy">The policy to apply if the balance exceeds the threshold.</param>
+        /// <returns>The remaining amount after deduction.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the delta is less than 0.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the balance is ineligible for deduction.</exception>
         public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
             if (delta < 0)
@@ -116,11 +126,17 @@ namespace Perkify.Core
             {
                 this.Outgoing += processed;
             }
+
             return remaining;
         }
 
-        /// <summary>See also in `IBalance&lt;T&gt;` interface.</summary>
-        /// <returns></returns>
+        /// <summary>
+        /// Adjusts the balance with the specified incoming and outgoing amounts.
+        /// </summary>
+        /// <param name="incoming">The incoming amount to set. Must be null or greater than or equal to 0.</param>
+        /// <param name="outgoing">The outgoing amount to set. Must be null or greater than or equal to 0.</param>
+        /// <returns>The adjusted balance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the incoming or outgoing amount is less than 0.</exception>
         public Balance Adjust(long? incoming, long? outgoing)
         {
             if (incoming.HasValue && incoming.Value < 0L)

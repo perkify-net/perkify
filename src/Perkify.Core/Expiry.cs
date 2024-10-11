@@ -25,7 +25,7 @@ namespace Perkify.Core
         }
 
         /// <summary>Specify the suspension time.</summary>
-        /// <param name="suspensionUtc"></param>
+        /// <param name="suspensionUtc">The suspension time in UTC.</param>
         /// <returns>The expiry time after suspension.</returns>
         /// <exception cref="InvalidOperationException">Resuspending is not allowed.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier with the current time.</exception>

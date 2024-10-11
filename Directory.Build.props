@@ -30,7 +30,7 @@
     <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-all</AnalysisLevel>
-    <NoWarn>SA1124</NoWarn>
+    <NoWarn></NoWarn>
   </PropertyGroup>
   <ItemGroup Label="BuildCops" Condition="$(ProjectDir.StartsWith('$(SourceDir)')) And !$(MSBuildProjectName.EndsWith('.Tests'))">
     <PackageReference Include="StyleCop.Analyzers">

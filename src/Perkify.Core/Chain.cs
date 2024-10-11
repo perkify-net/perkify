@@ -4,27 +4,32 @@
 
 namespace Perkify.Core
 {
-    /// <summary>The entitlement chain for eligibility.</summary>
+    /// <summary>
+    /// The entitlement chain for eligibility.
+    /// </summary>
     public class Chain : IEligible, IBalance<Chain>
     {
         private readonly List<Entitlement> entitlements;
 
         private readonly Func<long, Entitlement> entitlementBuilder;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Chain"/> class.
+        /// </summary>
+        /// <param name="entitlements">The collection of entitlements to initialize the chain with.</param>
+        /// <param name="entitlementBuilder">The function to build new entitlements.</param>
         public Chain(IEnumerable<Entitlement>? entitlements = null, Func<long, Entitlement>? entitlementBuilder = null)
         {
-            entitlements ??= Enumerable.Empty<Entitlement>();
-            this.entitlements =[.. entitlements.OrderBy(entitlement => entitlement.ExpiryUtc)];
-
+            entitlements ??= [];
+            this.entitlements = [.. entitlements.OrderBy(entitlement => entitlement.ExpiryUtc)];
             entitlementBuilder ??= (delta) => new Entitlement(new Balance(delta));
             this.entitlementBuilder = entitlementBuilder;
         }
 
-        #region Implement IEligible interface
-
+        /// <summary>
+        /// Gets a value indicating whether the chain is eligible.
+        /// </summary>
         public bool IsEligible => this.entitlements.Any(entitlement => entitlement.IsEligible);
-
-        #endregion
 
         #region Implements IBalance<T> interface
 
