@@ -13,6 +13,9 @@
 
   <!-- Dev/Tests Dependencies -->
   <ItemGroup>
+    <!-- Dev Infrastructure -->
+    <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" /> <!-- Code style analyzer -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.Metrics" Version="3.3.4" /> <!-- Code metrics analyzer -->
     <!-- Test Infrastrcuture -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" /> <!-- Microsoft .NET Test SDK -->
     <PackageVersion Include="coverlet.collector" Version="6.0.2" /> <!-- Test coverage collector -->
@@ -20,6 +23,7 @@
     <PackageVersion Include="ReportGenerator" Version="5.3.11" /> <!-- Test coverage report generator -->
     <PackageVersion Include="xunit.analyzers" Version="1.16.0" /> <!-- xUnit Test analyzer -->
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" /> <!-- xUnit Test runner for VS2022 -->
+    <PackageVersion Include="Moq.Analyzers" Version="0.1.2" /> <!-- Moq Test analyzer -->
     <!-- Test Utility -->
     <PackageVersion Include="xunit" Version="2.9.2" /> <!-- Test framework -->
     <PackageVersion Include="Xunit.Combinatorial" Version="1.6.24" /> <!-- Data-driven test enhancement for combinatorial test -->

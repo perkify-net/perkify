@@ -1,10 +1,6 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Perkify.Core
+﻿namespace Perkify.Core
 {
-    /// <summary>
-    /// The balance amount with threshold for eligibility.
-    /// </summary>
+    /// <summary>The balance amount with threshold for eligibility.</summary>
     public class Balance : IEligible, IBalance<Balance>
     {
         #region Factory Methods
@@ -44,6 +40,7 @@ namespace Perkify.Core
             {
                 throw new ArgumentOutOfRangeException(nameof(incoming), "Amount must be zero or positive");
             }
+
             if (outgoing < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(outgoing), "Amount must be zero or positive");

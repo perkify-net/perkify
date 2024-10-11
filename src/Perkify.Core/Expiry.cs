@@ -125,7 +125,7 @@
         /// <summary>
         /// Renew the expiry time in timeline arithmetic or calendrical arithmetic.
         /// </summary>
-        /// <param name="renewval">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
+        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
         /// <returns>The expiry time after renewal.</returns>
         public Expiry Renew(Renewal? renewal = null)
         {
@@ -172,7 +172,7 @@
         public bool IsActive => !this.suspensionUtc.HasValue;
 
         /// <summary>Suspends the expiry time.</summary>
-        /// <param name="suspendUtc">The suspend time in UTC.</param>
+        /// <param name="suspensionUtc">The suspend time in UTC.</param>
         /// <returns>The expiry time after suspension.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier than current time.</exception>
         public Expiry Deactivate(DateTime? suspensionUtc = null)
