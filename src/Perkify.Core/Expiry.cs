@@ -56,15 +56,6 @@ namespace Perkify.Core
             _ => throw new InvalidOperationException("Invalid state.")
         };
 
-        /// <summary>Specify the suspension time.</summary>
-        /// <param name="suspensionUtc">The suspension time in UTC.</param>
-        /// <returns>The expiry time after suspension.</returns>
-        public Expiry WithSuspensionUtc(DateTime suspensionUtc)
-        {
-            this.suspensionUtc = suspensionUtc < this.GetDeadlineUtc() ? suspensionUtc : this.GetDeadlineUtc();
-            return this;
-        }
-
         /// <summary>Specify the renewal period.</summary>
         /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
         /// <returns>The expiry time with specified renewal period.</returns>
