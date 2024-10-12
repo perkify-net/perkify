@@ -1,46 +1,59 @@
 namespace Perkify.Core.Tests
 {
     using System.Globalization;
+    using NodaTime.Extensions;
     using NodaTime.Testing;
     using NodaTime.Text;
 
     public partial class ExpiryTests
     {
-        [Theory(Skip = SkipOrNot)]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, true)]
-        [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, false)]
-        [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, false)]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", true)]
-        [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", true)]
-        [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", true)]
-        [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", false)]
-        [InlineData("2024-06-09T19:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", false)]
-        public void TestExpiryElligible(string nowUtc, string expiryUtcString, string? graceString, bool eligible)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestIsElligible
+        (
+            [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
+            [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving,
+            [CombinatorialValues(-1, 0, +1)] int nowUtcOffset
+        )
         {
-            var clock = nowUtc != null ? new FakeClock(InstantPattern.General.Parse(nowUtc).Value) : null;
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = graceString != null ? TimeSpan.Parse(graceString, CultureInfo.InvariantCulture) : (TimeSpan?)null;
+            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
+            var deadlineUtc = expiryUtc + (grace ?? TimeSpan.Zero);
+            var nowUtc = deadlineUtc.AddHours(nowUtcOffset);
+            var clock = new FakeClock(nowUtc.ToInstant());
+
             var expiry = new Expiry(expiryUtc, grace, clock);
-            Assert.Equal(eligible, expiry.IsEligible);
+            var expected = nowUtcOffset < 0;
+            expiry.IsEligible.Should().Be(expected);
         }
 
-        [Theory(Skip = SkipOrNot)]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T14:00:00Z", false)]
-        [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z", false)]
-        [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z", false)]
-        [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T14:00:00Z", false)]
-        [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T15:00:00Z", false)]
-        [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T16:00:00Z", false)]
-        [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T17:00:00Z", false)]
-        [InlineData("2024-06-09T19:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T18:00:00Z", false)]
-        public void TestExpiryElligibleWithSuspensionUtc(string nowUtc, string expiryUtcString, string? graceString, string suspensionUtcString, bool eligible)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestIsElligibleWithSuspensionUtc
+        (
+            [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
+            [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving,
+            [CombinatorialValues(-3, -2, -1, 0, +1)] int nowUtcOffset,
+            [CombinatorialValues(-4, -3, -2, -1, 0)] int suspensionUtcOffset
+        )
         {
-            var clock = nowUtc != null ? new FakeClock(InstantPattern.General.Parse(nowUtc).Value) : null;
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = graceString != null ? TimeSpan.Parse(graceString, CultureInfo.InvariantCulture) : (TimeSpan?)null;
-            var suspensionUtc = InstantPattern.General.Parse(suspensionUtcString).Value.ToDateTimeUtc();
+            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
+            var deadlineUtc = expiryUtc + (grace ?? TimeSpan.Zero);
+            var nowUtc = deadlineUtc.AddHours(nowUtcOffset);
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var suspensionUtc = deadlineUtc.AddHours(suspensionUtcOffset);
+
             var expiry = new Expiry(expiryUtc, grace, clock).WithSuspensionUtc(suspensionUtc);
-            Assert.Equal(eligible, expiry.IsEligible);
+            var expected = (suspensionUtcOffset, nowUtcOffset) switch
+            {
+                // Already suspended
+                (int so, int no) when so <= no => false,
+
+                // Will suspend in future
+                (int so, int no) when so > no => nowUtcOffset < 0,
+
+                _ => throw new NotImplementedException(),
+            };
+            expiry.IsEligible.Should().Be(expected);
         }
     }
 }

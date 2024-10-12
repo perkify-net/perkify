@@ -7,14 +7,9 @@ namespace Perkify.Core
     using NodaTime;
 
     /// <inheritdoc/>
-    public partial class Expiry : INowUtc, IExpiry<Expiry>
+    public partial class Expiry : IExpiry<Expiry>
     {
-        private readonly IClock clock;
-
         private DateTime? suspensionUtc;
-
-        /// <inheritdoc/>
-        public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
 
         /// <inheritdoc/>
         public TimeSpan GracePeriod { get; private set; }

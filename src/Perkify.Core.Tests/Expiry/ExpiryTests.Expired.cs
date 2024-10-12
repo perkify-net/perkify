@@ -15,7 +15,7 @@ namespace Perkify.Core.Tests
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", true)]
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", true)]
         [InlineData("2024-06-09T19:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", true)]
-        public void TestExpiryExpired(string nowUtcString, string expiryUtcString, string? graceString, bool expired)
+        public void TestIsExpired(string nowUtcString, string expiryUtcString, string? graceString, bool expired)
         {
             var clock = nowUtcString != null ? new FakeClock(InstantPattern.General.Parse(nowUtcString).Value) : null;
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
@@ -36,7 +36,7 @@ namespace Perkify.Core.Tests
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T17:00:00Z", true)]
         [InlineData("2024-06-09T19:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T18:00:00Z", true)]
         [InlineData("2024-06-09T20:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T19:00:00Z", true)]
-        public void TestExpiryExpiredWithSuspensionUtc(string nowUtc, string expiryUtcString, string? graceString, string suspensionUtcString, bool expired)
+        public void TestIsExpiredWithSuspensionUtc(string nowUtc, string expiryUtcString, string? graceString, string suspensionUtcString, bool expired)
         {
             var clock = nowUtc != null ? new FakeClock(InstantPattern.General.Parse(nowUtc).Value) : null;
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
@@ -47,7 +47,6 @@ namespace Perkify.Core.Tests
             Assert.Equal(expired, expiry.IsExpired());
         }
 
-
         [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "00:00:00")]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "00:00:00")]
@@ -57,7 +56,7 @@ namespace Perkify.Core.Tests
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "01:00:00")]
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "02:00:00")]
         [InlineData("2024-06-09T19:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "02:00:00")]
-        public void TestExpiryOverdue(string nowUtc, string expiryUtcString, string? graceString, string overdueString)
+        public void TestOverdue(string nowUtc, string expiryUtcString, string? graceString, string overdueString)
         {
             var clock = nowUtc != null ? new FakeClock(InstantPattern.General.Parse(nowUtc).Value) : null;
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
@@ -77,7 +76,7 @@ namespace Perkify.Core.Tests
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T17:00:00Z", "01:00:00")]
         [InlineData("2024-06-09T19:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T18:00:00Z", "02:00:00")]
         [InlineData("2024-06-09T20:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T19:00:00Z", "02:00:00")]
-        public void TestExpiryOverdueWithSuspensionUtc(string nowUtc, string expiryUtcString, string? graceString, string suspensionUtcString, string overdueString)
+        public void TestOverdueWithSuspensionUtc(string nowUtc, string expiryUtcString, string? graceString, string suspensionUtcString, string overdueString)
         {
             var clock = nowUtc != null ? new FakeClock(InstantPattern.General.Parse(nowUtc).Value) : null;
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
