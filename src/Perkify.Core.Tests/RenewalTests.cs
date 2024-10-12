@@ -1,5 +1,6 @@
 namespace Perkify.Core.Tests
 {
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using System.Globalization;
 
     public class RenewalTests
@@ -12,8 +13,8 @@ namespace Perkify.Core.Tests
         public void TestCreateRenewal(string duration, bool calendar)
         {
             var renewal = new Renewal(duration, calendar);
-            Assert.Equal(duration, renewal.Duration);
-            Assert.Equal(calendar, renewal.Calendar);
+            renewal.Duration.Should().Be(duration);
+            renewal.Calendar.Should().Be(calendar);
         }
 
         [Theory(Skip = SkipOrNot)]
@@ -21,7 +22,11 @@ namespace Perkify.Core.Tests
         [InlineData("INCORRECT", false)]
         public void TestCreateRenewalInvalidFormat(string duration, bool calendar)
         {
-            Assert.Throws<FormatException>(() => new Renewal(duration, calendar));
+            var action = () => new Renewal(duration, calendar);
+            action
+                .Should()
+            .Throw<FormatException>()
+            .WithMessage("Incorrect ISO8601 duration string.");
         }
 
         [Theory(Skip = SkipOrNot)]
@@ -33,7 +38,7 @@ namespace Perkify.Core.Tests
             var expected = DateTime.Parse(expectedUtcString, CultureInfo.InvariantCulture).ToUniversalTime();
             var renewal = new Renewal(duration, calendar);
             var actual = renewal.Renew(expiryUtc);
-            Assert.Equal(expected, actual);
+            actual.Should().Be(expected);
         }
 
         [Theory(Skip = SkipOrNot)]
@@ -45,7 +50,7 @@ namespace Perkify.Core.Tests
             var expected = TimeSpan.Parse(expectedString, CultureInfo.InvariantCulture);
             var renewal = new Renewal(duration, calendar);
             var actual = renewal.Till(expiryUtc);
-            Assert.Equal(expected, actual);
+            actual.Should().Be(expected);
         }
     }
 }

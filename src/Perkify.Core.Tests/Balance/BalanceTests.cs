@@ -2,7 +2,7 @@
 {
     public partial class BalanceTests
     {
-        const string SkipOrNot = "Skipped";
+        const string SkipOrNot = null;
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestCreateBalanceWithZeroOrPositiveThreshold

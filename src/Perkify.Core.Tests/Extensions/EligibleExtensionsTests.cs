@@ -14,9 +14,8 @@ namespace Perkify.Core.Tests
             action.Should().NotThrow();
         }
 
-        [Theory(Skip = SkipOrNot)]
-        [InlineData(false)]
-        public void TestCheckIneligible(bool eligible)
+        [Fact(Skip = SkipOrNot)]
+        public void TestCheckIneligible()
         {
             var mock = new Mock<IEligible>();
             mock.Setup(x => x.IsEligible).Returns(false);

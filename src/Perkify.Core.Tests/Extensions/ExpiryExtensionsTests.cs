@@ -2,40 +2,6 @@
 {
     using System.Globalization;
 
-    public class MockExpiry : INowUtc, IExpiry<MockExpiry>
-    {
-        public DateTime NowUtc { get; set; }
-
-        public DateTime ExpiryUtc { get; set; }
-
-        public TimeSpan GracePeriod { get; set; }
-
-        public TimeSpan Remaining { get; set; }
-
-        public TimeSpan Overdue { get; set; }
-
-        public Renewal? Renewal { get; set; }
-
-        public DateTime? SuspensionUtc { get; set; }
-
-        public bool IsActive { get; set; }
-
-        public MockExpiry Activate(DateTime? resumptionUtc = null, bool extended = false)
-        {
-            throw new NotImplementedException();
-        }
-
-        public MockExpiry Deactivate(DateTime? suspensionUtc = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public MockExpiry Renew(Renewal? renewal)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class ExpiryExtensionsTests
     {
         const string SkipOrNot = null;
@@ -47,13 +13,14 @@
             var expiryUtc = DateTime.Parse(expiryUtcString, CultureInfo.InvariantCulture).ToUniversalTime();
             var gracePeriod = TimeSpan.Parse(gracePeriodString, CultureInfo.InvariantCulture);
             var expected = DateTime.Parse(deadlineUtcString, CultureInfo.InvariantCulture).ToUniversalTime();
-            var expiry = new MockExpiry
-            {
-                ExpiryUtc = expiryUtc,
-                GracePeriod = gracePeriod
-            };
+
+            var mock = new Mock<IMockExpiry>();
+            mock.SetupGet(x => x.ExpiryUtc).Returns(expiryUtc);
+            mock.SetupGet(x => x.GracePeriod).Returns(gracePeriod);
+            var expiry = mock.Object;
+
             var actual = expiry.GetDeadlineUtc();
-            Assert.Equal(expected, actual);
+            actual.Should().Be(expected);
         }
 
         [Theory(Skip = SkipOrNot)]
@@ -68,12 +35,13 @@
             var nowUtc = DateTime.Parse(nowUtcString, CultureInfo.InvariantCulture).ToUniversalTime();
             var expiryUtc = DateTime.Parse(expiryUtcString, CultureInfo.InvariantCulture).ToUniversalTime();
             var suspensionUtc = suspensionUtcString != null ? DateTime.Parse(suspensionUtcString, CultureInfo.InvariantCulture).ToUniversalTime() : (DateTime?)null;
-            var expiry = new MockExpiry
-            {
-                NowUtc = nowUtc,
-                ExpiryUtc = expiryUtc,
-                SuspensionUtc = suspensionUtc,
-            };
+
+            var mock = new Mock<IMockExpiry>();
+            mock.SetupGet(x => x.NowUtc).Returns(nowUtc);
+            mock.SetupGet(x => x.ExpiryUtc).Returns(expiryUtc);
+            mock.SetupGet(x => x.SuspensionUtc).Returns(suspensionUtc);
+            var expiry = mock.Object;
+
             var actual = expiry.IsExpired();
             Assert.Equal(expected, actual);
         }
