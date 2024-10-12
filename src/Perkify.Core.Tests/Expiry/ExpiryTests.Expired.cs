@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, false)]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, true)]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, true)]
@@ -25,7 +25,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(expired, expiry.IsExpired());
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T14:00:00Z", false)]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z", false)]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z", true)]
@@ -48,7 +48,7 @@ namespace Perkify.Core.Tests
         }
 
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "00:00:00")]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "00:00:00")]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "00:00:00")]
@@ -68,7 +68,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(overdue, expiry.Overdue);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z", "00:00:00")]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z", "00:00:00")]
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T17:00:00Z", "00:00:00")]
@@ -89,7 +89,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(overdue, expiry.Overdue);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "01:00:00")]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "00:00:00")]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "00:00:00")]
@@ -108,7 +108,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(remaining, expiry.Remaining);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T14:00:00Z", "02:00:00")]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z", "01:00:00")]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z", "00:00:00")]

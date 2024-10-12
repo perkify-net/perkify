@@ -2,19 +2,22 @@ namespace Perkify.Core.Tests
 {
     public partial class BalanceTests
     {
-        [Theory]
-        [InlineData(0, 100, 100, true)]
-        [InlineData(0, 100, 50, true)]
-        [InlineData(0, 50, 100, false)]
-        [InlineData(-10, 100, 100, true)]
-        [InlineData(-10, 100, 50, true)]
-        [InlineData(-10, 50, 60, true)]
-        [InlineData(-10, 50, 100, false)]
-        public void TestIsEligible(long threshold, long incoming, long outgoing, bool eligible)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestIsEligible
+        (
+            [CombinatorialValues(0, -10)] long threshold,
+            [CombinatorialValues(10)] long incoming,
+            [CombinatorialValues(0, 10, -10)] long delta
+        )
         {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(eligible, balance.IsEligible);
+            var outgoing = incoming - threshold - delta;
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
+
+            var eligible = delta >= 0;
+            balance.IsEligible.Should().Be(eligible);
         }
     }
 }

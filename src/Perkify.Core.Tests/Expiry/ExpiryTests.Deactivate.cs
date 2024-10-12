@@ -7,7 +7,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T16:00:00Z", null, "2024-06-07T16:00:00Z", "2024-06-07T16:00:00Z")]
         [InlineData("2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z")]
         [InlineData("2024-06-09T16:00:00Z", null, "2024-06-11T16:00:00Z", "2024-06-09T16:00:00Z")]
@@ -33,7 +33,7 @@ namespace Perkify.Core.Tests
             Assert.False(expiry.IsEligible);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T16:00:00Z", null, "2024-06-07T16:00:00Z", "2024-06-07T16:00:00Z")]
         [InlineData("2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z")]
         [InlineData("2024-06-09T16:00:00Z", null, "2024-06-11T16:00:00Z", "2024-06-09T16:00:00Z")]
@@ -60,7 +60,7 @@ namespace Perkify.Core.Tests
             Assert.False(expiry.IsEligible);
         }
 
-        [Theory, CombinatorialData]
+        [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestDeactivateExpiryImplicitSuspensionUtc
         (
             [CombinatorialValues("2024-10-09T15:00:00Z")] string expiryUtcString,
@@ -81,7 +81,7 @@ namespace Perkify.Core.Tests
             Assert.False(expiry.IsEligible);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-07T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-07T16:00:00Z")]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
         [InlineData("2024-06-11T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
@@ -105,7 +105,7 @@ namespace Perkify.Core.Tests
             Assert.False(expiry.IsEligible);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-08T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-07T16:00:00Z")]
         [InlineData("2024-06-08T16:00:00Z", "2024-06-09T16:00:00Z", "2:00:00:00", "2024-06-07T16:00:00Z")]
         public void TestDeactivateExpiryAlreadySuspended(string nowUtc, string expiryUtcString, string? graceString, string suspensionUtcString)
