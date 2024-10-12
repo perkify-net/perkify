@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
-namespace Perkify.Core.Tests
+﻿namespace Perkify.Core.Tests
 {
     public class BalanceExceedancePolicyExtensionsTests
     {

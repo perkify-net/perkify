@@ -24,7 +24,6 @@ namespace Perkify.Core
                 BalanceExceedancePolicy.Overflow => Overflow(ref delta, maximum),
                 BalanceExceedancePolicy.Overdraft => Overdraft(ref delta, maximum),
                 _ => throw new NotSupportedException($"Unsupported balance exceedance policy: {policy}")
-                 #pragma warning restore CS0162
             };
 
         private static long Reject(ref long delta, long maximum)
