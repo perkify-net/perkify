@@ -9,8 +9,10 @@ namespace Perkify.Core
     /// <summary>
     /// Expiry time for eligibility.
     /// </summary>
-    public partial class Expiry : IEligible
+    public partial class Expiry : IEligible, INowUtc
     {
+        private readonly IClock clock;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Expiry"/> class.Create the expiry time for eligibility.</summary>
         /// <param name="expiryUtc">Expiry time in UTC.</param>
@@ -27,25 +29,29 @@ namespace Perkify.Core
         }
 
         /// <inheritdoc/>
-        public bool IsEligible => !this.suspensionUtc.HasValue && this.NowUtc < this.GetDeadlineUtc();
+        public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
+
+        /// <inheritdoc/>
+        public bool IsEligible => (this.suspensionUtc, this.NowUtc, this.GetDeadlineUtc()) switch
+        {
+            // Not suspended
+            (null, DateTime n, DateTime d) => n < d,
+
+            // Already suspended
+            (DateTime s, DateTime n, DateTime d) when s <= n => false,
+
+            // Will suspend in future
+            (DateTime s, DateTime n, DateTime d) when s > n => n < d,
+
+            // Default
+            _ => throw new InvalidOperationException("Invalid state.")
+        };
 
         /// <summary>Specify the suspension time.</summary>
         /// <param name="suspensionUtc">The suspension time in UTC.</param>
         /// <returns>The expiry time after suspension.</returns>
-        /// <exception cref="InvalidOperationException">Resuspending is not allowed.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The suspension time must be earlier with the current time.</exception>
         public Expiry WithSuspensionUtc(DateTime suspensionUtc)
         {
-            if (this.suspensionUtc.HasValue)
-            {
-                throw new InvalidOperationException("Resuspending is not allowed.");
-            }
-
-            if (suspensionUtc > this.NowUtc)
-            {
-                throw new ArgumentOutOfRangeException(nameof(suspensionUtc), "The suspension time must be earlier with the current time");
-            }
-
             this.suspensionUtc = suspensionUtc < this.GetDeadlineUtc() ? suspensionUtc : this.GetDeadlineUtc();
             return this;
         }

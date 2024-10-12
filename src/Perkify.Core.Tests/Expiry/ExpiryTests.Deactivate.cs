@@ -61,24 +61,25 @@ namespace Perkify.Core.Tests
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
-        public void TestDeactivateExpiryImplicitSuspensionUtc
+        public void TestDeactivateExpiryWithImplicitSuspensionUtc
         (
             [CombinatorialValues("2024-10-09T15:00:00Z")] string expiryUtcString,
             [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving,
-            [CombinatorialValues("3:00:00", "2:00:00", "1:00:00", "00:00:00", "-1:00:00")] string? nowUtcIfHaving
+            [CombinatorialValues(-3, -2, -1, 0, 1)] int nowUtcOffset
         )
         {
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var gracePeriod = gracePeriodIfHaving is null ? (TimeSpan?)null : TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture);
-            var nowUtc = nowUtcIfHaving is null ? (DateTime?)null : expiryUtc.Add(TimeSpan.Parse(nowUtcIfHaving, CultureInfo.InvariantCulture));
-            var clock = nowUtc is null ? null : new FakeClock(nowUtc.Value.ToInstant());
-            var expiry = new Expiry(expiryUtc, gracePeriod, clock);
-            Assert.True(expiry.IsActive);
+            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
+            var deadlineUtc = expiryUtc + (grace ?? TimeSpan.Zero);
+            var nowUtc = deadlineUtc.AddHours(nowUtcOffset);
+            var clock = new FakeClock(nowUtc.ToInstant());
 
+            var expiry = new Expiry(expiryUtc, grace, clock);
+            expiry.IsActive.Should().BeTrue();
             expiry.Deactivate(null);
-            Assert.False(expiry.IsActive);
+            expiry.IsActive.Should().BeFalse();
+
             Assert.Equal(expiryUtc, expiry.SuspensionUtc);
-            Assert.False(expiry.IsEligible);
         }
 
         [Theory(Skip = SkipOrNot)]
