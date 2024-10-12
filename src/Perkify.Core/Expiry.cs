@@ -32,7 +32,6 @@ namespace Perkify.Core
         public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
 
         /// <inheritdoc/>
-        /// !this.suspensionUtc.HasValue && this.NowUtc < this.GetDeadlineUtc();
         public bool IsEligible => (this.suspensionUtc, this.NowUtc, this.GetDeadlineUtc()) switch
         {
             // Not suspended
