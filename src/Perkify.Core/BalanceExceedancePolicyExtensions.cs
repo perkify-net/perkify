@@ -23,14 +23,15 @@ namespace Perkify.Core
                 BalanceExceedancePolicy.Reject => Reject(ref delta, maximum),
                 BalanceExceedancePolicy.Overflow => Overflow(ref delta, maximum),
                 BalanceExceedancePolicy.Overdraft => Overdraft(ref delta, maximum),
-                _ => throw new ArgumentOutOfRangeException(nameof(policy), "Invalid balance exceedance policy.")
+                _ => throw new NotSupportedException($"Unsupported balance exceedance policy: {policy}")
+                 #pragma warning restore CS0162
             };
 
         private static long Reject(ref long delta, long maximum)
         {
             if (delta > maximum)
             {
-                throw new ArgumentOutOfRangeException(nameof(delta), "The amount is over-spending.");
+                throw new ArgumentOutOfRangeException(nameof(delta), "Rejected due to insufficient balance.");
             }
 
             return 0;

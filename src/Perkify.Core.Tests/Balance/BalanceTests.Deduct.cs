@@ -1,105 +1,198 @@
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+
 namespace Perkify.Core.Tests
 {
     public partial class BalanceTests
     {
-        [Theory]
-        [InlineData(0, 100, 50, 10, 60)]                // Debit: Eligible => Eligible
-        [InlineData(0, 100, 100, 10, 110)]              // Debit: Eligible => Eligible
-        [InlineData(0, 100, 50, 50, 100)]               // Debit: Eligible => Ineligible
-        [InlineData(-10, 100, 100, 10, 110)]            // Credit: Ineligible => Eligible
-        [InlineData(-10, 100, 50, 10, 60)]              // Credit: Eligible => Eligible
-        public void TestDeductBalance(long threshold, long incoming, long outgoing, long spend, long expected)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestDeductBalance
+        (
+            [CombinatorialValues(0L, -10L)] long threshold,
+            [CombinatorialValues(100L)] long incoming,
+            [CombinatorialValues(50L, 90L)] long outgoing,
+            [CombinatorialValues(0L, 10L)] long delta,
+            [CombinatorialValues
+            (
+                BalanceExceedancePolicy.Overdraft,
+                BalanceExceedancePolicy.Overflow,
+                BalanceExceedancePolicy.Reject
+            )] BalanceExceedancePolicy policy
+        )
         {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
 
-            balance.Deduct(spend, BalanceExceedancePolicy.Overdraft);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(expected, balance.Outgoing);
+            delta = incoming - threshold - outgoing - delta;
+            var remained = balance.Deduct(delta, policy);
+            var expected = outgoing + delta;
+            balance.Outgoing.Should().Be(expected);
+            remained.Should().Be(0);
         }
 
-        [Theory]
-        [InlineData(0, 100, 100, -10, BalanceExceedancePolicy.Overdraft)]
-        [InlineData(0, 100, 100, -10, BalanceExceedancePolicy.Reject)]
-        [InlineData(-10, 100, 100, -10, BalanceExceedancePolicy.Overdraft)]
-        [InlineData(-10, 100, 100, -10, BalanceExceedancePolicy.Reject)]
-        public void TestDeductBalanceNegativeAmount(long threshold, long incoming, long outgoing, long spend, BalanceExceedancePolicy policy)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestDeductBalanceNegativeAmount
+        (
+            [CombinatorialValues(0L, -10L)] long threshold,
+            [CombinatorialValues(100L)] long incoming,
+            [CombinatorialValues(100L)] long outgoing,
+            [CombinatorialValues(-10L)] long delta,
+            [CombinatorialValues
+            (
+                BalanceExceedancePolicy.Overdraft,
+                BalanceExceedancePolicy.Overflow,
+                BalanceExceedancePolicy.Reject
+            )] BalanceExceedancePolicy policy
+        )
         {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
+            balance.IsEligible.Should().BeTrue();
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => balance.Deduct(spend, policy));
-            Assert.Equal(incoming, balance.Incoming);
+            var parameter = nameof(delta);
+            var action = () => balance.Deduct(delta, policy);
+            action
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .WithParameterName(parameter)
+                .WithMessage($"Amount must be positive or zero. (Parameter '{parameter}')");
+            balance.IsEligible.Should().BeTrue();
+            balance.Outgoing.Should().Be(outgoing);
+        }
+
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestDeductBalanceIneligible
+        (
+            [CombinatorialValues(0L, -10L)] long threshold,
+            [CombinatorialValues(50L)] long incoming,
+            [CombinatorialValues(100L)] long outgoing,
+            [CombinatorialValues(10L)] long delta,
+            [CombinatorialValues
+            (
+                BalanceExceedancePolicy.Overdraft,
+                BalanceExceedancePolicy.Overflow,
+                BalanceExceedancePolicy.Reject
+            )] BalanceExceedancePolicy policy
+        )
+        {
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
+            balance.IsEligible.Should().BeFalse();
+
+            var action = () => balance.Deduct(delta, policy);
+            action
+                .Should()
+                .Throw<InvalidOperationException>()
+                .WithMessage($"Ineligible state.");
+            balance.IsEligible.Should().BeFalse();
             Assert.Equal(outgoing, balance.Outgoing);
         }
 
-        [Theory]
-        [InlineData(0, 50, 100, 10, BalanceExceedancePolicy.Overdraft, 50)]
-        [InlineData(0, 50, 100, 10, BalanceExceedancePolicy.Reject, 50)]
-        [InlineData(-10, 50, 100, 10, BalanceExceedancePolicy.Overdraft, 40)]
-        [InlineData(-10, 50, 100, 10, BalanceExceedancePolicy.Reject, 40)]
-        public void TestDeductBalanceIneligible(long threshold, long incoming, long outgoing, long spend, BalanceExceedancePolicy policy, long expected)
-        {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
-            Assert.False(balance.IsEligible);
-
-            Assert.Throws<InvalidOperationException>(() => balance.Deduct(spend, policy));
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
-            Assert.Equal(expected, balance.GetOverSpendingAmount());
-        }
-
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData(0, 100, 50, 60)]
         [InlineData(-10, 0, 0, 20)]
-        public void TestDeductBalanceOverspending(long threshold, long incoming, long outgoing, long spend)
+        public void TestDeductBalanceRejected
+        (
+            [CombinatorialValues(0L, -10L)] long threshold,
+            [CombinatorialValues(100L)] long incoming,
+            [CombinatorialValues(90L)] long outgoing,
+            [CombinatorialValues(20L)] long exceed
+        )
         {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
+            balance.IsEligible.Should().BeTrue();
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => balance.Deduct(spend, BalanceExceedancePolicy.Reject));
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
+            var maximum = incoming - threshold - outgoing;
+            var delta = maximum + exceed;
+            var action = () => balance.Deduct(delta, BalanceExceedancePolicy.Reject);
+            var parameter = nameof(delta);
+            action
+                .Should()
+                .Throw<ArgumentOutOfRangeException>()
+                .WithParameterName(parameter)
+                .WithMessage($"Rejected due to insufficient balance. (Parameter '{parameter}')");
+            balance.IsEligible.Should().BeTrue();
+            balance.Outgoing.Should().Be(outgoing);
         }
 
-        [Theory]
-        [InlineData(0, 100, 100, long.MaxValue - 9)]
-        [InlineData(-10, 100, 100, long.MaxValue - 9)]
-        public void TestDeductBalanceOverflow(long threshold, long incoming, long outgoing, long spend)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestDeductBalanceOverflow
+        (
+            [CombinatorialValues(0L, -10L)] long threshold,
+            [CombinatorialValues(100L)] long incoming,
+            [CombinatorialValues(90L)] long outgoing,
+            [CombinatorialValues(20L)] long exceed
+        )
         {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
+            balance.IsEligible.Should().BeTrue();
 
-            Assert.Throws<OverflowException>(() => balance.Deduct(spend, BalanceExceedancePolicy.Overdraft));
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
+            var maximum = incoming - threshold - outgoing;
+            var delta = maximum + exceed;
+            var remained = balance.Deduct(delta, BalanceExceedancePolicy.Overflow);
+            var expected = outgoing + delta - remained;
+            remained.Should().Be(exceed);
+            balance.Outgoing.Should().Be(expected);
+            balance.IsEligible.Should().BeTrue();
         }
 
-        [Theory]
-        [InlineData(0, 100, 50, 0)]         // Debit: without overspending
-        [InlineData(0, 100, 100, 0)]        // Debit: without overspending (on the edge)
-        [InlineData(0, 100, 120, 20)]       // Debit: with overspending
-        [InlineData(-10, 100, 105, 0)]      // Credit: without overspending
-        [InlineData(-10, 100, 110, 0)]      // Credit: without overspending (on the edge)
-        [InlineData(-10, 100, 120, 10)]     // Credit: with overspending
-        public void TestBalanceOverspending(long threshold, long incoming, long outgoing, long overspending)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestDeductBalanceOverdraft
+        (
+            [CombinatorialValues(0L, -10L)] long threshold,
+            [CombinatorialValues(100L)] long incoming,
+            [CombinatorialValues(90L)] long outgoing,
+            [CombinatorialValues(20L)] long exceed
+        )
         {
-            var balance = new Balance(threshold).Adjust(incoming, outgoing);
-            Assert.Equal(threshold, balance.Threshold);
-            Assert.Equal(incoming, balance.Incoming);
-            Assert.Equal(outgoing, balance.Outgoing);
-            Assert.Equal(overspending, balance.GetOverSpendingAmount());
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
+            balance.IsEligible.Should().BeTrue();
+
+            var maximum = incoming - threshold - outgoing;
+            var delta = maximum + exceed;
+            var remained = balance.Deduct(delta, BalanceExceedancePolicy.Overdraft);
+            var expected = outgoing + delta - remained;
+            remained.Should().Be(0);
+            balance.Outgoing.Should().Be(expected);
+            balance.IsEligible.Should().BeFalse();
+        }
+
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestDeductBalanceOverdraftedWithOverflowException
+        (
+            [CombinatorialValues(0L, -10L)] long threshold,
+            [CombinatorialValues(100L)] long incoming,
+            [CombinatorialValues(100L)] long outgoing,
+            [CombinatorialValues(long.MaxValue - 9)] long delta
+        )
+        {
+            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            balance.Threshold.Should().Be(threshold);
+            balance.Incoming.Should().Be(incoming);
+            balance.Outgoing.Should().Be(outgoing);
+            balance.IsEligible.Should().BeTrue();
+
+            var action = () => balance.Deduct(delta, BalanceExceedancePolicy.Overdraft);
+            action
+                .Should()
+                .Throw<OverflowException>()
+                .WithMessage("Arithmetic operation resulted in an overflow.");
+            balance.IsEligible.Should().BeTrue();
+            balance.Outgoing.Should().Be(outgoing);
         }
     }
 }

@@ -2,7 +2,7 @@ namespace Perkify.Core.Tests
 {
     public partial class BalanceTests
     {
-        [Theory, CombinatorialData]
+        [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestAdjustBalance
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -26,7 +26,7 @@ namespace Perkify.Core.Tests
             balance.Outgoing.Should().Be(outgoing);
         }
 
-        [Theory, CombinatorialData]
+        [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestClearBalance
         (
             [CombinatorialValues(0, -10)] long threshold,

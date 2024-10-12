@@ -38,7 +38,9 @@
 
     public class ExpiryExtensionsTests
     {
-        [Theory]
+        const string SkipOrNot = null;
+
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T18:00:00Z")]
         public void TestGetDeadlineUtc(string expiryUtcString, string gracePeriodString, string deadlineUtcString)
         {
@@ -54,7 +56,7 @@
             Assert.Equal(expected, actual);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, false)]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, true)]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, true)]

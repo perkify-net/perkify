@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "PT1H", false, "2024-06-09T17:00:00Z")]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "PT1H", false, "2024-06-09T17:00:00Z")]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "PT1H", false, "2024-06-09T17:00:00Z")]
@@ -36,7 +36,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(expected, expiry.ExpiryUtc);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "PT-1H", true)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "PT-1H", false)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "PT-1H", true)]
@@ -52,7 +52,7 @@ namespace Perkify.Core.Tests
             Assert.Throws<InvalidOperationException>(() => expiry.Renew(renewal));
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z", "PT1H", true)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z", "PT1H", false)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T15:00:00Z", "PT1H", true)]

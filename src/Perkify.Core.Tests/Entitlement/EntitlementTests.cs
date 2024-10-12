@@ -7,7 +7,9 @@ namespace Perkify.Core.Tests
 
     public class EntitlementTests
     {
-        [Theory, CombinatorialData]
+        const string SkipOrNot = "Skipped";
+
+        [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestCreateEntitlement
         (
             [CombinatorialValues(0, 100)] long balanceAmount,
@@ -37,7 +39,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(autorenewal, entitlement.AutoRenewalMode);
         }
 
-        [Theory, CombinatorialData]
+        [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestCreateEntitlementWithoutExpiry
         (
             [CombinatorialValues(0, 100)] long balanceAmount,

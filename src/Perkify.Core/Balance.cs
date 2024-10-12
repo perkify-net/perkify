@@ -31,7 +31,7 @@ namespace Perkify.Core
         {
             if (threshold >= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(threshold), "Threshold amount must be negative");
+                throw new ArgumentOutOfRangeException(nameof(threshold), "Amount must be negative");
             }
 
             return new Balance(threshold);
@@ -49,12 +49,12 @@ namespace Perkify.Core
         {
             if (incoming < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(incoming), "Amount must be zero or positive");
+                throw new ArgumentOutOfRangeException(nameof(incoming), "Amount must be positive or zero.");
             }
 
             if (outgoing < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(outgoing), "Amount must be zero or positive");
+                throw new ArgumentOutOfRangeException(nameof(outgoing), "Amount must be positive or zero.");
             }
 
             this.Incoming = incoming;

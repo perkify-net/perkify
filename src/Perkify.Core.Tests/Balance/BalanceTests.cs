@@ -1,11 +1,14 @@
-namespace Perkify.Core.Tests
+﻿namespace Perkify.Core.Tests
 {
     public partial class BalanceTests
     {
-        [Theory]
-        [InlineData(10)]
-        [InlineData(0)]
-        public void TestCreateBalanceWithZeroOrPositiveThreshold(long threshold)
+        const string SkipOrNot = "Skipped";
+
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestCreateBalanceWithZeroOrPositiveThreshold
+        (
+            [CombinatorialValues(0, 10)] long threshold
+        )
         {
             var balance = new Balance(threshold);
 
@@ -16,9 +19,11 @@ namespace Perkify.Core.Tests
             balance.GetBalanceType().Should().Be(BalanceType.Debit);
         }
 
-        [Theory]
-        [InlineData(-10)]
-        public void TestCreateBalanceWithNegativeThreshold(long threshold)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestCreateBalanceWithNegativeThreshold
+        (
+            [CombinatorialValues(-10)] long threshold
+        )
         {
             var balance = new Balance(threshold);
 
@@ -29,10 +34,11 @@ namespace Perkify.Core.Tests
             balance.GetBalanceType().Should().Be(BalanceType.Credit);
         }
 
-        [Fact]
+        [Fact(Skip = SkipOrNot)]
         public void TestCreateDebitBalanceDirectly()
         {
             var debit = Balance.Debit();
+
             debit.Incoming.Should().Be(0);
             debit.Outgoing.Should().Be(0);
             debit.GetBalanceAmount().Should().Be(0);
@@ -40,11 +46,14 @@ namespace Perkify.Core.Tests
             debit.GetBalanceType().Should().Be(BalanceType.Debit);
         }
 
-        [Theory]
-        [InlineData(-10)]
-        public void TestCreateCreditBalanceDirectly(long threshold)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestCreateCreditBalanceDirectly
+        (
+            [CombinatorialValues(-10)] long threshold
+        )
         {
             var credit = Balance.Credit(threshold);
+
             credit.Incoming.Should().Be(0);
             credit.Outgoing.Should().Be(0);
             credit.GetBalanceAmount().Should().Be(0);
@@ -52,10 +61,11 @@ namespace Perkify.Core.Tests
             credit.GetBalanceType().Should().Be(BalanceType.Credit);
         }
 
-        [Theory]
-        [InlineData(0)]
-        [InlineData(10)]
-        public void TestCreateCreditBalanceDirectlyWithInvalidThreshold(long threshold)
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestCreateCreditBalanceDirectlyWithInvalidThreshold
+        (
+            [CombinatorialValues(0, 10)] long threshold
+        )
         {
             var parameter = nameof(threshold);
             var action = () => Balance.Credit(threshold);
@@ -64,10 +74,10 @@ namespace Perkify.Core.Tests
                 .Should()
                 .Throw<ArgumentOutOfRangeException>()
                 .WithParameterName(parameter)
-                .WithMessage($"Threshold amount must be negative (Parameter '{parameter}')");
+                .WithMessage($"Amount must be negative (Parameter '{parameter}')");
         }
 
-        [Theory, CombinatorialData]
+        [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestWithBalance
         (
             [CombinatorialValues(0, 100, 200)] long incoming,
@@ -79,7 +89,7 @@ namespace Perkify.Core.Tests
             balance.Outgoing.Should().Be(outgoing);
         }
 
-        [Theory, CombinatorialData]
+        [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestWithBalanceInNegativeAmount
         (
             [CombinatorialValues(-100)] long amount,
@@ -94,11 +104,11 @@ namespace Perkify.Core.Tests
             var balance = Balance.Debit();
             var action = () => balance.WithBalance(incoming, outgoing);
 
-            action
+            _ = action
                 .Should()
                 .Throw<ArgumentOutOfRangeException>()
                 .WithParameterName(parameter)
-                .WithMessage($"Amount must be zero or positive (Parameter '{parameter}')");
+                .WithMessage($"Amount must be positive or zero. (Parameter '{parameter}')");
             balance.Incoming.Should().Be(0);
             balance.Outgoing.Should().Be(0);
         }

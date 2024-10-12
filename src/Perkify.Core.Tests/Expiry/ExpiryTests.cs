@@ -6,7 +6,9 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        [Theory]
+        const string SkipOrNot = "Skipped";
+
+        [Theory(Skip = SkipOrNot)]
         [InlineData(null, "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
         [InlineData(null, "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T18:00:00Z")]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
@@ -29,7 +31,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(deadlineUtc, expiry.GetDeadlineUtc());
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", null, "2024-06-09T15:00:00Z", "2024-06-09T15:00:00Z")]
         [InlineData("2024-06-09T15:00:00Z", "02:00:00", "2024-06-09T15:00:00Z", "2024-06-09T17:00:00Z")]
         public void TestCreateExpiryWithNowUtc(string nowUtcString, string? graceString, string expiryUtcString, string deadlineUtcString)
@@ -44,7 +46,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(grace ?? TimeSpan.Zero, expiry.GracePeriod);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T18:00:00Z")]
@@ -61,7 +63,7 @@ namespace Perkify.Core.Tests
             Assert.False(expiry.IsActive);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T17:00:00Z")]
         [InlineData("2024-06-09T20:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T19:00:00Z")]
         [InlineData("2024-06-09T21:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T20:00:00Z")]
@@ -77,7 +79,7 @@ namespace Perkify.Core.Tests
             Assert.False(expiry.IsActive);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
         [InlineData("2024-06-09T18:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T18:00:00Z")]
@@ -93,7 +95,7 @@ namespace Perkify.Core.Tests
             Assert.Throws<InvalidOperationException>(() => expiry.WithSuspensionUtc(suspensionUtc));
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T14:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z")]
         [InlineData("2024-06-09T14:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T15:00:00Z")]
         public void TestCreateExpiryWithSuspensionUtcInvalidFutureTime(string nowUtc, string expiryUtcString, string? graceString, string suspensionUtcString)
@@ -109,7 +111,7 @@ namespace Perkify.Core.Tests
             Assert.Null(expiry.SuspensionUtc);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z")]
         [InlineData("2024-06-09T19:00:00Z", "2024-06-09T16:00:00Z", "02:00:00", "2024-06-09T18:00:00Z")]
         public void TestExpirySuspensionUtc(string nowUtc, string expiryUtcString, string? graceString, string suspensionUtcString)

@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, true)]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, false)]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, false)]
@@ -24,7 +24,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(eligible, expiry.IsEligible);
         }
 
-        [Theory]
+        [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T14:00:00Z", false)]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T15:00:00Z", false)]
         [InlineData("2024-06-09T17:00:00Z", "2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z", false)]

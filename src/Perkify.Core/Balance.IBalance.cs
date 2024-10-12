@@ -21,7 +21,7 @@ namespace Perkify.Core
         {
             if (delta < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(delta), "Amount must be greater than 0");
+                throw new ArgumentOutOfRangeException(nameof(delta), "Amount must be positive or zero.");
             }
 
             checked
@@ -35,7 +35,7 @@ namespace Perkify.Core
         {
             if (delta < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(delta), "The Amount must be greater than 0.");
+                throw new ArgumentOutOfRangeException(nameof(delta), "Amount must be positive or zero.");
             }
 
             if (!this.IsEligible)
