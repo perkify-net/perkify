@@ -4,12 +4,13 @@ namespace Perkify.Core.Tests
     {
         const string SkipOrNot = null;
 
-        [Theory(Skip = SkipOrNot)]
-        [InlineData(true)]
-        public void TestCheck(bool eligible)
+        [Fact(Skip = SkipOrNot)]
+        public void TestCheckEligible()
         {
-            var delegation = new Delegation(() => eligible);
-            var action = new Action(() => delegation.Check());
+            var mock = new Mock<IEligible>();
+            mock.Setup(x => x.IsEligible).Returns(true);
+            var mockEligibleObject = mock.Object;
+            var action = new Action(() => mockEligibleObject.Check());
             action.Should().NotThrow();
         }
 
@@ -17,9 +18,11 @@ namespace Perkify.Core.Tests
         [InlineData(false)]
         public void TestCheckIneligible(bool eligible)
         {
-            var delegation = new Delegation(() => eligible);
-            var action = new Action(() => delegation.Check());
-            action.Should().Throw<InvalidOperationException>().WithMessage("");
+            var mock = new Mock<IEligible>();
+            mock.Setup(x => x.IsEligible).Returns(false);
+            var mockEligibleObject = mock.Object;
+            var action = new Action(() => mockEligibleObject.Check());
+            action.Should().Throw<InvalidOperationException>().WithMessage("Ineligible state.");
         }
     }
 }

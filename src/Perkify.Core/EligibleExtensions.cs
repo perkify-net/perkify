@@ -16,7 +16,7 @@ namespace Perkify.Core
         {
             if (!eligible.IsEligible)
             {
-                throw new InvalidOperationException("The eligibility is invalid.");
+                throw new InvalidOperationException("Ineligible state.");
             }
         }
     }
