@@ -48,13 +48,14 @@ namespace Perkify.Core
             _ => throw new InvalidOperationException("Invalid state.")
         };
 
-        private static bool Foo(DateTime? value1, DateTime value2) => (value1, value2) switch
+        /// <summary>Specify the suspension time.</summary>
+        /// <param name="suspensionUtc">The suspension time in UTC.</param>
+        /// <returns>The expiry time after suspension.</returns>
+        public Expiry WithSuspensionUtc(DateTime suspensionUtc)
         {
-            (null, DateTime v2) => v2 >= DateTime.UtcNow,
-            (DateTime v1, DateTime v2) when v1 >= v2 => v1 >= DateTime.UtcNow,
-            (DateTime v1, DateTime v2) when v1 < v2 => v2 >= DateTime.UtcNow,
-            _ => throw new InvalidOperationException("Invalid state.")
-        };
+            this.suspensionUtc = suspensionUtc < this.GetDeadlineUtc() ? suspensionUtc : this.GetDeadlineUtc();
+            return this;
+        }
 
         /// <summary>Specify the renewal period.</summary>
         /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
