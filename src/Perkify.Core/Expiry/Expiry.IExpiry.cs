@@ -39,13 +39,11 @@ namespace Perkify.Core
         }
 
         /// <inheritdoc/>
-        public void Renew(ChronoInterval? renewal = null)
+        public void Renew(string? interval = null)
         {
-            renewal ??= this.Renewal;
-            if (renewal == null)
-            {
-                throw new ArgumentNullException(nameof(renewal), "Renewal period is required.");
-            }
+            var renewal = interval != null
+                ? new ChronoInterval(interval)
+                : this.Renewal ?? throw new ArgumentNullException(nameof(interval), "Renewal interval is required.");
 
             var previousExpiryUtc = this.ExpiryUtc;
             var nextExpiryUtc = renewal.Renew(previousExpiryUtc);

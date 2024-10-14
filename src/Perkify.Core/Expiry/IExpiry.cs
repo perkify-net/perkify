@@ -50,9 +50,9 @@ namespace Perkify.Core
         public TimeSpan Remaining(bool deadline = false);
 
         /// <summary>
-        /// Renew the expiry time in timeline arithmetic or calendrical arithmetic.
+        /// Renews the expiry time using either timeline or calendrical arithmetic.
         /// </summary>
-        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
-        public void Renew(ChronoInterval? renewal);
+        /// <param name="interval">The renewal interval, specified as an ISO 8601 duration string.</param>
+        public void Renew(string? interval);
     }
 }

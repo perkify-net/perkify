@@ -59,7 +59,7 @@
 
         public void CreateSubscription(CreateSubscriptionOptions opts)
         {
-            this.subscription = new Subscription(this.clock, new ChronoInterval(opts.Duration), opts.Grace);
+            this.subscription = new Subscription(this.clock, opts.Renewal, opts.Grace);
         }
 
         public void RenewSubscription(RenewSubscriptionOptions opts)
@@ -139,8 +139,7 @@
             AnsiConsole.MarkupLine($"Product ID: [yellow]{this.subscription.ProductId}[/]");
             AnsiConsole.MarkupLine($"Metadata: [yellow]{this.subscription.Metadata}[/]");
             AnsiConsole.MarkupLine($"Recurring Plan: [yellow]{this.subscription.RecurringPlan}[/]");
-            AnsiConsole.MarkupLine($"Duration: [yellow]{this.subscription.renewal.Duration}[/]");
-            AnsiConsole.MarkupLine($"Calendar: [yellow]{this.subscription.renewal.Calendar}[/]");
+            AnsiConsole.MarkupLine($"Renewal: [yellow]{this.subscription.renewal}[/]");
             AnsiConsole.MarkupLine($"Grace: [yellow]{this.subscription.grace}[/]");
             AnsiConsole.MarkupLine($"Expiry.ExpiryUtc: [yellow]{this.subscription.expiry.ExpiryUtc}[/]");
             AnsiConsole.MarkupLine($"Expiry.Eligible: [yellow]{this.subscription.expiry.IsEligible}[/]");
