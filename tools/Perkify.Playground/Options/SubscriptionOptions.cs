@@ -8,9 +8,6 @@
         [Option('d', "duration", Required = false, Default = "P1M", HelpText = "The recurring duration.")]
         public required string Duration { get; set; }
 
-        [Option('c', "calendar", Required = false, Default = true, HelpText = "If the recurring duration is calendar based.")]
-        public bool Calendar { get; set; }
-
         [Option('g', "grace", Required = false, Default = null, HelpText = "The grace period.")]
         public string? Grace { get; set; }
     }

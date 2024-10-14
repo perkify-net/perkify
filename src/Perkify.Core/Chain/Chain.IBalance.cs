@@ -5,7 +5,7 @@
 namespace Perkify.Core
 {
     /// <inheritdoc/>
-    public partial class Chain : IBalance<Chain>
+    public partial class Chain : IBalance
     {
         /// <inheritdoc/>
         public long Incoming => this.entitlements.Sum(entitlement => entitlement.Incoming);
@@ -15,6 +15,16 @@ namespace Perkify.Core
 
         /// <inheritdoc/>
         public long Threshold => this.entitlements.Sum(entitlement => entitlement.Threshold);
+
+        /// <inheritdoc/>
+        public BalanceType BalanceType
+            => throw new NotSupportedException("Invalid operation for entitlement chain.");
+
+        /// <inheritdoc/>
+        public long Gross => this.entitlements.Sum(entitlement => entitlement.Gross);
+
+        /// <inheritdoc/>
+        public long Overspending => this.entitlements.Sum(entitlement => entitlement.Gross);
 
         /// <inheritdoc/>
         public void Topup(long delta)
@@ -50,16 +60,15 @@ namespace Perkify.Core
         }
 
         /// <inheritdoc/>
-        public Chain Adjust(long? incoming, long? outgoing)
+        public void Adjust(long? incoming, long? outgoing)
         {
-            throw new InvalidOperationException("Please adjust in specific entitlement or balance.");
+            throw new NotSupportedException("Please adjust specific entitlement or its balance.");
         }
 
         /// <inheritdoc/>
-        public Chain Clear()
+        public void Clear()
         {
             this.entitlements.ForEach(entitlement => entitlement.Clear());
-            return this;
         }
     }
 }

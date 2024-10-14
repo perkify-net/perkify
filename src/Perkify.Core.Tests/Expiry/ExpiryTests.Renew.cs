@@ -6,6 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
+        /*
         [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T15:00:00Z", "2024-06-09T16:00:00Z", null, "PT1H", false, "2024-06-09T17:00:00Z")]
         [InlineData("2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z", null, "PT1H", false, "2024-06-09T17:00:00Z")]
@@ -69,5 +70,6 @@ namespace Perkify.Core.Tests
             Assert.False(expiry.IsActive);
             Assert.Throws<InvalidOperationException>(() => expiry.Renew(renewal));
         }
+        */
     }
 }

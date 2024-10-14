@@ -59,7 +59,7 @@
 
         public void CreateSubscription(CreateSubscriptionOptions opts)
         {
-            this.subscription = new Subscription(this.clock, new Renewal(opts.Duration, opts.Calendar), opts.Grace);
+            this.subscription = new Subscription(this.clock, new ChronoInterval(opts.Duration), opts.Grace);
         }
 
         public void RenewSubscription(RenewSubscriptionOptions opts)
@@ -70,11 +70,13 @@
                 return;
             }
 
+            /*
             if (!this.subscription.expiry.IsActive)
             {
                 AnsiConsole.MarkupLine($"[red]The subscription has already been suspended.[/]");
                 return;
             }
+            */
 
             this.subscription.Renew(opts.Count);
             AnsiConsole.MarkupLine("[green]Subscription renewed![/]");
@@ -88,11 +90,13 @@
                 return;
             }
 
+            /*
             if (!this.subscription.expiry.IsActive)
             {
                 AnsiConsole.MarkupLine($"[red]The subscription has already been suspended.[/]");
                 return;
             }
+            */
 
             this.subscription.Deactivate();
             AnsiConsole.MarkupLine("[green]Subscription suspended![/]");
@@ -106,12 +110,6 @@
                 return;
             }
 
-            if (this.subscription.expiry.IsActive)
-            {
-                AnsiConsole.MarkupLine($"[red]Please suspend the subscription.[/]");
-                return;
-            }
-
             this.subscription.Activate(opts.Extended);
             AnsiConsole.MarkupLine("[green]Subscription resumed![/]");
         }
@@ -121,12 +119,6 @@
             if (this.subscription is null)
             {
                 AnsiConsole.MarkupLine("[red]No subscription found![/]");
-                return;
-            }
-
-            if (this.subscription.expiry.IsActive)
-            {
-                AnsiConsole.MarkupLine($"[red]Please suspend the subscription.[/]");
                 return;
             }
 
@@ -152,7 +144,7 @@
             AnsiConsole.MarkupLine($"Grace: [yellow]{this.subscription.grace}[/]");
             AnsiConsole.MarkupLine($"Expiry.ExpiryUtc: [yellow]{this.subscription.expiry.ExpiryUtc}[/]");
             AnsiConsole.MarkupLine($"Expiry.Eligible: [yellow]{this.subscription.expiry.IsEligible}[/]");
-            AnsiConsole.MarkupLine($"Expiry.IsActive: [yellow]{this.subscription.expiry.IsActive}[/]");
+//            AnsiConsole.MarkupLine($"Expiry.IsActive: [yellow]{this.subscription.expiry.IsActive}[/]");
             AnsiConsole.MarkupLine($"Expiry.Remaining: [yellow]{this.subscription.expiry.Remaining}[/]");
             AnsiConsole.MarkupLine($"Expiry.Ovedue: [yellow]{this.subscription.expiry.Overdue}[/]");
         }

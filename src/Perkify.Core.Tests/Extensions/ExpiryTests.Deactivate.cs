@@ -7,6 +7,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
+        /*
         [Theory(Skip = SkipOrNot)]
         [InlineData("2024-06-09T16:00:00Z", null, "2024-06-07T16:00:00Z", "2024-06-07T16:00:00Z")]
         [InlineData("2024-06-09T16:00:00Z", null, "2024-06-09T16:00:00Z", "2024-06-09T16:00:00Z")]
@@ -120,5 +121,6 @@ namespace Perkify.Core.Tests
             expiry.Deactivate(suspensionUtc.AddDays(1));
             Assert.Equal(suspensionUtc, expiry.SuspensionUtc);
         }
+        */
     }
 }

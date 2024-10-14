@@ -5,70 +5,79 @@
         const string SkipOrNot = null;
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
-        public void TestCreateBalanceWithZeroOrPositiveThreshold
+        public void TestCreateBalance
         (
-            [CombinatorialValues(0, 10)] long threshold
+            [CombinatorialValues(-10L, 0L, 10L)] long threshold,
+            [CombinatorialValues
+            (
+                BalanceExceedancePolicy.Reject, 
+                BalanceExceedancePolicy.Overflow,
+                BalanceExceedancePolicy.Overdraft
+            )] BalanceExceedancePolicy policy
         )
         {
-            var balance = new Balance(threshold);
+            var balance = new Balance(threshold, policy);
 
             balance.Incoming.Should().Be(0);
             balance.Outgoing.Should().Be(0);
-            balance.GetBalanceAmount().Should().Be(0);
+            balance.Gross.Should().Be(0);
             balance.Threshold.Should().Be(threshold);
-            balance.GetBalanceType().Should().Be(BalanceType.Debit);
+            balance.Policy.Should().Be(policy);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
-        public void TestCreateBalanceWithNegativeThreshold
-        (
-            [CombinatorialValues(-10)] long threshold
-        )
+        [Theory(Skip = SkipOrNot)]
+        [InlineData(BalanceExceedancePolicy.Reject)]
+        [InlineData(BalanceExceedancePolicy.Overflow)]
+        [InlineData(BalanceExceedancePolicy.Overdraft)]
+        public void TestCreateDebitBalanceDirectly(BalanceExceedancePolicy policy)
         {
-            var balance = new Balance(threshold);
-
-            balance.Incoming.Should().Be(0);
-            balance.Outgoing.Should().Be(0);
-            balance.GetBalanceAmount().Should().Be(0);
-            balance.Threshold.Should().Be(threshold);
-            balance.GetBalanceType().Should().Be(BalanceType.Credit);
-        }
-
-        [Fact(Skip = SkipOrNot)]
-        public void TestCreateDebitBalanceDirectly()
-        {
-            var debit = Balance.Debit();
+            var debit = Balance.Debit(policy);
 
             debit.Incoming.Should().Be(0);
             debit.Outgoing.Should().Be(0);
-            debit.GetBalanceAmount().Should().Be(0);
+            debit.Gross.Should().Be(0);
             debit.Threshold.Should().Be(0);
-            debit.GetBalanceType().Should().Be(BalanceType.Debit);
+            debit.Policy.Should().Be(policy);
+            debit.BalanceType.Should().Be(BalanceType.Debit);
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestCreateCreditBalanceDirectly
         (
-            [CombinatorialValues(-10)] long threshold
+            [CombinatorialValues(-10)] long threshold,
+            [CombinatorialValues
+            (
+                BalanceExceedancePolicy.Reject,
+                BalanceExceedancePolicy.Overflow,
+                BalanceExceedancePolicy.Overdraft
+            )] BalanceExceedancePolicy policy
         )
         {
-            var credit = Balance.Credit(threshold);
+            var credit = Balance.Credit(threshold, policy);
 
             credit.Incoming.Should().Be(0);
             credit.Outgoing.Should().Be(0);
-            credit.GetBalanceAmount().Should().Be(0);
+            credit.Gross.Should().Be(0);
             credit.Threshold.Should().Be(threshold);
-            credit.GetBalanceType().Should().Be(BalanceType.Credit);
+            credit.Threshold.Should().BeNegative();
+            credit.Policy.Should().Be(policy);
+            credit.BalanceType.Should().Be(BalanceType.Credit);
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestCreateCreditBalanceDirectlyWithInvalidThreshold
         (
-            [CombinatorialValues(0, 10)] long threshold
+            [CombinatorialValues(0, 10)] long threshold,
+            [CombinatorialValues
+            (
+                BalanceExceedancePolicy.Reject,
+                BalanceExceedancePolicy.Overflow,
+                BalanceExceedancePolicy.Overdraft
+            )] BalanceExceedancePolicy policy
         )
         {
             var parameter = nameof(threshold);
-            var action = () => Balance.Credit(threshold);
+            var action = () => Balance.Credit(threshold, policy);
 
             action
                 .Should()

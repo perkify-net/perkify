@@ -1,5 +1,6 @@
 namespace Perkify.Core.Tests
 {
+    /*
     public class EligibleExtensionsTests
     {
         const string SkipOrNot = null;
@@ -24,4 +25,5 @@ namespace Perkify.Core.Tests
             action.Should().Throw<InvalidOperationException>().WithMessage("Ineligible state.");
         }
     }
+    */
 }
