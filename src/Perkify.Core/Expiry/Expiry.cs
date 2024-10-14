@@ -30,11 +30,11 @@ namespace Perkify.Core
         public bool IsEligible => this.NowUtc < this.DeadlineUtc;
 
         /// <summary>Specify the renewal period.</summary>
-        /// <param name="renewal">The renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.</param>
+        /// <param name="interval">The renewal interval, specified as an ISO 8601 duration string.</param>
         /// <returns>The expiry time with specified renewal period.</returns>
-        public Expiry WithRenewal(ChronoInterval renewal)
+        public Expiry WithRenewal(string interval)
         {
-            this.Renewal = renewal;
+            this.Renewal = new ChronoInterval(interval);
             return this;
         }
     }
