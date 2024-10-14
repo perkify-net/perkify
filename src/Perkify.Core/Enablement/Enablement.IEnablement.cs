@@ -27,19 +27,13 @@ namespace Perkify.Core
         /// <inheritdoc/>
         public void Deactivate(DateTime? deactivationUtc)
         {
-            deactivationUtc ??= this.NowUtc;
-
-            if (this.IsActive)
-            {
-                this.DeactivationUtc = deactivationUtc;
-                return;
-            }
-
-            // Ignore earlier deactivation
-            if (deactivationUtc >= this.DeactivationUtc!.Value)
+            if (!this.IsActive)
             {
                 throw new InvalidOperationException("Already in inactive state.");
             }
+
+            deactivationUtc ??= this.NowUtc;
+            this.DeactivationUtc = deactivationUtc;
         }
     }
 }
