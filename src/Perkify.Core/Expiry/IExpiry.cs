@@ -15,9 +15,9 @@ namespace Perkify.Core
         public DateTime ExpiryUtc { get; }
 
         /// <summary>
-        /// Gets the Grace period as absolute time span.
+        /// Gets or sets the Grace period as absolute time span.
         /// </summary>
-        public TimeSpan GracePeriod { get; }
+        public TimeSpan? GracePeriod { get; set; }
 
         /// <summary>
         /// Gets calculates the deadline time in UTC based on the expiry time and grace period.
