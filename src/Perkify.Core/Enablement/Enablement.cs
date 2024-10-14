@@ -9,7 +9,9 @@ namespace Perkify.Core
     /// <summary>
     /// The activator managing activation and deactivation for eligibility.
     /// </summary>
-    public partial class Enablement : INowUtc, IEligible
+    /// <param name="deactivationUtc">The UTC time when deactivation should occur.</param>
+    public partial class Enablement(DateTime? deactivationUtc = null)
+        : INowUtc, IEligible
     {
         /// <summary>
         /// Gets or sets the clock instance used to retrieve the current time.
@@ -20,17 +22,10 @@ namespace Perkify.Core
         public DateTime NowUtc => this.Clock.GetCurrentInstant().ToDateTimeUtc();
 
         /// <inheritdoc/>
-        public bool IsEligible => this.IsActive || this.NowUtc < this.DeactivationUtc;
-
-        /// <summary>
-        /// Initialize with the activation time.
-        /// </summary>
-        /// <param name="deactivationUtc">The UTC time when deactivation should occur.</param>
-        /// <returns>The current instance of the <see cref="Enablement"/> class with updated deactivation time.</returns>
-        public Enablement WithDeactivationUtc(DateTime deactivationUtc)
+        public bool IsEligible => this.IsActive switch
         {
-            this.DeactivationUtc = deactivationUtc;
-            return this;
-        }
+            true => true,
+            false => this.NowUtc < this.DeactivationUtc!.Value
+        };
     }
 }
