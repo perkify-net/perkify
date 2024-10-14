@@ -29,7 +29,7 @@ namespace Perkify.Core
         public TimeSpan Remaining(bool deadline = false) => this.Expiry!.Remaining(deadline);
 
         /// <inheritdoc/>
-        public void Renew(ChronoInterval? renewal)
-            => this.Expiry!.Renew(renewal);
+        public void Renew(string? interval)
+            => this.Expiry!.Renew(interval);
     }
 }

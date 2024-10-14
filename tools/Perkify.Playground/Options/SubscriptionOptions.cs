@@ -6,7 +6,7 @@
     public class CreateSubscriptionOptions
     {
         [Option('d', "duration", Required = false, Default = "P1M", HelpText = "The recurring duration.")]
-        public required string Duration { get; set; }
+        public required string Renewal { get; set; }
 
         [Option('g', "grace", Required = false, Default = null, HelpText = "The grace period.")]
         public string? Grace { get; set; }
