@@ -30,14 +30,6 @@ namespace Perkify.Core
         public bool IsExpired { get; }
 
         /// <summary>
-        /// Gets the remaining portion.
-        /// - If suspended, the remaining portion is the time between suspend time and expiry time.
-        /// - If eligible, the remaining portion is the current time between now and expiry time.
-        /// - If ineligible (after grace period), the remaining portion is negative grace period.
-        /// </summary>
-        public TimeSpan Remaining { get; }
-
-        /// <summary>
         /// Gets the overdue portion.
         /// - Suspended: The overdue portion is the time between suspend time and expiry time. Zero if suspend time is earlier than expiry time.
         /// - Eligible: The overdue portion is the time between expiry time and now. Zero if now is earlier than expiry time.
@@ -49,6 +41,13 @@ namespace Perkify.Core
         /// Gets the renewal period based on ISO8601 duration string and flag to identify calendar arithmetic.
         /// </summary>
         public ChronoInterval? Renewal { get; }
+
+        /// <summary>
+        /// Gets the remaining time until the expiry or deadline.
+        /// </summary>
+        /// <param name="deadline">If true, calculates the remaining time until the deadline; otherwise, calculates the remaining time until the expiry.</param>
+        /// <returns>The remaining time as a <see cref="TimeSpan"/>.</returns>
+        public TimeSpan Remaining(bool deadline = false);
 
         /// <summary>
         /// Renew the expiry time in timeline arithmetic or calendrical arithmetic.

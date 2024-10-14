@@ -20,16 +20,6 @@ namespace Perkify.Core
         public bool IsExpired => this.NowUtc >= this.ExpiryUtc;
 
         /// <inheritdoc/>
-        public TimeSpan Remaining
-        {
-            get
-            {
-                var delta = this.DeadlineUtc - this.NowUtc;
-                return delta > TimeSpan.Zero ? delta : TimeSpan.Zero;
-            }
-        }
-
-        /// <inheritdoc/>
         public TimeSpan Overdue => this.NowUtc switch
         {
             var nowUtc when nowUtc <= this.ExpiryUtc => TimeSpan.Zero,
@@ -39,6 +29,14 @@ namespace Perkify.Core
 
         /// <inheritdoc/>
         public ChronoInterval? Renewal { get; private set; }
+
+        /// <inheritdoc/>
+        public TimeSpan Remaining(bool deadline = false)
+        {
+            var origin = deadline ? this.DeadlineUtc : this.ExpiryUtc;
+            var delta = origin - this.NowUtc;
+            return delta >= TimeSpan.Zero ? delta : TimeSpan.Zero;
+        }
 
         /// <inheritdoc/>
         public void Renew(ChronoInterval? renewal = null)

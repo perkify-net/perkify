@@ -1,5 +1,3 @@
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-
 namespace Perkify.Core.Tests
 {
     public partial class BalanceTests
@@ -28,6 +26,7 @@ namespace Perkify.Core.Tests
             var remained = balance.Deduct(delta, policy);
             var expected = outgoing + delta;
             balance.Outgoing.Should().Be(expected);
+            balance.Overspending.Should().Be(0);
             remained.Should().Be(0);
         }
 
@@ -145,6 +144,7 @@ namespace Perkify.Core.Tests
             remained.Should().Be(exceed);
             balance.Outgoing.Should().Be(expected);
             balance.IsEligible.Should().BeTrue();
+            balance.Overspending.Should().Be(0);
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
@@ -169,6 +169,7 @@ namespace Perkify.Core.Tests
             remained.Should().Be(0);
             balance.Outgoing.Should().Be(expected);
             balance.IsEligible.Should().BeFalse();
+            balance.Overspending.Should().Be(exceed);
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
