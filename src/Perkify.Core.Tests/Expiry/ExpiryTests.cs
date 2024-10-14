@@ -59,9 +59,7 @@ namespace Perkify.Core.Tests
             var clock = new FakeClock(nowUtc.ToInstant());
             var calendar = !duration.EndsWith('!');
 
-            var renewal = new ChronoInterval(duration);
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock }.WithRenewal(renewal);
-            expiry.Renewal!.Should().Be(renewal);
+            var expiry = new Expiry(expiryUtc, grace) { Clock = clock }.WithRenewal(duration);
             expiry.Renewal!.Calendar.Should().Be(calendar);
             expiry.Renewal!.Duration.Should().Be(duration);
         }
