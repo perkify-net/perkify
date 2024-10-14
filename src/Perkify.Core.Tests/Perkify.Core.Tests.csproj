@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Include=".deprecated\ExpiryExtensionsTests.cs" />
+    <Compile Include=".deprecated\ExpiryTests.Activate.cs" />
+    <Compile Include=".deprecated\ExpiryTests.Deactivate.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="$(SourceDir)/Perkify.Core/Perkify.Core.csproj" />
   </ItemGroup>
 
