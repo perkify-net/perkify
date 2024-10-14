@@ -110,5 +110,26 @@ namespace Perkify.Core.Tests
             var overdue = nowUtcOffsetInHours > 0 ? TimeSpan.FromHours(gracePeriodInHours) : TimeSpan.Zero;
             expiry.Overdue.Should().Be(overdue);
         }
+
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestSetGracePeriod
+        (
+            [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
+            [CombinatorialValues(null, +2, +5)] int? initialGracePeriodInHours,
+            [CombinatorialValues(-1)] int nowUtcOffsetInHours,
+            [CombinatorialValues(null, +2, +5)] int? expectedGracePeriodInHours
+        )
+        {
+            var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
+            var initial = initialGracePeriodInHours != null ? TimeSpan.FromHours(initialGracePeriodInHours.Value) : (TimeSpan?) null;
+            var nowUtc = expiryUtc.AddHours(nowUtcOffsetInHours);
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var expiry = new Expiry(expiryUtc, initial) { Clock = clock };
+            expiry.GracePeriod.Should().Be(initial);
+
+            var expected = expectedGracePeriodInHours != null ? TimeSpan.FromHours(expectedGracePeriodInHours.Value) : (TimeSpan?)null;
+            expiry.GracePeriod = expected;
+            expiry.GracePeriod.Should().Be(expected);
+        }
     }
 }

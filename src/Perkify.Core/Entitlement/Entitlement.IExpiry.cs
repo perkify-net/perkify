@@ -11,7 +11,11 @@ namespace Perkify.Core
         public DateTime ExpiryUtc => this.Expiry!.ExpiryUtc;
 
         /// <inheritdoc/>
-        public TimeSpan GracePeriod => this.Expiry!.GracePeriod;
+        public TimeSpan? GracePeriod
+        {
+            get => this.Expiry!.GracePeriod;
+            set => this.Expiry!.GracePeriod = value;
+        }
 
         /// <inheritdoc/>
         public DateTime DeadlineUtc => this.Expiry!.DeadlineUtc;

@@ -11,10 +11,14 @@ namespace Perkify.Core
         public DateTime ExpiryUtc { get; private set; } = expiryUtc;
 
         /// <inheritdoc/>
-        public TimeSpan GracePeriod { get; private set; } = grace ?? TimeSpan.Zero;
+        public TimeSpan? GracePeriod
+        {
+            get => grace;
+            set => grace = value;
+        }
 
         /// <inheritdoc/>
-        public DateTime DeadlineUtc => this.ExpiryUtc + this.GracePeriod;
+        public DateTime DeadlineUtc => this.ExpiryUtc + (this.GracePeriod ?? TimeSpan.Zero);
 
         /// <inheritdoc/>
         public bool IsExpired => this.NowUtc >= this.ExpiryUtc;
@@ -24,7 +28,7 @@ namespace Perkify.Core
         {
             var nowUtc when nowUtc <= this.ExpiryUtc => TimeSpan.Zero,
             var nowUtc when nowUtc < this.DeadlineUtc => nowUtc - this.ExpiryUtc,
-            var _ => this.GracePeriod
+            var _ => this.GracePeriod ?? TimeSpan.Zero
         };
 
         /// <inheritdoc/>
@@ -53,7 +57,10 @@ namespace Perkify.Core
             }
 
             this.ExpiryUtc = nextExpiryUtc;
-            this.Renewal = renewal;
+            if (interval != null)
+            {
+                this.Renewal = renewal;
+            }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Perkify.Core.Tests
 
             var expiry = new Expiry(expiryUtc, grace) { Clock = clock };
             expiry.ExpiryUtc.Should().Be(expiryUtc);
-            expiry.GracePeriod.Should().Be(grace ?? TimeSpan.Zero);
+            expiry.GracePeriod.Should().Be(grace);
             expiry.NowUtc.Should().Be(nowUtc);
         }
 
@@ -40,7 +40,7 @@ namespace Perkify.Core.Tests
 
             var expiry = new Expiry(expiryUtc, grace);
             expiry.ExpiryUtc.Should().Be(expiryUtc);
-            expiry.GracePeriod.Should().Be(grace ?? TimeSpan.Zero);
+            expiry.GracePeriod.Should().Be(grace);
             expiry.NowUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
         }
 
