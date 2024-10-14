@@ -20,13 +20,13 @@ namespace Perkify.Core
         public bool IsExpired => this.Expiry!.IsExpired;
 
         /// <inheritdoc/>
-        public TimeSpan Remaining => this.Expiry!.Remaining;
-
-        /// <inheritdoc/>
         public TimeSpan Overdue => this.Expiry!.Overdue;
 
         /// <inheritdoc/>
         public ChronoInterval? Renewal => this.Expiry!.Renewal;
+
+        /// <inheritdoc/>
+        public TimeSpan Remaining(bool deadline = false) => this.Expiry!.Remaining(deadline);
 
         /// <inheritdoc/>
         public void Renew(ChronoInterval? renewal)

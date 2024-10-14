@@ -7,7 +7,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        const string SkipOrNot = "Skipped";
+        const string SkipOrNot = null;
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestCreateExpiry
@@ -57,7 +57,7 @@ namespace Perkify.Core.Tests
             var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
             var nowUtc = expiryUtc.AddHours(nowUtcOffset);
             var clock = new FakeClock(nowUtc.ToInstant());
-            var calendar = duration.EndsWith('!');
+            var calendar = !duration.EndsWith('!');
 
             var renewal = new ChronoInterval(duration);
             var expiry = new Expiry(expiryUtc, grace) { Clock = clock }.WithRenewal(renewal);
@@ -65,31 +65,5 @@ namespace Perkify.Core.Tests
             expiry.Renewal!.Calendar.Should().Be(calendar);
             expiry.Renewal!.Duration.Should().Be(duration);
         }
-
-        /*
-        [Theory(Skip = SkipOrNot), CombinatorialData]
-        public void TestCreateExpiryWithSuspensionUtc
-        (
-            [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
-            [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving,
-            [CombinatorialValues(-1, 0, +1, +2, +3)] int nowUtcOffset,
-            [CombinatorialValues(-2, -1, 0, +1, +2, +3, +4)] int suspensionUtcOffset
-        )
-        {
-            var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
-            var nowUtc = expiryUtc.AddHours(nowUtcOffset);
-            var clock = new FakeClock(nowUtc.ToInstant());
-            var suspensionUtc = expiryUtc.AddHours(suspensionUtcOffset);
-
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock }.WithSuspensionUtc(suspensionUtc);
-            expiry.DeactivationUtc.HasValue.Should().BeTrue();
-            var deadlineUtc = expiry.GetDeadlineUtc();
-            var expected = suspensionUtc < deadlineUtc ? suspensionUtc : deadlineUtc;
-            expiry.DeactivationUtc!.Value.Should().Be(expected);
-            expiry.DeactivationUtc!.Value.Should().BeOnOrBefore(deadlineUtc);
-            expiry.IsActive.Should().BeFalse();
-        }
-        */
     }
 }

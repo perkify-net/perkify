@@ -12,5 +12,21 @@ namespace Perkify.Core.Tests
             var delegation = new Delegation(() => eligible);
             delegation.IsEligible.Should().Be(eligible);
         }
+
+        [Fact(Skip = SkipOrNot)]
+        public void TestCheckEligible()
+        {
+            var delgation = new Delegation(() => true) as IEligible;
+            var action = new Action(() => (delgation as IEligible).Check());
+            action.Should().NotThrow();
+        }
+
+        [Fact(Skip = SkipOrNot)]
+        public void TestCheckIneligible()
+        {
+            var delgation = new Delegation(() => false) as IEligible;
+            var action = new Action(() => (delgation as IEligible).Check());
+            action.Should().Throw<InvalidOperationException>().WithMessage("Ineligible state.");
+        }
     }
 }
