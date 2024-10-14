@@ -8,10 +8,10 @@ namespace Perkify.Core
     public partial class Enablement : IEnablement
     {
         /// <inheritdoc/>
-        public bool IsActive { get; }
+        public bool IsActive => !this.DeactivationUtc.HasValue;
 
         /// <inheritdoc/>
-        public DateTime? DeactivationUtc { get; private set; }
+        public DateTime? DeactivationUtc { get; private set; } = deactivationUtc;
 
         /// <inheritdoc/>
         public void Activate(DateTime? activationUtc)
