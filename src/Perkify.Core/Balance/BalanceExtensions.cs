@@ -4,6 +4,7 @@
 
 namespace Perkify.Core
 {
+    /*
     /// <summary>
     /// Provides extension methods for balance operations.
     /// </summary>
@@ -37,7 +38,7 @@ namespace Perkify.Core
         /// <returns>The amount overspent beyond the threshold.</returns>
         public static long GetOverspendingAmount<T>(this T balance)
             where T : IBalance<T>
-            => balance.GetBalanceAmount() >= balance.Threshold ? 0 : balance.Threshold - balance.GetBalanceAmount();
+            => balance.Gross >= balance.Threshold ? 0 : balance.Threshold - balance.Gross;
 
         /// <summary>
         /// The upper limit amount that can be deducted from the account balance.
@@ -46,10 +47,11 @@ namespace Perkify.Core
         /// <param name="balance">The balance instance.</param>
         /// <param name="policy">The policy for balance exceedance.</param>
         /// <returns>The maximum deductible amount.</returns>
-        public static long GetMaxDeductibleAmount<T>(this T balance, BalanceExceedancePolicy policy)
+        public static long GetDeductibleAllowance<T>(this T balance, BalanceExceedancePolicy policy)
             where T : IBalance<T>
             => policy != BalanceExceedancePolicy.Overdraft
-            ? Math.Max(balance.GetBalanceAmount() - balance.Threshold, 0L)
+            ? Math.Max(balance.Gross - balance.Threshold, 0L)
             : long.MaxValue;
     }
+    */
 }

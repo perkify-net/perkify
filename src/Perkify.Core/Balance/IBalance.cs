@@ -4,11 +4,16 @@
 
 namespace Perkify.Core
 {
-    /// <summary>The interface to maintain a balance amount with threshold for eligibility.</summary>
-    /// <typeparam name="T">The type that implements the IBalance interface.</typeparam>
-    public interface IBalance<T>
-        where T : IBalance<T>
+    /// <summary>
+    /// The interface to maintain a balance amount with threshold for eligibility.
+    /// </summary>
+    public interface IBalance
     {
+        /// <summary>
+        /// Gets the threshold amount for the balance.
+        /// </summary>
+        public long Threshold { get; }
+
         /// <summary>
         /// Gets all incoming revenue to the balance.
         /// </summary>
@@ -20,15 +25,25 @@ namespace Perkify.Core
         public long Outgoing { get; }
 
         /// <summary>
-        /// Gets the threshold amount for the balance.
+        /// Gets the balance type: debit or credit.
         /// </summary>
-        public long Threshold { get; }
+        public BalanceType BalanceType { get; }
+
+        /// <summary>
+        /// Gets the current gross amount based on incoming and outcoming amount.
+        /// </summary>
+        public long Gross { get; }
+
+        /// <summary>
+        /// Gets the overspending amount.
+        /// </summary>
+        public long Overspending { get; }
 
         /// <summary>
         /// Topup the balance with incoming revenue.
         /// </summary>
         /// <param name="delta">The amount to top up the balance.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when the delta is less than 0.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the delta is negative.</exception>
         public void Topup(long delta);
 
         /// <summary>
@@ -45,13 +60,11 @@ namespace Perkify.Core
         /// </summary>
         /// <param name="incoming">The delta of incoming amount to adjust.</param>
         /// <param name="outgoing">The delta of outgoing amount to adjust.</param>
-        /// <returns>The balance with adjusted incoming/outgoing amounts.</returns>
-        public T Adjust(long? incoming, long? outgoing);
+        public void Adjust(long? incoming, long? outgoing);
 
         /// <summary>
         /// Clear the balance with zero amount.
         /// </summary>
-        /// <returns>The cleared balance with zero incoming/outgoing amounts.</returns>
-        public T Clear();
+        public void Clear();
     }
 }

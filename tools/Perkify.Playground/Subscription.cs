@@ -14,7 +14,7 @@
 
         public readonly long id;
 
-        public readonly Renewal renewal;
+        public readonly ChronoInterval renewal;
 
         public readonly string? grace;
 
@@ -35,18 +35,19 @@
 
         #endregion
 
-        public Subscription(IClock clock, Renewal renewal, string? grace)
+        public Subscription(IClock clock, ChronoInterval renewal, string? grace)
         {
             this.clock = clock;
             this.id = Random.Shared.NextInt64(1001, 1999);
             this.renewal = renewal;
             this.grace = grace;
+
             this.expiry = new Expiry
             (
-                expiryUtc: null,
-                grace: grace != null ? TimeSpan.Parse(grace, CultureInfo.InvariantCulture) : null,
-                clock: clock
-            ).Renew(this.renewal);
+                expiryUtc: DateTime.UtcNow,
+                grace: grace != null ? TimeSpan.Parse(grace, CultureInfo.InvariantCulture) : null
+            );
+            expiry.Renew(this.renewal);
         }
 
         public void Renew(int count = 1)
@@ -56,20 +57,37 @@
 
         public void Deactivate()
         {
-            this.expiry.Deactivate();
+            //this.expiry.Deactivate();
         }
 
         public void Activate(bool extended)
         {
+            /*
+            if (this.subscription.expiry.IsActive)
+            {
+                AnsiConsole.MarkupLine($"[red]Please suspend the subscription.[/]");
+                return;
+            }
+
             this.expiry.Activate(extended: extended);
+            */
         }
 
         public void Cancel(bool refund)
         {
+            /*
+            if (this.subscription.expiry.IsActive)
+            {
+                AnsiConsole.MarkupLine($"[red]Please suspend the subscription.[/]");
+                return;
+            }
+            */
+
             if (refund)
             {
+                /*
                 var remaining = this.expiry.Remaining;
-                var duration = PeriodPattern.NormalizingIso.Parse(this.renewal.Duration).Value;
+//                var duration = PeriodPattern.NormalizingIso.Parse(this.renewal.Duration).Value;
                 var expiryUtc = this.expiry.ExpiryUtc.ToInstant().InUtc().LocalDateTime;
                 var originUtc = expiryUtc - duration;
                 var total = expiryUtc - originUtc;
@@ -78,15 +96,14 @@
                 var ratio = 1.0 * remaining.Days / total.Days;
                 AnsiConsole.MarkupLine($"Refunding started...");
                 AnsiConsole.MarkupLine($"Remaining: [yellow]{this.expiry.Remaining}[/]");
-                AnsiConsole.MarkupLine($"Duration: [yellow]{this.renewal.Duration}[/]");
-                AnsiConsole.MarkupLine($"Calendar: [yellow]{this.renewal.Calendar}[/]");
+//                AnsiConsole.MarkupLine($"Duration: [yellow]{this.renewal.Duration}[/]");
+//                AnsiConsole.MarkupLine($"Calendar: [yellow]{this.renewal.Calendar}[/]");
                 AnsiConsole.MarkupLine($"Ratio: [yellow]{ratio * 100}%[/]");
                 AnsiConsole.MarkupLine($"Price: [yellow]{price} {currency}[/]");
                 AnsiConsole.MarkupLine($"Refund: [yellow]{price * ratio} {currency}[/]");
+                */
                 AnsiConsole.MarkupLine($"Refunding completed...");
             }
         }
     }
 }
-
-

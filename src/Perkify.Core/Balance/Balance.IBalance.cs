@@ -5,8 +5,11 @@
 namespace Perkify.Core
 {
     /// <inheritdoc/>
-    public partial class Balance : IBalance<Balance>
+    public partial class Balance : IBalance
     {
+        /// <inheritdoc/>
+        public long Threshold { get; } = threshold;
+
         /// <inheritdoc/>
         public long Incoming { get; private set; }
 
@@ -14,7 +17,13 @@ namespace Perkify.Core
         public long Outgoing { get; private set; }
 
         /// <inheritdoc/>
-        public long Threshold { get; } = threshold;
+        public BalanceType BalanceType => this.Threshold >= 0 ? BalanceType.Debit : BalanceType.Credit;
+
+        /// <inheritdoc/>
+        public long Gross => this.Incoming - this.Outgoing;
+
+        /// <inheritdoc/>
+        public long Overspending => this.Gross >= this.Threshold ? 0 : this.Threshold - this.Gross;
 
         /// <inheritdoc/>
         public void Topup(long delta)
@@ -43,7 +52,7 @@ namespace Perkify.Core
                 throw new InvalidOperationException("Ineligible state.");
             }
 
-            var maximum = this.GetMaxDeductibleAmount(policy);
+            var maximum = policy.GetDeductibleAllowance(this.Gross, this.Threshold);
             var processed = delta;
             var remaining = policy.Deduct(ref processed, maximum);
             checked
@@ -55,23 +64,20 @@ namespace Perkify.Core
         }
 
         /// <inheritdoc/>
-        public Balance Adjust(long? incoming, long? outgoing)
+        public void Adjust(long? incoming, long? outgoing)
         {
             checked
             {
                 this.Incoming += incoming ?? 0;
                 this.Outgoing += outgoing ?? 0;
             }
-
-            return this;
         }
 
         /// <inheritdoc/>
-        public Balance Clear()
+        public void Clear()
         {
             this.Incoming = 0;
             this.Outgoing = 0;
-            return this;
         }
     }
 }

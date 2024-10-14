@@ -20,10 +20,13 @@ namespace Perkify.Core
         /// <param name="entitlementBuilder">The function to build new entitlements.</param>
         public Chain(IEnumerable<Entitlement>? entitlements = null, Func<long, Entitlement>? entitlementBuilder = null)
         {
-            entitlements ??= [];
-            this.entitlements = [.. entitlements.OrderBy(entitlement => entitlement.ExpiryUtc)];
-            entitlementBuilder ??= (delta) => new Entitlement(new Balance(delta));
-            this.entitlementBuilder = entitlementBuilder;
+            entitlements ??= Enumerable.Empty<Entitlement>();
+            this.entitlements = entitlements.OrderBy(entitlement => entitlement.ExpiryUtc).ToList();
+            Func<long, Entitlement> defaultEntitlementBuilder = (delta) => new Entitlement(AutoRenewalMode.Default)
+            {
+                Balance = new Balance(delta, BalanceExceedancePolicy.Reject),
+            };
+            this.entitlementBuilder = entitlementBuilder ?? defaultEntitlementBuilder;
         }
 
         /// <inheritdoc/>

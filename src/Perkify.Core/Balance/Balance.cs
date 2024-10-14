@@ -5,36 +5,48 @@
 namespace Perkify.Core
 {
     /// <summary>
-    /// The balance amount with threshold for eligibility.</summary>
+    /// The balance amount with threshold for eligibility.
+    /// </summary>
     /// <remarks>
-    /// Initializes a new instance of the <see cref="Balance"/> class.Create a new balance with threshold.</remarks>
+    /// Initializes a new instance of the <see cref="Balance"/> class.
+    /// Create a new balance with threshold and optuinal balance exceedance policy.
+    /// </remarks>
     /// <param name="threshold">The threshold amount for the balance.</param>
-    public partial class Balance(long threshold)
+    /// <param name="policy">The policy to apply when the balance exceeds the threshold.</param>
+    public partial class Balance(long threshold, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         : IEligible
     {
+        /// <summary>
+        /// Gets the balance exceedance policy.
+        /// </summary>
+        public BalanceExceedancePolicy Policy => policy;
+
         /// <inheritdoc/>
-        public bool IsEligible => this.GetBalanceAmount() >= this.Threshold;
+        public bool IsEligible => this.Gross >= this.Threshold;
 
         /// <summary>
         /// Creates a new balance with a threshold of 0.
         /// </summary>
+        /// <param name="policy">The policy to apply when the balance exceeds the threshold.</param>
         /// <returns>A new instance of the <see cref="Balance"/> class.</returns>
-        public static Balance Debit() => new (threshold: 0);
+        public static Balance Debit(BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
+            => new (threshold: 0, policy);
 
         /// <summary>
         /// Creates a new balance with a specified threshold.
         /// </summary>
         /// <param name="threshold">The threshold amount for the balance.</param>
+        /// <param name="policy">The policy to apply when the balance exceeds the threshold.</param>
         /// <returns>A new instance of the <see cref="Balance"/> class.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the threshold amount is greater than or equal to 0.</exception>
-        public static Balance Credit(long threshold)
+        public static Balance Credit(long threshold, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
             if (threshold >= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(threshold), "Amount must be negative");
             }
 
-            return new Balance(threshold);
+            return new Balance(threshold, policy);
         }
 
         /// <summary>
