@@ -7,31 +7,54 @@ namespace Perkify.Core.Tests
     public partial class EnablementTests
     {
         [Theory(Skip = SkipOrNot), CombinatorialData]
-        public void TestIsEligible
+        public void TestIsEligibleWithImmediateEffectiveUtc
         (
-            [CombinatorialValues("2021-01-01T00:00:00Z")] string nowUtcString,
-            [CombinatorialValues(null, +1)] int? deactivationUtcOffsetInHours
+            [CombinatorialValues(true, false)] bool isActive,
+            [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
+            [CombinatorialValues(-1, 0, +1)] int effiectiveUtcOffset,
+            [CombinatorialValues(true)] bool isImmediateEffective
         )
         {
-            var nowUtc = nowUtcString != null ? InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc() : (DateTime?)null;
-            var clock = new FakeClock(nowUtc!.Value.ToInstant());
-            var deactivationUtc = deactivationUtcOffsetInHours.HasValue ? nowUtc!.Value.AddHours(deactivationUtcOffsetInHours.Value) : (DateTime?)null;
-            var enablement = new Enablement(deactivationUtc) { Clock = clock };
-            enablement.IsEligible.Should().BeTrue();
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var effectiveUtc = nowUtc.AddHours(effiectiveUtcOffset);
+
+            var enablement = new Enablement(isActive) { Clock = clock }.WithEffectiveUtc(effectiveUtc, isImmediateEffective);
+            enablement.IsEligible.Should().Be(isActive);
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
-        public void TestIsIneligible
+        public void TestIsEligibleWithEffectiveUtcInPast
         (
-            [CombinatorialValues("2021-01-01T00:00:00Z")] string nowUtcString,
-            [CombinatorialValues(0, -1)] int? deactivationUtcOffsetInHours
+            [CombinatorialValues(true, false)] bool isActive,
+            [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
+            [CombinatorialValues(-1, 0)] int effiectiveUtcOffset,
+            [CombinatorialValues(false)] bool isImmediateEffective
         )
         {
-            var nowUtc = nowUtcString != null ? InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc() : (DateTime?)null;
-            var clock = new FakeClock(nowUtc!.Value.ToInstant());
-            var deactivationUtc = deactivationUtcOffsetInHours.HasValue ? nowUtc!.Value.AddHours(deactivationUtcOffsetInHours.Value) : (DateTime?)null;
-            var enablement = new Enablement(deactivationUtc) { Clock = clock };
-            enablement.IsEligible.Should().BeFalse();
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var effectiveUtc = nowUtc.AddHours(effiectiveUtcOffset);
+
+            var enablement = new Enablement(isActive) { Clock = clock }.WithEffectiveUtc(effectiveUtc, isImmediateEffective);
+            enablement.IsEligible.Should().Be(!isActive);
+        }
+
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestIsEligibleWithEffectiveUtcInFuture
+        (
+            [CombinatorialValues(true, false)] bool isActive,
+            [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
+            [CombinatorialValues(+1)] int effiectiveUtcOffset,
+            [CombinatorialValues(false)] bool isImmediateEffective
+        )
+        {
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var effectiveUtc = nowUtc.AddHours(effiectiveUtcOffset);
+
+            var enablement = new Enablement(isActive) { Clock = clock }.WithEffectiveUtc(effectiveUtc, isImmediateEffective);
+            enablement.IsEligible.Should().Be(isActive);
         }
     }
 }

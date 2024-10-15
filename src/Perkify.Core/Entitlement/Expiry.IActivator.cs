@@ -6,7 +6,7 @@ namespace Perkify.Core
 {
     /*
              /// <inheritdoc/>
-        public bool IsEligible => (this.DeactivationUtc, this.NowUtc, this.DeadlineUtc) switch
+        public bool IsEligible => (this.EffectiveUtc, this.NowUtc, this.DeadlineUtc) switch
         {
             // Not suspended
             (null, DateTime n, DateTime d) => n < d,
@@ -46,16 +46,16 @@ namespace Perkify.Core
     public partial class Expiry : IActivator<Expiry>
     {
         /// <inheritdoc/>
-        public DateTime? DeactivationUtc { get; private set; }
+        public DateTime? EffectiveUtc { get; private set; }
 
         /// <inheritdoc/>
-        public bool IsActive => !this.DeactivationUtc.HasValue;
+        public bool IsActive => !this.EffectiveUtc.HasValue;
 
         /// <inheritdoc/>
         public Expiry Deactivate(DateTime? suspensionUtc = null)
         {
             // Keep idempotent if resubmitting suspending requests.
-            if (this.DeactivationUtc.HasValue)
+            if (this.EffectiveUtc.HasValue)
             {
                 return this;
             }

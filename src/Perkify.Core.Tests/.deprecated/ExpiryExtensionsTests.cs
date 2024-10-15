@@ -99,11 +99,11 @@
             var suspensionUtc = expiryUtc.AddHours(suspensionUtcOffset);
 
             var expiry = new Expiry(expiryUtc, grace) { Clock = clock }.WithSuspensionUtc(suspensionUtc);
-            expiry.DeactivationUtc.HasValue.Should().BeTrue();
+            expiry.EffectiveUtc.HasValue.Should().BeTrue();
             var deadlineUtc = expiry.GetDeadlineUtc();
             var expected = suspensionUtc < deadlineUtc ? suspensionUtc : deadlineUtc;
-            expiry.DeactivationUtc!.Value.Should().Be(expected);
-            expiry.DeactivationUtc!.Value.Should().BeOnOrBefore(deadlineUtc);
+            expiry.EffectiveUtc!.Value.Should().Be(expected);
+            expiry.EffectiveUtc!.Value.Should().BeOnOrBefore(deadlineUtc);
             expiry.IsActive.Should().BeFalse();
         }
         */

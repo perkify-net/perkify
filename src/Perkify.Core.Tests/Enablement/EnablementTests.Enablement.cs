@@ -7,93 +7,147 @@ namespace Perkify.Core.Tests
     public partial class EnablementTests
     {
         [Theory(Skip = SkipOrNot), CombinatorialData]
-        public void TestIsActive
-        (
-            [CombinatorialValues("2021-01-01T00:00:00Z")] string nowUtcString,
-            [CombinatorialValues(null, +1, 0, -1)] int? deactivationUtcOffsetInHours
-        )
-        {
-            var nowUtc = nowUtcString != null ? InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc() : (DateTime?)null;
-            var clock = new FakeClock(nowUtc!.Value.ToInstant());
-            var deactivationUtc = deactivationUtcOffsetInHours.HasValue ? nowUtc!.Value.AddHours(deactivationUtcOffsetInHours.Value) : (DateTime?)null;
-            var enablement = new Enablement(deactivationUtc) { Clock = clock };
-            var expected = deactivationUtcOffsetInHours == null;
-            enablement.IsActive.Should().Be(expected);
-        }
-
-        [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestDeactivate
         (
-            [CombinatorialValues("2021-01-01T00:00:00Z")] string nowUtcString,
-            [CombinatorialValues(+1, 0, -1, null)] int? deactivationUtcOffsetInHours
+            [CombinatorialValues(true)] bool isActive,
+            [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
+            [CombinatorialValues(-1, 0, +1)] int initialEffiectiveUtcOffsetInHours,
+            [CombinatorialValues(true)] bool initialIsImmediateEffective,
+
+            [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours,
+            [CombinatorialValues(true, false)] bool isImmediateEffective,
+            [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
-            var nowUtc = nowUtcString != null ? InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc() : (DateTime?)null;
-            var clock = new FakeClock(nowUtc!.Value.ToInstant());
-            var deactivationUtc = deactivationUtcOffsetInHours.HasValue ? nowUtc!.Value.AddHours(deactivationUtcOffsetInHours.Value) : (DateTime?)null;
-            var enablement = new Enablement(null) { Clock = clock };
-            enablement.IsActive.Should().BeTrue();
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var initialEffiectiveUtc = nowUtc.AddHours(initialEffiectiveUtcOffsetInHours);
 
-            enablement.Deactivate(deactivationUtc);
-            enablement.IsActive.Should().BeFalse();
-            enablement.DeactivationUtc.HasValue.Should().BeTrue();
-            enablement.DeactivationUtc.Should().Be(deactivationUtc ?? nowUtc);
+            var enablement = new Enablement(isActive)
+            {
+                Clock = clock
+            }.WithEffectiveUtc(initialEffiectiveUtc, initialIsImmediateEffective);
+            enablement.IsActive.Should().Be(isActive);
+            EnablementStateChangeEventArgs? stateChangedEvent = null;
+            if (isStateChangedEventHooked)
+            {
+                enablement.StateChanged += (sender, e) => { stateChangedEvent = e; };
+            }
+
+            var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
+            enablement.Deactivate(effectiveUtc, isImmediateEffective);
+            enablement.IsImmediateEffective.Should().Be(isImmediateEffective);
+            enablement.EffectiveUtc.Should().Be(effectiveUtc ?? nowUtc);
+            enablement.IsActive.Should().Be(isImmediateEffective ? !isActive : isActive);
+            if (isStateChangedEventHooked)
+            {
+                stateChangedEvent.Should().NotBeNull();
+                stateChangedEvent!.Operation.Should().Be(EnablemenStateOperation.Deactivate);
+                stateChangedEvent!.EffictiveUtc.Should().Be(effectiveUtc ?? nowUtc);
+                stateChangedEvent!.IsImmediateEffective.Should().Be(isImmediateEffective);
+            }
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestDeactivateWithIncorrectState
         (
-            [CombinatorialValues("2021-01-01T00:00:00Z")] string nowUtcString,
-            [CombinatorialValues(+1, 0, -1)] int? deactivationUtcOffsetInHours
+            [CombinatorialValues(false)] bool isActive,
+            [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
+            [CombinatorialValues(-1, 0, +1)] int initialEffiectiveUtcOffsetInHours,
+            [CombinatorialValues(true)] bool initialIsImmediateEffective,
+
+            [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours,
+            [CombinatorialValues(true, false)] bool isImmediateEffective
         )
         {
-            var nowUtc = nowUtcString != null ? InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc() : (DateTime?)null;
-            var clock = new FakeClock(nowUtc!.Value.ToInstant());
-            var deactivationUtc = deactivationUtcOffsetInHours.HasValue ? nowUtc!.Value.AddHours(deactivationUtcOffsetInHours.Value) : (DateTime?)null;
-            var enablement = new Enablement(deactivationUtc) { Clock = clock };
-            enablement.IsActive.Should().BeFalse();
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var initialEffiectiveUtc = nowUtc.AddHours(initialEffiectiveUtcOffsetInHours);
 
-            var action = new Action(() => enablement.Deactivate(nowUtc));
+            var enablement = new Enablement(isActive)
+            {
+                Clock = clock
+            }.WithEffectiveUtc(initialEffiectiveUtc, initialIsImmediateEffective);
+            enablement.IsActive.Should().Be(isActive);
+
+            var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
+            var action = () => enablement.Deactivate(effectiveUtc, isImmediateEffective);
             action.Should()
                 .Throw<InvalidOperationException>()
                 .WithMessage("Already in inactive state.");
-            enablement.IsActive.Should().BeFalse();
+            enablement.IsActive.Should().Be(isActive);
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestActivate
         (
-            [CombinatorialValues("2021-01-01T00:00:00Z")] string nowUtcString,
-            [CombinatorialValues(+1, 0, -1)] int? deactivationUtcOffsetInHours
+            [CombinatorialValues(false)] bool isActive,
+            [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
+            [CombinatorialValues(-1, 0, +1)] int initialEffiectiveUtcOffsetInHours,
+            [CombinatorialValues(true)] bool initialIsImmediateEffective,
+
+            [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours,
+            [CombinatorialValues(true, false)] bool isImmediateEffective,
+            [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
-            var nowUtc = nowUtcString != null ? InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc() : (DateTime?)null;
-            var clock = new FakeClock(nowUtc!.Value.ToInstant());
-            var deactivationUtc = deactivationUtcOffsetInHours.HasValue ? nowUtc!.Value.AddHours(deactivationUtcOffsetInHours.Value) : (DateTime?)null;
-            var enablement = new Enablement(deactivationUtc) { Clock = clock };
-            enablement.IsActive.Should().BeFalse();
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var initialEffiectiveUtc = nowUtc.AddHours(initialEffiectiveUtcOffsetInHours);
 
-            enablement.Activate(nowUtc);
-            enablement.IsActive.Should().BeTrue();
-            enablement.DeactivationUtc.HasValue.Should().BeFalse();
+            var enablement = new Enablement(isActive)
+            {
+                Clock = clock
+            }.WithEffectiveUtc(initialEffiectiveUtc, initialIsImmediateEffective);
+            enablement.IsActive.Should().Be(isActive);
+            EnablementStateChangeEventArgs? stateChangedEvent = null;
+            if (isStateChangedEventHooked)
+            {
+                enablement.StateChanged += (sender, e) => { stateChangedEvent = e; };
+            }
+
+            var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
+            enablement.Activate(effectiveUtc, isImmediateEffective);
+            enablement.IsImmediateEffective.Should().Be(isImmediateEffective);
+            enablement.EffectiveUtc.Should().Be(effectiveUtc ?? nowUtc);
+            enablement.IsActive.Should().Be(isImmediateEffective ? !isActive : isActive);
+            if (isStateChangedEventHooked)
+            {
+                stateChangedEvent.Should().NotBeNull();
+                stateChangedEvent!.Operation.Should().Be(EnablemenStateOperation.Activate);
+                stateChangedEvent!.EffictiveUtc.Should().Be(effectiveUtc ?? nowUtc);
+                stateChangedEvent!.IsImmediateEffective.Should().Be(isImmediateEffective);
+            }
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
         public void TestActivateWithIncorrectState
         (
-            [CombinatorialValues("2021-01-01T00:00:00Z")] string nowUtcString
+            [CombinatorialValues(true)] bool isActive,
+            [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
+            [CombinatorialValues(-1, 0, +1)] int initialEffiectiveUtcOffsetInHours,
+            [CombinatorialValues(true)] bool initialIsImmediateEffective,
+
+            [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours,
+            [CombinatorialValues(true, false)] bool isImmediateEffective
         )
         {
-            var nowUtc = nowUtcString != null ? InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc() : (DateTime?)null;
-            var clock = new FakeClock(nowUtc!.Value.ToInstant());
-            var enablement = new Enablement(null) { Clock = clock };
-            enablement.IsActive.Should().BeTrue();
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var initialEffiectiveUtc = nowUtc.AddHours(initialEffiectiveUtcOffsetInHours);
 
-            var action = new Action(() => enablement.Activate(nowUtc));
+            var enablement = new Enablement(isActive)
+            {
+                Clock = clock
+            }.WithEffectiveUtc(initialEffiectiveUtc, initialIsImmediateEffective);
+            enablement.IsActive.Should().Be(isActive);
+
+            var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
+            var action = () => enablement.Activate(effectiveUtc, isImmediateEffective);
             action.Should()
                 .Throw<InvalidOperationException>()
                 .WithMessage("Already in active state.");
-            enablement.IsActive.Should().BeTrue();
+            enablement.IsActive.Should().Be(isActive);
         }
     }
 }

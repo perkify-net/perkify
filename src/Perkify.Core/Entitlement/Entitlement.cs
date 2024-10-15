@@ -18,6 +18,9 @@ namespace Perkify.Core
     {
         private IClock clock = SystemClock.Instance;
 
+        private Enablement? enablement;
+        private Expiry? expiry;
+
         /// <summary>
         /// Gets or sets the clock instance used to retrieve the current time.
         /// </summary>
@@ -54,12 +57,37 @@ namespace Perkify.Core
         /// <summary>
         /// Gets the expiry associated with the entitlement.
         /// </summary>
-        public Expiry? Expiry { get; init; }
+        public Expiry? Expiry
+        {
+            get => this.expiry;
+            init
+            {
+                this.expiry = value;
+
+                if (this.expiry != null)
+                {
+                    this.expiry.Clock = this.Clock;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the enablement associated with the entitlement.
         /// </summary>
-        public Enablement? Enablement { get; init; }
+        public Enablement? Enablement
+        {
+            get => this.enablement;
+            init
+            {
+                this.enablement = value;
+
+                if (this.enablement != null)
+                {
+                    this.enablement.Clock = this.Clock;
+                    this.enablement.StateChanged += (sender, args) => this.StateChanged?.Invoke(this, args);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the prerequisite eligibility associated with the entitlement.
