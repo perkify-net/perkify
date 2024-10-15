@@ -10,6 +10,11 @@ namespace Perkify.Core
     public interface IEnablement
     {
         /// <summary>
+        /// Occurs when the state changes.
+        /// </summary>
+        public event EventHandler<EnablementStateChangeEventArgs>? StateChanged;
+
+        /// <summary>
         /// Gets a value indicating whether the state is active.
         /// - true if the state is active (activated or not suspended).
         /// - false if the state is inactive (deactivated or suspended).
@@ -17,22 +22,29 @@ namespace Perkify.Core
         public bool IsActive { get; }
 
         /// <summary>
-        /// Gets the deactivation time in UTC.
-        /// - null if the state is active.
-        /// - not null if the state is inactive.
+        /// Gets the effective UTC time for the state change.
         /// </summary>
-        public DateTime? DeactivationUtc { get; }
+        public DateTime EffectiveUtc { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the state change is immediately effective.
+        /// - true if the state change is immediately effective, aligned to the current IsActive state.
+        /// - false if the state change will take effect in future, reversed to the current IsActive state.
+        /// </summary>
+        public bool IsImmediateEffective { get; }
 
         /// <summary>
         /// Activate and switch to active state.
         /// </summary>
-        /// <param name="activationUtc">The activation time in UTC.</param>
-        public void Activate(DateTime? activationUtc = null);
+        /// <param name="effectiveUtc">The activation time in UTC.</param>
+        /// <param name="isImmediateEffective">Indicates if the activation is immediate.</param>
+        public void Activate(DateTime? effectiveUtc = null, bool isImmediateEffective = true);
 
         /// <summary>
         /// Deactivate and switch to inactive state.
         /// </summary>
-        /// <param name="deactivationUtc">The deactivation time in UTC.</param>
-        public void Deactivate(DateTime? deactivationUtc = null);
+        /// <param name="effectiveUtc">The deactivation time in UTC.</param>
+        /// <param name="isImmediateEffective">Indicates if the deactivation is immediate.</param>
+        public void Deactivate(DateTime? effectiveUtc = null, bool isImmediateEffective = true);
     }
 }

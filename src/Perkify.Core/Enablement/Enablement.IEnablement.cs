@@ -8,32 +8,59 @@ namespace Perkify.Core
     public partial class Enablement : IEnablement
     {
         /// <inheritdoc/>
-        public bool IsActive => !this.DeactivationUtc.HasValue;
+        public event EventHandler<EnablementStateChangeEventArgs>? StateChanged;
 
         /// <inheritdoc/>
-        public DateTime? DeactivationUtc { get; private set; } = deactivationUtc;
+        public bool IsActive { get; private set; } = isActive;
 
         /// <inheritdoc/>
-        public void Activate(DateTime? activationUtc)
+        public DateTime EffectiveUtc { get; private set; } = DateTime.UtcNow;
+
+        /// <inheritdoc/>
+        public bool IsImmediateEffective { get; private set; } = true;
+
+        /// <inheritdoc/>
+        public void Activate(DateTime? effectiveUtc, bool isImmediateEffective)
         {
             if (this.IsActive)
             {
                 throw new InvalidOperationException("Already in active state.");
             }
 
-            this.DeactivationUtc = null;
+            this.EffectiveUtc = effectiveUtc ?? this.NowUtc;
+            this.IsImmediateEffective = isImmediateEffective;
+            if (isImmediateEffective)
+            {
+                this.IsActive = true;
+            }
+
+            this.StateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablemenStateOperation.Activate)
+            {
+                EffictiveUtc = this.EffectiveUtc,
+                IsImmediateEffective = this.IsImmediateEffective,
+            });
         }
 
         /// <inheritdoc/>
-        public void Deactivate(DateTime? deactivationUtc)
+        public void Deactivate(DateTime? effectiveUtc, bool isImmediateEffective)
         {
             if (!this.IsActive)
             {
                 throw new InvalidOperationException("Already in inactive state.");
             }
 
-            deactivationUtc ??= this.NowUtc;
-            this.DeactivationUtc = deactivationUtc;
+            this.EffectiveUtc = effectiveUtc ?? this.NowUtc;
+            this.IsImmediateEffective = isImmediateEffective;
+            if (isImmediateEffective)
+            {
+                this.IsActive = false;
+            }
+
+            this.StateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablemenStateOperation.Deactivate)
+            {
+                EffictiveUtc = this.EffectiveUtc,
+                IsImmediateEffective = this.IsImmediateEffective,
+            });
         }
     }
 }

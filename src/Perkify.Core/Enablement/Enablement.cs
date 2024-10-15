@@ -5,12 +5,12 @@
 namespace Perkify.Core
 {
     using NodaTime;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// The activator managing activation and deactivation for eligibility.
     /// </summary>
-    /// <param name="deactivationUtc">The UTC time when deactivation should occur.</param>
-    public partial class Enablement(DateTime? deactivationUtc = null)
+    public partial class Enablement(bool isActive = true)
         : INowUtc, IEligible
     {
         /// <summary>
@@ -22,10 +22,22 @@ namespace Perkify.Core
         public DateTime NowUtc => this.Clock.GetCurrentInstant().ToDateTimeUtc();
 
         /// <inheritdoc/>
-        public bool IsEligible => this.IsActive switch
+        public bool IsEligible =>
+            this.IsImmediateEffective || this.NowUtc < this.EffectiveUtc
+                ? this.IsActive
+                : !this.IsActive;
+
+        /// <summary>
+        /// Sets the effective date and time in UTC and whether it is immediately effective.
+        /// </summary>
+        /// <param name="effectiveUtc">The effective date and time in UTC.</param>
+        /// <param name="isImmediateEffective">Indicates if the change is immediately effective.</param>
+        /// <returns>The updated <see cref="Enablement"/> instance.</returns>
+        public Enablement WithEffectiveUtc(DateTime effectiveUtc, bool isImmediateEffective)
         {
-            true => true,
-            false => this.NowUtc < this.DeactivationUtc!.Value
-        };
+            this.EffectiveUtc = effectiveUtc;
+            this.IsImmediateEffective = isImmediateEffective;
+            return this;
+        }
     }
 }
