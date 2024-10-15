@@ -5,7 +5,6 @@
 namespace Perkify.Core
 {
     using NodaTime;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// The activator managing activation and deactivation for eligibility.
