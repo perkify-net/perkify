@@ -5,15 +5,20 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
-  <!-- Runtime Dependencies -->
+  <!-- Runtime Utilities -->
   <ItemGroup>
+    <PackageVersion Include="FluentValidation" Version="11.10.0" /> <!-- Data validation utility -->
+    <PackageVersion Include="Hangfire" Version="1.8.14" /> <!-- Background job utility -->
     <PackageVersion Include="NodaTime" Version="3.1.12" /> <!-- Datatime utility -->
-    <PackageVersion Include="NodaTime.Testing" Version="3.1.12" /> <!-- Datatime test utility to mock system clock -->
+    <PackageVersion Include="NodaTime.Testing" Version="3.1.12" /> <!-- Datatime test utility -->
+    <PackageVersion Include="Polly" Version="8.4.2" /> <!-- Resilience utility -->
+    <PackageVersion Include="Serilog" Version="4.0.2" /> <!-- Logging utility -->
   </ItemGroup>
 
   <!-- Dev/Tests Dependencies -->
   <ItemGroup>
     <!-- Dev Infrastructure -->
+    <PackageVersion Include="Fody" Version="6.8.2" /> <!-- Code weaving utility -->
     <PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" /> <!-- Code style analyzer -->
     <PackageVersion Include="Microsoft.CodeAnalysis.Metrics" Version="3.3.4" /> <!-- Code metrics analyzer -->
     <!-- Test Infrastrcuture -->
@@ -32,8 +37,9 @@
     <PackageVersion Include="Bogus" Version="35.6.1" /> <!-- Generate faked test data -->
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" /> <!-- Benchmark testing utility -->
     <PackageVersion Include="NBomber" Version="5.7.0" /> <!-- Load testing utility -->
+    <PackageVersion Include="Microsoft.Playwright" Version="1.47.0" /> <!-- Web automation test utility -->
   </ItemGroup>
-
+  
   <!-- Tools Dependencies -->
   <ItemGroup>
     <PackageVersion Include="CommandLineParser" Version="2.9.1" /> <!-- Command line parser -->
