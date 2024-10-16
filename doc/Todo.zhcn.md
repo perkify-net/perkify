@@ -45,12 +45,12 @@
 项目架构设计，包括系统架构、模块设计、接口设计、数据模型设计等。
 
 - 系统架构设计
-  - [ ] 层次结构图
+  - [x] 层次结构图
   - [ ] 时序图
 
 - 核心模块和接口设计
   - [x] Eligible
-  - [x] Balance & Expiry
+  - [x] Balance, Expiry, Enablement & Delegation
   - [x] Entitlement
   - [x] Chain
   - [ ] Taxonomy
@@ -72,37 +72,14 @@
 ## 工程项目
 
 - Perkify.Core（运行时，内核）
-	- Tier 0
-	  - [x] IEligible接口
-	  - [x] IEligible扩展方法
-	  - [x] Delegation类
-	  - [x] Eligible单元测试
-	- Tier 1
-	  - Balance
-		- [x] IBalance接口
-		- [x] BalanceType枚举
-		- [x] IBalance扩展方法
-		- [ ] IBalance单元测试
-		- [x] Balance类
-		- [x] Balance单元测试
-	  - Expiry
-		- [x] Renewal类
-		- [ ] Renewal单元测试
-		- [x] IExpiry接口
-		- [x] IExpiry扩展方法
-		- [ ] IExpiry单元测试
-		- [x] Expiry类
-		- [x] Expiry单元测试
-	- Tier 2
-	  - Entitlement
-		- [x] Entitlement类
-		- [ ] Entitlement单元测试
-	  - Chain
-		- [x] Chain类
-		- [ ] Chain单元测试
-	  - Taxonomy
-		- [ ] Taxonomy类
-		- [ ] Taxonomy单元测试
+  - [x] Eligible
+  - [x] Balance, Expiry, Enablement & Delegation
+  - [ ] Entitlement
+    - [x] 代码实现
+    - [ ] 单元测试
+  - [ ] Chain
+    - [x] 代码实现
+    - [ ] 单元测试
 
 ## 文档和演示代码
 
