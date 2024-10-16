@@ -35,14 +35,14 @@ namespace Perkify.Core
             {
                 this.clock = value;
 
-                if (this.Expiry != null)
+                if (this.expiry != null)
                 {
-                    this.Expiry.Clock = value;
+                    this.expiry.Clock = value;
                 }
 
-                if (this.Enablement != null)
+                if (this.enablement != null)
                 {
-                    this.Enablement.Clock = value;
+                    this.enablement.Clock = value;
                 }
             }
         }
@@ -61,7 +61,7 @@ namespace Perkify.Core
             // NOTE:
             // - Do not expose inner object to prevent state mutation with synchronization issues.
             // - Another solution is to use private getter, but it will raise CA1822 warning.
-            get => throw new InvalidOperationException("Access denied.");
+            get => throw new InvalidOperationException("Access denied (inner balance).");
             init => this.balance = value;
         }
 
@@ -76,7 +76,7 @@ namespace Perkify.Core
             // NOTE:
             // - Do not expose inner object to prevent state mutation with synchronization issues.
             // - Another solution is to use private getter, but it will raise CA1822 warning.
-            get => throw new InvalidOperationException("Access denied.");
+            get => throw new InvalidOperationException("Access denied (inner expiry).");
             init
             {
                 this.expiry = value;
@@ -99,7 +99,7 @@ namespace Perkify.Core
             // NOTE:
             // - Do not expose inner object to prevent state mutation with synchronization issues.
             // - Another solution is to use private getter, but it will raise CA1822 warning.
-            get => throw new InvalidOperationException("Access denied.");
+            get => throw new InvalidOperationException("Access denied (inner enablement).");
             init
             {
                 this.enablement = value;
@@ -124,9 +124,9 @@ namespace Perkify.Core
 
         /// <inheritdoc/>
         public bool IsEligible =>
-            (this.Balance?.IsEligible ?? true)
-            && (this.Expiry?.IsEligible ?? true)
-            && (this.Enablement?.IsEligible ?? true)
+            (this.balance?.IsEligible ?? true)
+            && (this.expiry?.IsEligible ?? true)
+            && (this.enablement?.IsEligible ?? true)
             && (this.Prerequesite?.IsEligible ?? true);
     }
 }
