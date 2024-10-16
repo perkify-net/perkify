@@ -16,7 +16,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues("2024-10-09T15:00:00Z")] string expiryUtcString,
             [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving,
             [CombinatorialValues(3, 0, -3)] long nowUtcOffset,
-            [CombinatorialValues(AutoRenewalMode.None, AutoRenewalMode.Default, AutoRenewalMode.All)] AutoRenewalMode autorenewal,
+            [CombinatorialValues(AutoRenewalMode.None, AutoRenewalMode.Default, AutoRenewalMode.Balance)] AutoRenewalMode autorenewal,
             [CombinatorialValues(null, true, false)] bool? prerequisiteIfHaving
         )
         {
