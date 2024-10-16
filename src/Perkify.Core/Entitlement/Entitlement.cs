@@ -120,7 +120,7 @@ namespace Perkify.Core
         /// <summary>
         /// Gets the auto-renewal mode connecting balance and expiry.
         /// </summary>
-        public AutoRenewalMode AutoRenewalMode { get; private set; } = autorenewal;
+        public AutoRenewalMode AutoRenewalMode { get; } = autorenewal;
 
         /// <inheritdoc/>
         public bool IsEligible =>
