@@ -4,7 +4,7 @@ namespace Perkify.Core.Tests
     using NodaTime.Testing;
     using NodaTime.Text;
 
-    public class EntitlementTests
+    public partial class EntitlementTests
     {
         const string SkipOrNot = null;
 
@@ -74,8 +74,8 @@ namespace Perkify.Core.Tests
                 () => _ = entitlement.Renewal,
                 () => _ = entitlement.Remaining(),
                 () => entitlement.Renew(null),
-                () => entitlement.Renew(null),
                 // OPs: IEnablement
+                () => _ = entitlement.IsActive,
                 () => _ = entitlement.EffectiveUtc,
                 () => _ = entitlement.IsImmediateEffective,
                 () => entitlement.Deactivate(),
