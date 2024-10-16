@@ -20,13 +20,13 @@ namespace Perkify.Core
         public EnablemenStateOperation Operation { get; } = operation;
 
         /// <summary>
-        /// Gets the effective UTC date and time of the operation.
+        /// Gets the previous enablement state.
         /// </summary>
-        public DateTime EffictiveUtc { get; init; }
+        required public EnablementState From { get; init; }
 
         /// <summary>
-        /// Gets a value indicating whether the operation is effective immediately.
+        /// Gets the new enablement state.
         /// </summary>
-        public bool IsImmediateEffective { get; init; }
+        required public EnablementState To { get; init; }
     }
 }
