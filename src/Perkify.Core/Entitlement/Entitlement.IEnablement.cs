@@ -8,7 +8,7 @@ namespace Perkify.Core
     public partial class Entitlement : IEnablement
     {
         /// <inheritdoc/>
-        public event EventHandler<EnablementStateChangeEventArgs>? StateChanged;
+        public event EventHandler<EnablementStateChangeEventArgs>? EnablementStateChanged;
 
         /// <inheritdoc/>
         public bool IsActive => this.Enablement!.IsActive;

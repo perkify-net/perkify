@@ -84,7 +84,7 @@ namespace Perkify.Core
                 if (this.enablement != null)
                 {
                     this.enablement.Clock = this.Clock;
-                    this.enablement.StateChanged += (sender, args) => this.StateChanged?.Invoke(this, args);
+                    this.enablement.EnablementStateChanged += (sender, args) => this.EnablementStateChanged?.Invoke(this, args);
                 }
             }
         }
