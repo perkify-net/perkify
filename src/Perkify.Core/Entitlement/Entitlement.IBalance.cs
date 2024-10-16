@@ -9,47 +9,47 @@ namespace Perkify.Core
     {
         /// <inheritdoc/>
         public long Incoming
-            => this.Balance!.Incoming;
+            => this.balance!.Incoming;
 
         /// <inheritdoc/>
         public long Outgoing
-            => this.Balance!.Outgoing;
+            => this.balance!.Outgoing;
 
         /// <inheritdoc/>
         public long Threshold
-            => this.Balance!.Threshold;
+            => this.balance!.Threshold;
 
         /// <inheritdoc/>
         public BalanceType BalanceType
-            => this.Balance!.BalanceType;
+            => this.balance!.BalanceType;
 
         /// <inheritdoc/>
         public long Gross
-            => this.Balance!.Gross;
+            => this.balance!.Gross;
 
         /// <inheritdoc/>
         public long Overspending
-            => this.Balance!.Overspending;
+            => this.balance!.Overspending;
 
         /// <inheritdoc/>
         public void Topup(long delta)
         {
-            this.Balance!.Topup(delta);
+            this.balance!.Topup(delta);
 
             if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Topup))
             {
-                this.Expiry?.Renew();
+                this.expiry?.Renew();
             }
         }
 
         /// <inheritdoc/>
         public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
         {
-            var result = this.Balance!.Deduct(delta, policy);
+            var result = this.balance!.Deduct(delta, policy);
 
             if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Deduct))
             {
-                this.Expiry?.Renew();
+                this.expiry?.Renew();
             }
 
             return result;
@@ -58,20 +58,20 @@ namespace Perkify.Core
         /// <inheritdoc/>
         public void Adjust(long? incoming, long? outgoing)
         {
-            this.Balance!.Adjust(incoming, outgoing);
+            this.balance!.Adjust(incoming, outgoing);
             if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
             {
-                this.Expiry?.Renew();
+                this.expiry?.Renew();
             }
         }
 
         /// <inheritdoc/>
         public void Clear()
         {
-            this.Balance!.Clear();
+            this.balance!.Clear();
             if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
             {
-                this.Expiry?.Renew();
+                this.expiry?.Renew();
             }
         }
     }

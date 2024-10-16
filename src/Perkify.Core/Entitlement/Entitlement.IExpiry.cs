@@ -9,37 +9,37 @@ namespace Perkify.Core
     {
         /// <inheritdoc/>
         public DateTime ExpiryUtc
-            => this.Expiry!.ExpiryUtc;
+            => this.expiry!.ExpiryUtc;
 
         /// <inheritdoc/>
         public TimeSpan? GracePeriod
         {
-            get => this.Expiry!.GracePeriod;
-            set => this.Expiry!.GracePeriod = value;
+            get => this.expiry!.GracePeriod;
+            set => this.expiry!.GracePeriod = value;
         }
 
         /// <inheritdoc/>
         public DateTime DeadlineUtc
-            => this.Expiry!.DeadlineUtc;
+            => this.expiry!.DeadlineUtc;
 
         /// <inheritdoc/>
         public bool IsExpired
-            => this.Expiry!.IsExpired;
+            => this.expiry!.IsExpired;
 
         /// <inheritdoc/>
         public TimeSpan Overdue
-            => this.Expiry!.Overdue;
+            => this.expiry!.Overdue;
 
         /// <inheritdoc/>
         public ChronoInterval? Renewal
-            => this.Expiry!.Renewal;
+            => this.expiry!.Renewal;
 
         /// <inheritdoc/>
         public TimeSpan Remaining(bool deadline = false)
-            => this.Expiry!.Remaining(deadline);
+            => this.expiry!.Remaining(deadline);
 
         /// <inheritdoc/>
         public void Renew(string? interval)
-            => this.Expiry!.Renew(interval);
+            => this.expiry!.Renew(interval);
     }
 }
