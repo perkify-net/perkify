@@ -31,7 +31,7 @@ namespace Perkify.Core.Tests
             EnablementStateChangeEventArgs? stateChangedEvent = null;
             if (isStateChangedEventHooked)
             {
-                enablement.StateChanged += (sender, e) => { stateChangedEvent = e; };
+                enablement.EnablementStateChanged += (sender, e) => { stateChangedEvent = e; };
             }
 
             var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
@@ -107,7 +107,7 @@ namespace Perkify.Core.Tests
             EnablementStateChangeEventArgs? stateChangedEvent = null;
             if (isStateChangedEventHooked)
             {
-                enablement.StateChanged += (sender, e) => { stateChangedEvent = e; };
+                enablement.EnablementStateChanged += (sender, e) => { stateChangedEvent = e; };
             }
 
             var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;

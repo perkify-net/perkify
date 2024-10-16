@@ -18,6 +18,7 @@ namespace Perkify.Core
     {
         private IClock clock = SystemClock.Instance;
 
+        private Balance? balance;
         private Enablement? enablement;
         private Expiry? expiry;
 
@@ -52,14 +53,30 @@ namespace Perkify.Core
         /// <summary>
         /// Gets the balance associated with the entitlement.
         /// </summary>
-        public Balance? Balance { get; init; }
+        /// <remarks>
+        /// Do not use. <see cref="InvalidOperationException"/> will be thrown to prevent state mutation with synchronization issues.
+        /// </remarks>
+        public Balance? Balance
+        {
+            // NOTE:
+            // - Do not expose inner object to prevent state mutation with synchronization issues.
+            // - Another solution is to use private getter, but it will raise CA1822 warning.
+            get => throw new InvalidOperationException("Access denied.");
+            init => this.balance = value;
+        }
 
         /// <summary>
         /// Gets the expiry associated with the entitlement.
         /// </summary>
+        /// <remarks>
+        /// Do not use. <see cref="InvalidOperationException"/> will be thrown to prevent state mutation with synchronization issues.
+        /// </remarks>
         public Expiry? Expiry
         {
-            get => this.expiry;
+            // NOTE:
+            // - Do not expose inner object to prevent state mutation with synchronization issues.
+            // - Another solution is to use private getter, but it will raise CA1822 warning.
+            get => throw new InvalidOperationException("Access denied.");
             init
             {
                 this.expiry = value;
@@ -74,9 +91,15 @@ namespace Perkify.Core
         /// <summary>
         /// Gets the enablement associated with the entitlement.
         /// </summary>
+        /// <remarks>
+        /// Do not use. <see cref="InvalidOperationException"/> will be thrown to prevent state mutation with synchronization issues.
+        /// </remarks>
         public Enablement? Enablement
         {
-            get => this.enablement;
+            // NOTE:
+            // - Do not expose inner object to prevent state mutation with synchronization issues.
+            // - Another solution is to use private getter, but it will raise CA1822 warning.
+            get => throw new InvalidOperationException("Access denied.");
             init
             {
                 this.enablement = value;
@@ -84,7 +107,7 @@ namespace Perkify.Core
                 if (this.enablement != null)
                 {
                     this.enablement.Clock = this.Clock;
-                    this.enablement.StateChanged += (sender, args) => this.StateChanged?.Invoke(this, args);
+                    this.enablement.EnablementStateChanged += (sender, args) => this.EnablementStateChanged?.Invoke(this, args);
                 }
             }
         }

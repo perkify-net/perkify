@@ -8,7 +8,8 @@ namespace Perkify.Core
     public partial class Entitlement : IExpiry
     {
         /// <inheritdoc/>
-        public DateTime ExpiryUtc => this.Expiry!.ExpiryUtc;
+        public DateTime ExpiryUtc
+            => this.Expiry!.ExpiryUtc;
 
         /// <inheritdoc/>
         public TimeSpan? GracePeriod
@@ -18,19 +19,24 @@ namespace Perkify.Core
         }
 
         /// <inheritdoc/>
-        public DateTime DeadlineUtc => this.Expiry!.DeadlineUtc;
+        public DateTime DeadlineUtc
+            => this.Expiry!.DeadlineUtc;
 
         /// <inheritdoc/>
-        public bool IsExpired => this.Expiry!.IsExpired;
+        public bool IsExpired
+            => this.Expiry!.IsExpired;
 
         /// <inheritdoc/>
-        public TimeSpan Overdue => this.Expiry!.Overdue;
+        public TimeSpan Overdue
+            => this.Expiry!.Overdue;
 
         /// <inheritdoc/>
-        public ChronoInterval? Renewal => this.Expiry!.Renewal;
+        public ChronoInterval? Renewal
+            => this.Expiry!.Renewal;
 
         /// <inheritdoc/>
-        public TimeSpan Remaining(bool deadline = false) => this.Expiry!.Remaining(deadline);
+        public TimeSpan Remaining(bool deadline = false)
+            => this.Expiry!.Remaining(deadline);
 
         /// <inheritdoc/>
         public void Renew(string? interval)

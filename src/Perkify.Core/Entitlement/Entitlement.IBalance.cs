@@ -8,31 +8,37 @@ namespace Perkify.Core
     public partial class Entitlement : IBalance
     {
         /// <inheritdoc/>
-        public long Incoming => this.Balance!.Incoming;
+        public long Incoming
+            => this.Balance!.Incoming;
 
         /// <inheritdoc/>
-        public long Outgoing => this.Balance!.Outgoing;
+        public long Outgoing
+            => this.Balance!.Outgoing;
 
         /// <inheritdoc/>
-        public long Threshold => this.Balance!.Threshold;
+        public long Threshold
+            => this.Balance!.Threshold;
 
         /// <inheritdoc/>
-        public BalanceType BalanceType => this.Balance!.BalanceType;
+        public BalanceType BalanceType
+            => this.Balance!.BalanceType;
 
         /// <inheritdoc/>
-        public long Gross => this.Balance!.Gross;
+        public long Gross
+            => this.Balance!.Gross;
 
         /// <inheritdoc/>
-        public long Overspending => this.Balance!.Overspending;
+        public long Overspending
+            => this.Balance!.Overspending;
 
         /// <inheritdoc/>
         public void Topup(long delta)
         {
             this.Balance!.Topup(delta);
 
-            if (this.Expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Topup))
+            if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Topup))
             {
-                this.Expiry.Renew();
+                this.Expiry?.Renew();
             }
         }
 
@@ -41,9 +47,9 @@ namespace Perkify.Core
         {
             var result = this.Balance!.Deduct(delta, policy);
 
-            if (this.Expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Deduct))
+            if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Deduct))
             {
-                this.Expiry.Renew();
+                this.Expiry?.Renew();
             }
 
             return result;
@@ -53,9 +59,9 @@ namespace Perkify.Core
         public void Adjust(long? incoming, long? outgoing)
         {
             this.Balance!.Adjust(incoming, outgoing);
-            if (this.Expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
+            if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
             {
-                this.Expiry.Renew();
+                this.Expiry?.Renew();
             }
         }
 
@@ -63,9 +69,9 @@ namespace Perkify.Core
         public void Clear()
         {
             this.Balance!.Clear();
-            if (this.Expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
+            if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
             {
-                this.Expiry.Renew();
+                this.Expiry?.Renew();
             }
         }
     }

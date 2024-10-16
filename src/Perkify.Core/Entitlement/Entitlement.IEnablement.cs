@@ -8,23 +8,40 @@ namespace Perkify.Core
     public partial class Entitlement : IEnablement
     {
         /// <inheritdoc/>
-        public event EventHandler<EnablementStateChangeEventArgs>? StateChanged;
+        public event EventHandler<EnablementStateChangeEventArgs>? EnablementStateChanged;
 
         /// <inheritdoc/>
-        public bool IsActive => this.Enablement!.IsActive;
+        public bool IsActive
+            => this.enablement!.IsActive;
 
         /// <inheritdoc/>
-        public DateTime EffectiveUtc => this.Enablement!.EffectiveUtc;
+        public DateTime EffectiveUtc
+            => this.enablement!.EffectiveUtc;
 
         /// <inheritdoc/>
-        public bool IsImmediateEffective => this.Enablement!.IsImmediateEffective;
+        public bool IsImmediateEffective
+            => this.enablement!.IsImmediateEffective;
 
         /// <inheritdoc/>
         public void Deactivate(DateTime? effectiveUtc = null, bool isImmediateEffective = true)
-            => this.Enablement!.Deactivate(effectiveUtc, isImmediateEffective);
+            => this.enablement!.Deactivate(effectiveUtc, isImmediateEffective);
 
         /// <inheritdoc/>
         public void Activate(DateTime? effectiveUtc = null, bool isImmediateEffective = true)
-            => this.Enablement!.Activate(effectiveUtc, isImmediateEffective);
+        {
+            // Deduct overdue time from activation time if need.
+            var overdue = TimeSpan.Zero;
+            if (this.expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Enablement))
+            {
+                var deactivationUtc = this.EffectiveUtc;
+                overdue = deactivationUtc - this.ExpiryUtc;
+                overdue = overdue > TimeSpan.Zero ? overdue : TimeSpan.Zero;
+                overdue = overdue < this.Overdue ? overdue : this.Overdue;
+            }
+
+            effectiveUtc = effectiveUtc ?? this.NowUtc;
+            effectiveUtc -= overdue;
+            this.enablement!.Activate(effectiveUtc, isImmediateEffective);
+        }
     }
 }

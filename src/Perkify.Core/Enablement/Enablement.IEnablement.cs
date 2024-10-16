@@ -8,7 +8,7 @@ namespace Perkify.Core
     public partial class Enablement : IEnablement
     {
         /// <inheritdoc/>
-        public event EventHandler<EnablementStateChangeEventArgs>? StateChanged;
+        public event EventHandler<EnablementStateChangeEventArgs>? EnablementStateChanged;
 
         /// <inheritdoc/>
         public bool IsActive { get; private set; } = isActive;
@@ -39,7 +39,7 @@ namespace Perkify.Core
                 this.IsActive = true;
             }
 
-            this.StateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablemenStateOperation.Activate)
+            this.EnablementStateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablemenStateOperation.Activate)
             {
                 From = previous,
                 To = new EnablementState(this.IsActive)
@@ -70,7 +70,7 @@ namespace Perkify.Core
                 this.IsActive = false;
             }
 
-            this.StateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablemenStateOperation.Deactivate)
+            this.EnablementStateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablemenStateOperation.Deactivate)
             {
                 From = previous,
                 To = new EnablementState(this.IsActive)
