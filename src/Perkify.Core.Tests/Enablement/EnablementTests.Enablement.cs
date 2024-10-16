@@ -43,8 +43,12 @@ namespace Perkify.Core.Tests
             {
                 stateChangedEvent.Should().NotBeNull();
                 stateChangedEvent!.Operation.Should().Be(EnablemenStateOperation.Deactivate);
-                stateChangedEvent!.EffictiveUtc.Should().Be(effectiveUtc ?? nowUtc);
-                stateChangedEvent!.IsImmediateEffective.Should().Be(isImmediateEffective);
+                stateChangedEvent!.From.IsActive.Should().Be(isActive);
+                stateChangedEvent!.From.EffictiveUtc.Should().Be(initialEffiectiveUtc);
+                stateChangedEvent!.From.IsImmediateEffective.Should().Be(initialIsImmediateEffective);
+                stateChangedEvent!.To.IsActive.Should().Be(enablement.IsActive);
+                stateChangedEvent!.To.EffictiveUtc.Should().Be(enablement.EffectiveUtc);
+                stateChangedEvent!.To.IsImmediateEffective.Should().Be(enablement.IsImmediateEffective);
             }
         }
 
@@ -115,8 +119,12 @@ namespace Perkify.Core.Tests
             {
                 stateChangedEvent.Should().NotBeNull();
                 stateChangedEvent!.Operation.Should().Be(EnablemenStateOperation.Activate);
-                stateChangedEvent!.EffictiveUtc.Should().Be(effectiveUtc ?? nowUtc);
-                stateChangedEvent!.IsImmediateEffective.Should().Be(isImmediateEffective);
+                stateChangedEvent!.From.IsActive.Should().Be(isActive);
+                stateChangedEvent!.From.EffictiveUtc.Should().Be(initialEffiectiveUtc);
+                stateChangedEvent!.From.IsImmediateEffective.Should().Be(initialIsImmediateEffective);
+                stateChangedEvent!.To.IsActive.Should().Be(enablement.IsActive);
+                stateChangedEvent!.To.EffictiveUtc.Should().Be(enablement.EffectiveUtc);
+                stateChangedEvent!.To.IsImmediateEffective.Should().Be(enablement.IsImmediateEffective);
             }
         }
 
