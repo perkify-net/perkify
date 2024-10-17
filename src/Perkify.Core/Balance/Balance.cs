@@ -22,7 +22,7 @@ namespace Perkify.Core
         public BalanceExceedancePolicy Policy => policy;
 
         /// <inheritdoc/>
-        public bool IsEligible => this.Gross >= this.Threshold;
+        public virtual bool IsEligible => this.Gross >= this.Threshold;
 
         /// <summary>
         /// Creates a new balance with a threshold of 0.

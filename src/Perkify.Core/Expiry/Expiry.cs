@@ -27,7 +27,7 @@ namespace Perkify.Core
         public DateTime NowUtc => this.Clock.GetCurrentInstant().ToDateTimeUtc();
 
         /// <inheritdoc/>
-        public bool IsEligible => this.NowUtc < this.DeadlineUtc;
+        public virtual bool IsEligible => this.NowUtc < this.DeadlineUtc;
 
         /// <summary>Specify the renewal period.</summary>
         /// <param name="interval">The renewal interval, specified as an ISO 8601 duration string.</param>

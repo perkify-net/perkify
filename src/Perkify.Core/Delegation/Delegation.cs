@@ -11,6 +11,6 @@ namespace Perkify.Core
         : IEligible
     {
         /// <inheritdoc/>
-        public bool IsEligible => fn!();
+        public virtual bool IsEligible => fn!();
     }
 }
