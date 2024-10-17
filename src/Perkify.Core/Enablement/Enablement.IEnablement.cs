@@ -29,7 +29,7 @@ namespace Perkify.Core
 
             var previous = new EnablementState(this.IsActive)
             {
-                EffictiveUtc = this.EffectiveUtc,
+                EffectiveUtc = this.EffectiveUtc,
                 IsImmediateEffective = this.IsImmediateEffective,
             };
             this.EffectiveUtc = effectiveUtc ?? this.NowUtc;
@@ -44,7 +44,7 @@ namespace Perkify.Core
                 From = previous,
                 To = new EnablementState(this.IsActive)
                 {
-                    EffictiveUtc = this.EffectiveUtc,
+                    EffectiveUtc = this.EffectiveUtc,
                     IsImmediateEffective = this.IsImmediateEffective,
                 },
             });
@@ -60,7 +60,7 @@ namespace Perkify.Core
 
             var previous = new EnablementState(this.IsActive)
             {
-                EffictiveUtc = this.EffectiveUtc,
+                EffectiveUtc = this.EffectiveUtc,
                 IsImmediateEffective = this.IsImmediateEffective,
             };
             this.EffectiveUtc = effectiveUtc ?? this.NowUtc;
@@ -75,7 +75,7 @@ namespace Perkify.Core
                 From = previous,
                 To = new EnablementState(this.IsActive)
                 {
-                    EffictiveUtc = this.EffectiveUtc,
+                    EffectiveUtc = this.EffectiveUtc,
                     IsImmediateEffective = this.IsImmediateEffective,
                 },
             });

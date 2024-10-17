@@ -123,7 +123,7 @@ namespace Perkify.Core
         public AutoRenewalMode AutoRenewalMode { get; } = autorenewal;
 
         /// <inheritdoc/>
-        public bool IsEligible =>
+        public virtual bool IsEligible =>
             (this.balance?.IsEligible ?? true)
             && (this.expiry?.IsEligible ?? true)
             && (this.enablement?.IsEligible ?? true)

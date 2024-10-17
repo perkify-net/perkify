@@ -21,7 +21,7 @@ namespace Perkify.Core
         public DateTime NowUtc => this.Clock.GetCurrentInstant().ToDateTimeUtc();
 
         /// <inheritdoc/>
-        public bool IsEligible =>
+        public virtual bool IsEligible =>
             this.IsImmediateEffective || this.NowUtc < this.EffectiveUtc
                 ? this.IsActive
                 : !this.IsActive;

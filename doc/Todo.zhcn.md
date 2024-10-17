@@ -74,9 +74,7 @@
 - Perkify.Core（运行时，内核）
   - [x] Eligible
   - [x] Balance, Expiry, Enablement & Delegation
-  - [ ] Entitlement
-    - [x] 代码实现
-    - [ ] 单元测试
+  - [x] Entitlement
   - [ ] Chain
     - [x] 代码实现
     - [ ] 单元测试
