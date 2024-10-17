@@ -35,6 +35,12 @@ namespace Perkify.Core.Tests
 
             entitlement.AutoRenewalMode.Should().Be(renewal);
             entitlement.NowUtc.Should().Be(nowUtc);
+
+            entitlement.HasBalance.Should().BeTrue();
+            entitlement.HasExpiry.Should().BeTrue();
+            entitlement.HasEnablement.Should().BeTrue();
+            entitlement.Prerequesite.Should().NotBeNull();
+
             entitlement.Gross.Should().Be(gross);
             entitlement.ExpiryUtc.Should().Be(expiryUtc);
             entitlement.IsActive.Should().Be(isActive);
@@ -53,6 +59,11 @@ namespace Perkify.Core.Tests
             var entitlement = new Entitlement(renewal) { Clock = clock };
             entitlement.AutoRenewalMode.Should().Be(renewal);
             entitlement.NowUtc.Should().Be(nowUtc);
+
+            entitlement.HasBalance.Should().BeFalse();
+            entitlement.HasExpiry.Should().BeFalse();
+            entitlement.HasEnablement.Should().BeFalse();
+            entitlement.Prerequesite.Should().BeNull();
 
             var operations = new Action[]
             {
@@ -145,7 +156,7 @@ namespace Perkify.Core.Tests
         {
             var mockBalance = new Mock<Balance>(MockBehavior.Strict, 0L, BalanceExceedancePolicy.Reject);
             mockBalance.SetupGet(balance => balance.IsEligible).Returns(isBalanceEligible);
-            var mockExpiry = new Mock<Expiry>(MockBehavior.Strict, DateTime.UtcNow, null);
+            var mockExpiry = new Mock<Expiry>(MockBehavior.Strict, DateTime.UtcNow, (TimeSpan?)null!);
             mockExpiry.SetupGet(expiry => expiry.IsEligible).Returns(isExpryEligible);
             var mockEnablement = new Mock<Enablement>(MockBehavior.Strict, true);
             mockEnablement.SetupGet(enablement => enablement.IsEligible).Returns(isEnablementEligible);
@@ -164,7 +175,7 @@ namespace Perkify.Core.Tests
         }
 
         [Fact(Skip = SkipOrNot)]
-        public void TestIsEligibleNullReference()
+        public void TestIsEligibleNotInitialized()
         {
             var entitlement = new Entitlement(AutoRenewalMode.None);
             entitlement.IsEligible.Should().BeTrue();
