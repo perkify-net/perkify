@@ -66,6 +66,11 @@ namespace Perkify.Core
         }
 
         /// <summary>
+        /// Gets a value indicating whether the entitlement has an embedded balance.
+        /// </summary>
+        public virtual bool HasBalance => this.balance != null;
+
+        /// <summary>
         /// Gets the expiry associated with the entitlement.
         /// </summary>
         /// <remarks>
@@ -87,6 +92,11 @@ namespace Perkify.Core
                 }
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the entitlement has an embedded expiry.
+        /// </summary>
+        public virtual bool HasExpiry => this.expiry != null;
 
         /// <summary>
         /// Gets the enablement associated with the entitlement.
@@ -111,6 +121,11 @@ namespace Perkify.Core
                 }
             }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the entitlement has an embedded enablement.
+        /// </summary>
+        public virtual bool HasEnablement => this.enablement != null;
 
         /// <summary>
         /// Gets the prerequisite eligibility associated with the entitlement.
