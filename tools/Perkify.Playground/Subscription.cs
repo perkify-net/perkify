@@ -6,7 +6,6 @@
     using Spectre.Console;
 
     using Perkify.Core;
-    using System.Globalization;
 
     public class Subscription
     {

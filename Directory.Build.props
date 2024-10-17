@@ -57,6 +57,11 @@
     <NoWarn></NoWarn>
   </PropertyGroup>
 
+  <!-- Prebuilt Items (All projects) -->
+  <ItemGroup>
+    <Using Include="System.Globalization" />
+  </ItemGroup>
+
   <!-- Prebuilt Items (Test Projects Only) -->
   <ItemGroup Label="TestAssets" Condition="$(ProjectDir.StartsWith('$(SourceDir)')) And $(MSBuildProjectName.EndsWith('.Tests'))">
     <!-- Test Infrastrcuture -->

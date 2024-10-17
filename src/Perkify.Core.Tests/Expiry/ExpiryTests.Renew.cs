@@ -1,7 +1,5 @@
 namespace Perkify.Core.Tests
 {
-    using System.Globalization;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using NodaTime.Extensions;
     using NodaTime.Testing;
     using NodaTime.Text;

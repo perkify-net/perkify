@@ -1,6 +1,5 @@
 namespace Perkify.Core.Tests
 {
-    using FluentAssertions;
     using NodaTime.Extensions;
     using NodaTime.Testing;
     using NodaTime.Text;
