@@ -9,8 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Core", "src\Perkify
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{2ECF4EF3-B291-4DAE-AD0F-5BA381A1E47F}"
 	ProjectSection(SolutionItems) = preProject
-		doc\Roadmap.zhcn.md = doc\Roadmap.zhcn.md
 		doc\perkify.architecture.png = doc\perkify.architecture.png
+		doc\Roadmap.zhcn.md = doc\Roadmap.zhcn.md
 		doc\Todo.zhcn.md = doc\Todo.zhcn.md
 	EndProjectSection
 EndProject
