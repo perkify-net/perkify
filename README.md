@@ -17,7 +17,7 @@ Here are the core modules and interfaces that we have implemented so far:
 - [x] **Balance**: The balance management for coupon or credits (prepaid card).
 - [x] **Expiry**: The expiry management for coupon, subscription or credits (prepaid card).
 - [x] **Enablement**: The enablement management for coupon, subscription or credits (prepaid card).
-- [x] **Delegation**: The delegation management for any extra eligiblity check.
-- [x] **Entitlement**: The entitlement is combination of eligibility check with balance, expiry and enablement (plus prerequisite if need).
-- [x] **Chain**: The chain of entitlement with specified order during the eligibility check and management.
+- [x] **Delegation**: The flexible delegation-based eligiblity check for better extensibiity.
+- [x] **Entitlement**: Combination of eligibility check with balance, expiry and enablement.
+- [x] **Chain**: The chain of entitlements with specified order (expiry time by default).
 - [ ] **Taxonomy**: Define a tags system and run eligibility check with the tags in flexible way.

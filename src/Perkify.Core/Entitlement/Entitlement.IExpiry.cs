@@ -41,5 +41,9 @@ namespace Perkify.Core
         /// <inheritdoc/>
         public void Renew(string? interval)
             => this.expiry!.Renew(interval);
+
+        /// <inheritdoc/>
+        public void AdjustTo(DateTime expiryUtc)
+            => this.expiry!.AdjustTo(expiryUtc);
     }
 }
