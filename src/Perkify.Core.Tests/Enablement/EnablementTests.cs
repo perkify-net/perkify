@@ -44,13 +44,13 @@ namespace Perkify.Core.Tests
         (
             [CombinatorialValues(true, false)] bool isActive,
             [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
-            [CombinatorialValues(-1, 0, +1)] int effiectiveUtcOffset,
+            [CombinatorialValues(-1, 0, +1)] int EffectiveUtcOffset,
             [CombinatorialValues(true, false)] bool isImmediateEffective
         )
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
-            var effectiveUtc = nowUtc.AddHours(effiectiveUtcOffset);
+            var effectiveUtc = nowUtc.AddHours(EffectiveUtcOffset);
 
             var enablement = new Enablement(isActive) { Clock = clock }.WithEffectiveUtc(effectiveUtc, isImmediateEffective);
             enablement.IsActive.Should().Be(isActive);

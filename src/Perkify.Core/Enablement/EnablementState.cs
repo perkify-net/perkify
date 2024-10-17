@@ -21,7 +21,7 @@ namespace Perkify.Core
         /// <summary>
         /// Gets the effective UTC date and time of the operation.
         /// </summary>
-        public DateTime EffictiveUtc { get; init; }
+        public DateTime EffectiveUtc { get; init; }
 
         /// <summary>
         /// Gets a value indicating whether the operation is effective immediately.
