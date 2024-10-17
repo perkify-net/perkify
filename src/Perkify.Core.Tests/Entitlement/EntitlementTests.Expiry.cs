@@ -3,7 +3,6 @@ namespace Perkify.Core.Tests
     using NodaTime.Extensions;
     using NodaTime.Testing;
     using NodaTime.Text;
-    using System.Globalization;
 
     public partial class EntitlementTests
     {

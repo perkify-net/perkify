@@ -1,8 +1,5 @@
 namespace Perkify.Core.Tests
 {
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using System.Globalization;
-
     public class ChronoIntervalTests
     {
         const string SkipOrNot = null;
