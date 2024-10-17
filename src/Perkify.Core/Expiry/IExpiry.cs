@@ -54,5 +54,11 @@ namespace Perkify.Core
         /// </summary>
         /// <param name="interval">The renewal interval, specified as an ISO 8601 duration string.</param>
         public void Renew(string? interval);
+
+        /// <summary>
+        /// Adjusts the expiry time to the specified UTC time.
+        /// </summary>
+        /// <param name="expiryUtc">The new expiry time in UTC.</param>
+        public void AdjustTo(DateTime expiryUtc);
     }
 }

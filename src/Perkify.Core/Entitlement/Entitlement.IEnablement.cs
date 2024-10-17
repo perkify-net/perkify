@@ -34,14 +34,18 @@ namespace Perkify.Core
             if (this.expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Enablement))
             {
                 var deactivationUtc = this.EffectiveUtc;
-                overdue = deactivationUtc - this.ExpiryUtc;
-                overdue = overdue > TimeSpan.Zero ? overdue : TimeSpan.Zero;
-                overdue = overdue < this.Overdue ? overdue : this.Overdue;
+                var overdueOnDeactivation = deactivationUtc - this.ExpiryUtc;
+                var overdueOnExpiry = this.expiry.Overdue;
+                overdue = overdueOnDeactivation < overdueOnExpiry ? overdueOnDeactivation : overdueOnExpiry;
             }
 
-            effectiveUtc = effectiveUtc ?? this.NowUtc;
-            effectiveUtc -= overdue;
             this.enablement!.Activate(effectiveUtc, isImmediateEffective);
+            if (this.expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Enablement))
+            {
+                var activationUtc = this.enablement.EffectiveUtc;
+                var newExpiryUtc = activationUtc - overdue;
+                this.expiry.AdjustTo(newExpiryUtc);
+            }
         }
     }
 }

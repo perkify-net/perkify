@@ -62,5 +62,9 @@ namespace Perkify.Core
                 this.Renewal = renewal;
             }
         }
+
+        /// <inheritdoc/>
+        public void AdjustTo(DateTime expiryUtc)
+            => this.ExpiryUtc = expiryUtc;
     }
 }

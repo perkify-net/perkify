@@ -135,5 +135,25 @@ namespace Perkify.Core.Tests
             expiry.ExpiryUtc.Should().Be(expiryUtc);
             expiry.Renewal.Should().BeNull();
         }
+
+        [Theory(Skip = SkipOrNot), CombinatorialData]
+        public void TestExpiryAdjustTo
+        (
+            [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
+            [CombinatorialValues(null, +2)] int? gracePeriodInHours,
+            [CombinatorialValues(-1, 0, +1, +2, +3)] int nowUtcOffsetInHours,
+            [CombinatorialValues(+10)] int expectedExpiryUtcOffsetInHours
+        )
+        {
+            var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
+            var grace = gracePeriodInHours != null ? TimeSpan.FromHours(gracePeriodInHours.Value) : (TimeSpan?)null;
+            var nowUtc = expiryUtc.AddHours(nowUtcOffsetInHours);
+            var clock = new FakeClock(nowUtc.ToInstant());
+
+            var expiry = new Expiry(expiryUtc, grace) { Clock = clock! };
+            var expectedExpiryUtc = expiryUtc.AddHours(expectedExpiryUtcOffsetInHours);
+            expiry.AdjustTo(expectedExpiryUtc);
+            expiry.ExpiryUtc.Should().Be(expectedExpiryUtc);
+        }
     }
 }
