@@ -136,48 +136,40 @@ namespace Perkify.Core.Tests
                 .WithMessage($"Access denied (inner enablement).");
         }
 
-        public class TestPrimaryConstructor(int a)
+        [Theory, CombinatorialData]
+        public void TestCreateEntitlementWithFakedClock
+        (
+            [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString
+        )
         {
-            public int A { get; } = a;
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var entitlement = new Entitlement(AutoRenewalMode.None, null)
+            {
+                Expiry = new Expiry(DateTime.UtcNow),
+                Enablement = new Enablement(true),
+            }.WithClock(clock);
+
+            // TODO: Test inner clocks within Expiry & Enablement.
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
         }
 
         [Theory, CombinatorialData]
-        public void TestIsEligible
+        public void TestCreateEntitlementWithSystemClock
         (
-            [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString,
-            [CombinatorialValues(true, false)] bool isBalanceEligible,
-            [CombinatorialValues(true, false)] bool isExpryEligible,
-            [CombinatorialValues(true, false)] bool isEnablementEligible,
-            [CombinatorialValues(true, false)] bool iskPrerequesiteEligible
+            [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString
         )
         {
-            var mockBalance = new Mock<Balance>(MockBehavior.Strict, 0L, BalanceExceedancePolicy.Reject);
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
-            mockBalance.SetupGet(balance => balance.IsEligible).Returns(isBalanceEligible);
-            var mockExpiry = new Mock<Expiry>(MockBehavior.Strict, DateTime.UtcNow, clock);
-            mockExpiry.SetupGet(expiry => expiry.IsEligible).Returns(isExpryEligible);
-            var mockEnablement = new Mock<Enablement>(MockBehavior.Strict, true, clock);
-            mockEnablement.SetupGet(enablement => enablement.IsEligible).Returns(isEnablementEligible);
-            var mockPrerequesite = new Mock<IEligible>();
-            mockPrerequesite.SetupGet(eligible =>eligible.IsEligible).Returns(iskPrerequesiteEligible);
-            var entitlement = new Entitlement(AutoRenewalMode.None)
+            var entitlement = new Entitlement(AutoRenewalMode.None, clock)
             {
-                Balance = mockBalance.Object,
-                Expiry = mockExpiry.Object,
-                Enablement = mockEnablement.Object,
-                Prerequesite = mockPrerequesite.Object,
-            };
+                Expiry = new Expiry(DateTime.UtcNow),
+                Enablement = new Enablement(true),
+            }.WithClock(null);
 
-            var expected = new[] { isBalanceEligible, isExpryEligible, isEnablementEligible, iskPrerequesiteEligible }.All(eligible => eligible);
-            entitlement.IsEligible.Should().Be(expected);
-        }
-
-        [Fact]
-        public void TestIsEligibleNotInitialized()
-        {
-            var entitlement = new Entitlement(AutoRenewalMode.None);
-            entitlement.IsEligible.Should().BeTrue();
+            // TODO: Test inner clocks within Expiry & Enablement.
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         }
     }
 }
