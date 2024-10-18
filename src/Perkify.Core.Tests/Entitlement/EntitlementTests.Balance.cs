@@ -26,10 +26,12 @@ namespace Perkify.Core.Tests
 
             entitlement.AutoRenewalMode.Should().Be(renewal);
             entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
+            entitlement.Threshold.Should().Be(balance.Threshold);
+            entitlement.BalanceExceedancePolicy.Should().Be(balance.BalanceExceedancePolicy);
+            entitlement.BalanceType.Should().Be(balance.BalanceType);
             entitlement.Incoming.Should().Be(balance.Incoming);
             entitlement.Outgoing.Should().Be(balance.Outgoing);
-            entitlement.Threshold.Should().Be(balance.Threshold);
-            entitlement.BalanceType.Should().Be(balance.BalanceType);
+            entitlement.Gross.Should().Be(balance.Gross);
             entitlement.Overspending.Should().Be(balance.Overspending);
         }
 

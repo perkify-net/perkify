@@ -20,7 +20,7 @@
             balance.Outgoing.Should().Be(0);
             balance.Gross.Should().Be(0);
             balance.Threshold.Should().Be(threshold);
-            balance.Policy.Should().Be(policy);
+            balance.BalanceExceedancePolicy.Should().Be(policy);
         }
 
         [Theory]
@@ -35,7 +35,7 @@
             debit.Outgoing.Should().Be(0);
             debit.Gross.Should().Be(0);
             debit.Threshold.Should().Be(0);
-            debit.Policy.Should().Be(policy);
+            debit.BalanceExceedancePolicy.Should().Be(policy);
             debit.BalanceType.Should().Be(BalanceType.Debit);
         }
 
@@ -58,7 +58,7 @@
             credit.Gross.Should().Be(0);
             credit.Threshold.Should().Be(threshold);
             credit.Threshold.Should().BeNegative();
-            credit.Policy.Should().Be(policy);
+            credit.BalanceExceedancePolicy.Should().Be(policy);
             credit.BalanceType.Should().Be(BalanceType.Credit);
         }
 

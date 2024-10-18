@@ -16,11 +16,6 @@ namespace Perkify.Core
     public partial class Balance(long threshold, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
     {
         /// <summary>
-        /// Gets the balance exceedance policy.
-        /// </summary>
-        public BalanceExceedancePolicy Policy => policy;
-
-        /// <summary>
         /// Creates a new balance with a threshold of 0.
         /// </summary>
         /// <param name="policy">The policy to apply when the balance exceeds the threshold.</param>

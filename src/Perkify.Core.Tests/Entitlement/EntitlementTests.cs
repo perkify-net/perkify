@@ -63,10 +63,12 @@ namespace Perkify.Core.Tests
             var operations = new Action[]
             {
                     // OPs: IBalance
+                    () => _ = entitlement.Threshold,
+                    () => _ = entitlement.BalanceExceedancePolicy,
+                    () => _ = entitlement.BalanceType,
                     () => _ = entitlement.Incoming,
                     () => _ = entitlement.Outgoing,
-                    () => _ = entitlement.Threshold,
-                    () => _ = entitlement.BalanceType,
+                    () => _ = entitlement.Gross,
                     () => _ = entitlement.Overspending,
                     () => entitlement.Topup(0L),
                     () => _ = entitlement.Deduct(0L),
