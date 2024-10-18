@@ -37,7 +37,7 @@ namespace Perkify.Core
         /// <summary>
         /// Gets the clock used to determine the current time.
         /// </summary>
-        public IClock Clock { get; } = clock ?? SystemClock.Instance;
+        public IClock Clock { get; private set; } = clock ?? SystemClock.Instance;
 
         /// <summary>
         /// Gets the factory function to build new entitlements.
@@ -55,7 +55,19 @@ namespace Perkify.Core
         public IEnumerable<Entitlement> Entitlements
         {
             get => this.entitlements;
-            init => this.entitlements = value?.ToImmutableSortedSet(this.Comparer) ?? ImmutableSortedSet<Entitlement>.Empty;
+            init => this.entitlements = value?.Select(entitlement => entitlement.WithClock(clock)).ToImmutableSortedSet(this.Comparer) ?? ImmutableSortedSet<Entitlement>.Empty;
+        }
+
+        /// <summary>
+        /// Sets a new clock for the entitlement chain and updates all entitlements with the new clock.
+        /// </summary>
+        /// <param name="clock">The new clock to be set.</param>
+        /// <returns>The updated entitlement chain with the new clock.</returns>
+        public EntitlementChain WithClock(IClock clock)
+        {
+            this.entitlements.ToList().ForEach(entitlement => entitlement.WithClock(clock));
+            this.Clock = clock;
+            return this;
         }
     }
 }
