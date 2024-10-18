@@ -18,6 +18,8 @@ namespace Perkify.Core
         /// <param name="y">The second Entitlement to compare.</param>
         /// <returns>A signed integer that indicates the relative values of x and y.</returns>
         public int Compare(Entitlement? x, Entitlement? y)
-            => Nullable.Compare(x?.ExpiryUtc, y?.ExpiryUtc);
+            => Nullable.Compare<DateTime>(
+                x?.HasExpiry ?? false ? x.ExpiryUtc : null,
+                y?.HasExpiry ?? false ? y.ExpiryUtc : null);
     }
 }

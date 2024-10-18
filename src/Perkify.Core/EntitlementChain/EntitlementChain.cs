@@ -63,8 +63,9 @@ namespace Perkify.Core
         /// </summary>
         /// <param name="clock">The new clock to be set.</param>
         /// <returns>The updated entitlement chain with the new clock.</returns>
-        public EntitlementChain WithClock(IClock clock)
+        public EntitlementChain WithClock(IClock? clock)
         {
+            clock ??= SystemClock.Instance;
             this.entitlements.ToList().ForEach(entitlement => entitlement.WithClock(clock));
             this.Clock = clock;
             return this;
