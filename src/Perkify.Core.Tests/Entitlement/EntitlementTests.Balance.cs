@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class EntitlementTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestBalanceProperties
         (
             [CombinatorialValues(AutoRenewalMode.Default)] AutoRenewalMode renewal,
@@ -19,14 +19,13 @@ namespace Perkify.Core.Tests
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
             var balance = new Balance(threshold).WithBalance(incoming, outgoing);
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Balance = balance,
-                Clock = clock,
             };
 
             entitlement.AutoRenewalMode.Should().Be(renewal);
-            entitlement.NowUtc.Should().Be(nowUtc);
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
             entitlement.Incoming.Should().Be(balance.Incoming);
             entitlement.Outgoing.Should().Be(balance.Outgoing);
             entitlement.Threshold.Should().Be(balance.Threshold);
@@ -34,7 +33,7 @@ namespace Perkify.Core.Tests
             entitlement.Overspending.Should().Be(balance.Overspending);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestBalanceTopup
         (
             [CombinatorialValues(AutoRenewalMode.None, AutoRenewalMode.All)] AutoRenewalMode renewal,
@@ -52,11 +51,10 @@ namespace Perkify.Core.Tests
             var balance = new Balance(threshold).WithBalance(incoming, outgoing);
             var expiryUtc = expiryUtcOffsetInHoursIfHaving != null ? nowUtc.AddHours(expiryUtcOffsetInHoursIfHaving.Value) : (DateTime?)null;
             var expiry = expiryUtc != null ? new Expiry(expiryUtc.Value, null).WithRenewal($"PT{autoRenewalIntervalInHours}H!") : null;
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Balance = balance,
                 Expiry = expiry,
-                Clock = clock,
             };
 
             entitlement.Topup(delta);
@@ -70,7 +68,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestBalanceDeduct
         (
             [CombinatorialValues(AutoRenewalMode.None, AutoRenewalMode.All)] AutoRenewalMode renewal,
@@ -88,11 +86,10 @@ namespace Perkify.Core.Tests
             var balance = new Balance(threshold).WithBalance(incoming, outgoing);
             var expiryUtc = expiryUtcOffsetInHoursIfHaving != null ? nowUtc.AddHours(expiryUtcOffsetInHoursIfHaving.Value) : (DateTime?)null;
             var expiry = expiryUtc != null ? new Expiry(expiryUtc.Value, null).WithRenewal($"PT{autoRenewalIntervalInHours}H!") : null;
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Balance = balance,
                 Expiry = expiry,
-                Clock = clock,
             };
 
             entitlement.Deduct(delta);
@@ -106,7 +103,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestBalanceAdjust
         (
             [CombinatorialValues(AutoRenewalMode.None, AutoRenewalMode.All)] AutoRenewalMode renewal,
@@ -125,11 +122,10 @@ namespace Perkify.Core.Tests
             var balance = new Balance(threshold).WithBalance(incoming, outgoing);
             var expiryUtc = expiryUtcOffsetInHoursIfHaving != null ? nowUtc.AddHours(expiryUtcOffsetInHoursIfHaving.Value) : (DateTime?)null;
             var expiry = expiryUtc != null ? new Expiry(expiryUtc.Value, null).WithRenewal($"PT{autoRenewalIntervalInHours}H!") : null;
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Balance = balance,
                 Expiry = expiry,
-                Clock = clock,
             };
 
             entitlement.Adjust(adjustedIncomingDelta, adjustedOutgoingDelta);
@@ -145,7 +141,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestBalanceClear
         (
             [CombinatorialValues(AutoRenewalMode.None, AutoRenewalMode.All)] AutoRenewalMode renewal,
@@ -162,11 +158,10 @@ namespace Perkify.Core.Tests
             var balance = new Balance(threshold).WithBalance(incoming, outgoing);
             var expiryUtc = expiryUtcOffsetInHoursIfHaving != null ? nowUtc.AddHours(expiryUtcOffsetInHoursIfHaving.Value) : (DateTime?)null;
             var expiry = expiryUtc != null ? new Expiry(expiryUtc.Value, null).WithRenewal($"PT{autoRenewalIntervalInHours}H!") : null;
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Balance = balance,
                 Expiry = expiry,
-                Clock = clock,
             };
 
             entitlement.Clear();

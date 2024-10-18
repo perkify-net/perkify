@@ -3,14 +3,10 @@ namespace Perkify.Core.Tests
     using NodaTime.Extensions;
     using NodaTime.Testing;
     using NodaTime.Text;
-    using System.Security.Cryptography.X509Certificates;
-    using System.Text.RegularExpressions;
 
     public partial class EntitlementTests
     {
-        const string SkipOrNot = null;
-
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateEntitlement
         (
             [CombinatorialValues(AutoRenewalMode.None, AutoRenewalMode.Default, AutoRenewalMode.All)] AutoRenewalMode renewal,
@@ -24,17 +20,16 @@ namespace Perkify.Core.Tests
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
             var expiryUtc = nowUtc.AddHours(expiryUtcOffsetInHours);
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Balance = Balance.Debit().WithBalance(gross, 0L),
                 Expiry = new Expiry(expiryUtc),
                 Enablement = new Enablement(isActive),
                 Prerequesite = new Delegation(() => prerequisite),
-                Clock = clock,
             };
 
             entitlement.AutoRenewalMode.Should().Be(renewal);
-            entitlement.NowUtc.Should().Be(nowUtc);
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
 
             entitlement.HasBalance.Should().BeTrue();
             entitlement.HasExpiry.Should().BeTrue();
@@ -47,7 +42,7 @@ namespace Perkify.Core.Tests
             entitlement.Prerequesite!.IsEligible.Should().Be(prerequisite);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateEntitlementNotInitialized
         (
             [CombinatorialValues(AutoRenewalMode.None)] AutoRenewalMode renewal,
@@ -56,9 +51,9 @@ namespace Perkify.Core.Tests
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
-            var entitlement = new Entitlement(renewal) { Clock = clock };
+            var entitlement = new Entitlement(renewal, clock);
             entitlement.AutoRenewalMode.Should().Be(renewal);
-            entitlement.NowUtc.Should().Be(nowUtc);
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
 
             entitlement.HasBalance.Should().BeFalse();
             entitlement.HasExpiry.Should().BeFalse();
@@ -80,7 +75,7 @@ namespace Perkify.Core.Tests
                     // OPs: IExpiry
                     () => _ = entitlement.ExpiryUtc,
                     () => _ = entitlement.GracePeriod,
-                    () => entitlement.GracePeriod = null,
+                    () => entitlement.GracePeriod = TimeSpan.Zero,
                     () => _ = entitlement.DeadlineUtc,
                     () => _ = entitlement.IsExpired,
                     () => _ = entitlement.Overdue,
@@ -103,7 +98,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateEntitlementGettersForbidden
         (
             [CombinatorialValues(AutoRenewalMode.None)] AutoRenewalMode renewal,
@@ -117,13 +112,12 @@ namespace Perkify.Core.Tests
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
             var expiryUtc = nowUtc.AddHours(expiryUtcOffsetInHours);
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Balance = Balance.Debit().WithBalance(gross, 0L),
                 Expiry = new Expiry(expiryUtc),
                 Enablement = new Enablement(isActive),
                 Prerequesite = new Delegation(() => prerequisite),
-                Clock = clock,
             };
 
             var balance = () => entitlement.Balance;
@@ -145,9 +139,10 @@ namespace Perkify.Core.Tests
             public int A { get; } = a;
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestIsEligible
         (
+            [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString,
             [CombinatorialValues(true, false)] bool isBalanceEligible,
             [CombinatorialValues(true, false)] bool isExpryEligible,
             [CombinatorialValues(true, false)] bool isEnablementEligible,
@@ -155,10 +150,12 @@ namespace Perkify.Core.Tests
         )
         {
             var mockBalance = new Mock<Balance>(MockBehavior.Strict, 0L, BalanceExceedancePolicy.Reject);
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
             mockBalance.SetupGet(balance => balance.IsEligible).Returns(isBalanceEligible);
-            var mockExpiry = new Mock<Expiry>(MockBehavior.Strict, DateTime.UtcNow, (TimeSpan?)null!);
+            var mockExpiry = new Mock<Expiry>(MockBehavior.Strict, DateTime.UtcNow, clock);
             mockExpiry.SetupGet(expiry => expiry.IsEligible).Returns(isExpryEligible);
-            var mockEnablement = new Mock<Enablement>(MockBehavior.Strict, true);
+            var mockEnablement = new Mock<Enablement>(MockBehavior.Strict, true, clock);
             mockEnablement.SetupGet(enablement => enablement.IsEligible).Returns(isEnablementEligible);
             var mockPrerequesite = new Mock<IEligible>();
             mockPrerequesite.SetupGet(eligible =>eligible.IsEligible).Returns(iskPrerequesiteEligible);
@@ -174,7 +171,7 @@ namespace Perkify.Core.Tests
             entitlement.IsEligible.Should().Be(expected);
         }
 
-        [Fact(Skip = SkipOrNot)]
+        [Fact]
         public void TestIsEligibleNotInitialized()
         {
             var entitlement = new Entitlement(AutoRenewalMode.None);

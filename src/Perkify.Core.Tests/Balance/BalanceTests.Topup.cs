@@ -2,7 +2,7 @@ namespace Perkify.Core.Tests
 {
     public partial class BalanceTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestTopupBalance
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -21,7 +21,7 @@ namespace Perkify.Core.Tests
             balance.Incoming.Should().Be(expected);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestTopupBalanceInvalidAmount
         (
             [CombinatorialValues(0, -10)] long threshold,
@@ -45,7 +45,7 @@ namespace Perkify.Core.Tests
             balance.Incoming.Should().Be(incoming);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestTopupBalanceWithOverflowException
         (
             [CombinatorialValues(0L, -10L)] long threshold,

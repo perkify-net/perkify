@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class EnablementTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestIsEligibleWithImmediateEffectiveUtc
         (
             [CombinatorialValues(true, false)] bool isActive,
@@ -23,7 +23,7 @@ namespace Perkify.Core.Tests
             enablement.IsEligible.Should().Be(isActive);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestIsEligibleWithEffectiveUtcInPast
         (
             [CombinatorialValues(true, false)] bool isActive,
@@ -40,7 +40,7 @@ namespace Perkify.Core.Tests
             enablement.IsEligible.Should().Be(!isActive);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestIsEligibleWithEffectiveUtcInFuture
         (
             [CombinatorialValues(true, false)] bool isActive,

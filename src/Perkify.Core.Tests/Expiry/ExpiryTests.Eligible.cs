@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestIsElligible
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
@@ -15,12 +15,12 @@ namespace Perkify.Core.Tests
         )
         {
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
-            var deadlineUtc = expiryUtc + (grace ?? TimeSpan.Zero);
+            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : TimeSpan.Zero;
+            var deadlineUtc = expiryUtc + grace;
             var nowUtc = deadlineUtc.AddHours(nowUtcOffset);
             var clock = new FakeClock(nowUtc.ToInstant());
 
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock };
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
             var expected = nowUtcOffset < 0;
             expiry.IsEligible.Should().Be(expected);
         }

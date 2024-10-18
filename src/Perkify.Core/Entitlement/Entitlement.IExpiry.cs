@@ -12,7 +12,7 @@ namespace Perkify.Core
             => this.expiry!.ExpiryUtc;
 
         /// <inheritdoc/>
-        public TimeSpan? GracePeriod
+        public TimeSpan GracePeriod
         {
             get => this.expiry!.GracePeriod;
             set => this.expiry!.GracePeriod = value;

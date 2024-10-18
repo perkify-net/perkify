@@ -2,7 +2,7 @@ namespace Perkify.Core.Tests
 {
     public partial class BalanceTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeductBalance
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -30,7 +30,7 @@ namespace Perkify.Core.Tests
             remained.Should().Be(0);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeductBalanceNegativeAmount
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -62,7 +62,7 @@ namespace Perkify.Core.Tests
             balance.Outgoing.Should().Be(outgoing);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeductBalanceIneligible
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -92,7 +92,7 @@ namespace Perkify.Core.Tests
             Assert.Equal(outgoing, balance.Outgoing);
         }
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData(0, 100, 50, 60)]
         [InlineData(-10, 0, 0, 20)]
         public void TestDeductBalanceRejected
@@ -122,7 +122,7 @@ namespace Perkify.Core.Tests
             balance.Outgoing.Should().Be(outgoing);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeductBalanceOverflow
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -147,7 +147,7 @@ namespace Perkify.Core.Tests
             balance.Overspending.Should().Be(0);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeductBalanceOverdraft
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -172,7 +172,7 @@ namespace Perkify.Core.Tests
             balance.Overspending.Should().Be(exceed);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeductBalanceOverdraftedWithOverflowException
         (
             [CombinatorialValues(0L, -10L)] long threshold,

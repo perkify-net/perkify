@@ -41,11 +41,10 @@
             this.renewal = renewal;
             this.grace = grace;
 
-            this.expiry = new Expiry
-            (
-                expiryUtc: DateTime.UtcNow,
-                grace: grace != null ? TimeSpan.Parse(grace, CultureInfo.InvariantCulture) : null
-            );
+            this.expiry = new Expiry(expiryUtc: DateTime.UtcNow, clock)
+            {
+                GracePeriod = grace != null ? TimeSpan.Parse(grace, CultureInfo.InvariantCulture) : TimeSpan.Zero
+            };
             expiry.Renew(this.renewal);
         }
 

@@ -2,9 +2,7 @@
 {
     public class BalanceExceedancePolicyExtensionsTests
     {
-        const string SkipOrNot = null;
-
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData(BalanceExceedancePolicy.Reject, 10, 100, 10)]
         [InlineData(BalanceExceedancePolicy.Overflow, 10, 100, 10)]
         [InlineData(BalanceExceedancePolicy.Overdraft, 10, 100, 10)]
@@ -21,7 +19,7 @@
             actual.Should().Be(0);
         }
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData(110, 100, 110)]
         public void TestDeductWithExceedanceRejected(long input, long maximum, long output)
         {
@@ -37,7 +35,7 @@
             delta.Should().Be(output);
         }
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData(110L, 100L, 100L, 10L)]
         public void TestDeductWithExceedanceOverflowed(long input, long maximum, long output, long expected)
         {
@@ -47,7 +45,7 @@
             actual.Should().Be(expected);
         }
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData(110, 100, 110)]
         public void TestDeductWithExceedanceOverdrafted(long input, long maximum, long output)
         {
@@ -57,7 +55,7 @@
             actual.Should().Be(0L);
         }
 
-        [Fact(Skip = SkipOrNot)]
+        [Fact]
         public void TestDeductWithUnsupportedPolicy()
         {
             var delta = 110L;
@@ -70,7 +68,7 @@
                 .WithMessage($"Unsupported balance exceedance policy: {policy}");
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestGetDeductibleAllowance
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -89,7 +87,7 @@
             actual.Should().BeGreaterThanOrEqualTo(0L);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestGetDeductibleAllowanceUnlimited
         (
             [CombinatorialValues(0L, -10L)] long threshold,
@@ -102,7 +100,7 @@
             actual.Should().Be(long.MaxValue);
         }
 
-        [Fact(Skip = SkipOrNot)]
+        [Fact]
         public void TestGetDeductibleAllowanceWithUnsupportedPolicy()
         {
             var policy = (BalanceExceedancePolicy)999;

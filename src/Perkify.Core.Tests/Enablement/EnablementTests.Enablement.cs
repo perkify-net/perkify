@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class EnablementTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeactivate
         (
             [CombinatorialValues(true)] bool isActive,
@@ -42,7 +42,7 @@ namespace Perkify.Core.Tests
             if (isStateChangedEventHooked)
             {
                 stateChangedEvent.Should().NotBeNull();
-                stateChangedEvent!.Operation.Should().Be(EnablemenStateOperation.Deactivate);
+                stateChangedEvent!.Operation.Should().Be(EnablementStateOperation.Deactivate);
                 stateChangedEvent!.From.IsActive.Should().Be(isActive);
                 stateChangedEvent!.From.EffectiveUtc.Should().Be(initialEffectiveUtc);
                 stateChangedEvent!.From.IsImmediateEffective.Should().Be(initialIsImmediateEffective);
@@ -52,7 +52,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeactivateWithIncorrectState
         (
             [CombinatorialValues(false)] bool isActive,
@@ -82,7 +82,7 @@ namespace Perkify.Core.Tests
             enablement.IsActive.Should().Be(isActive);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestActivate
         (
             [CombinatorialValues(false)] bool isActive,
@@ -118,7 +118,7 @@ namespace Perkify.Core.Tests
             if (isStateChangedEventHooked)
             {
                 stateChangedEvent.Should().NotBeNull();
-                stateChangedEvent!.Operation.Should().Be(EnablemenStateOperation.Activate);
+                stateChangedEvent!.Operation.Should().Be(EnablementStateOperation.Activate);
                 stateChangedEvent!.From.IsActive.Should().Be(isActive);
                 stateChangedEvent!.From.EffectiveUtc.Should().Be(initialEffectiveUtc);
                 stateChangedEvent!.From.IsImmediateEffective.Should().Be(initialIsImmediateEffective);
@@ -128,7 +128,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestActivateWithIncorrectState
         (
             [CombinatorialValues(true)] bool isActive,

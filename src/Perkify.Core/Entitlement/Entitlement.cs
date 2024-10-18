@@ -13,42 +13,21 @@ namespace Perkify.Core
     /// Initializes a new instance of the <see cref="Entitlement"/> class with auto-renewal mode.
     /// </remarks>
     /// <param name="autorenewal">The auto-renewal mode.</param>
-    public partial class Entitlement(AutoRenewalMode autorenewal = AutoRenewalMode.Default)
-        : INowUtc, IEligible
+    /// <param name="clock">The clock instance used to retrieve the current time.</param>
+    public partial class Entitlement(AutoRenewalMode autorenewal = AutoRenewalMode.Default, IClock? clock = null)
+        : IEligible
     {
-        private IClock clock = SystemClock.Instance;
-
         private Balance? balance;
         private Enablement? enablement;
         private Expiry? expiry;
 
         /// <summary>
-        /// Gets or sets the clock instance used to retrieve the current time.
+        /// Gets the clock instance used to retrieve the current time.
         /// </summary>
         /// <remarks>
         /// The clock is shared used across expiry and activation by default.
         /// </remarks>
-        public IClock Clock
-        {
-            get => this.clock;
-            set
-            {
-                this.clock = value;
-
-                if (this.expiry != null)
-                {
-                    this.expiry.Clock = value;
-                }
-
-                if (this.enablement != null)
-                {
-                    this.enablement.Clock = value;
-                }
-            }
-        }
-
-        /// <inheritdoc/>
-        public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
+        public IClock Clock => clock ?? SystemClock.Instance;
 
         /// <summary>
         /// Gets the balance associated with the entitlement.

@@ -6,28 +6,26 @@ namespace Perkify.Core.Tests
 
     public partial class EntitlementTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestExpiryProperties
         (
             [CombinatorialValues(AutoRenewalMode.Default)] AutoRenewalMode renewal,
             [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString,
             [CombinatorialValues(+5)] int expiryUtcOffsetInHours,
-            [CombinatorialValues(null, 2)] int? gracePeriodInHoursIfHaving
+            [CombinatorialValues(0, 2)] int gracePeriodInHours
         )
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
             var expiryUtc = nowUtc.AddHours(expiryUtcOffsetInHours);
-            var grace = gracePeriodInHoursIfHaving != null ? TimeSpan.FromHours(gracePeriodInHoursIfHaving.Value) : (TimeSpan?)null;
-            var expiry = new Expiry(expiryUtc, grace);
-
-            var entitlement = new Entitlement(renewal)
+            var grace = TimeSpan.FromHours(gracePeriodInHours);
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Expiry = expiry,
-                Clock = clock,
             };
             entitlement.AutoRenewalMode.Should().Be(renewal);
-            entitlement.NowUtc.Should().Be(nowUtc);
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
             entitlement.ExpiryUtc.Should().Be(expiry.ExpiryUtc);
             entitlement.GracePeriod.Should().Be(expiry.GracePeriod);
             entitlement.DeadlineUtc.Should().Be(expiry.DeadlineUtc);
@@ -38,7 +36,7 @@ namespace Perkify.Core.Tests
             entitlement.Remaining(true).Should().Be(expiry.Remaining(true));
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestExpirySetGracePeriod
         (
             [CombinatorialValues(AutoRenewalMode.Default)] AutoRenewalMode renewal,
@@ -51,19 +49,18 @@ namespace Perkify.Core.Tests
             var clock = new FakeClock(nowUtc.ToInstant());
             var expiryUtc = nowUtc.AddHours(expiryUtcOffsetInHours);
             var grace = TimeSpan.FromHours(gracePeriodInHours);
-            var expiry = new Expiry(expiryUtc, grace);
+            var expiry = new Expiry(expiryUtc) { GracePeriod = grace };
 
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Expiry = expiry,
-                Clock = clock,
             };
             entitlement.GracePeriod.Should().Be(expiry.GracePeriod);
-            entitlement.GracePeriod = null;
-            entitlement.GracePeriod.Should().BeNull();
+            entitlement.GracePeriod = TimeSpan.Zero;
+            entitlement.GracePeriod.Should().Be(TimeSpan.Zero);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestExpiryRenew
         (
             [CombinatorialValues(AutoRenewalMode.Default)] AutoRenewalMode renewal,
@@ -77,19 +74,18 @@ namespace Perkify.Core.Tests
             var clock = new FakeClock(nowUtc.ToInstant());
             var expiryUtc = nowUtc.AddHours(expiryUtcOffsetInHours);
             var grace = TimeSpan.FromHours(gracePeriodInHours);
-            var expiry = new Expiry(expiryUtc, grace);
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
 
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Expiry = expiry,
-                Clock = clock,
             };
             entitlement.Renew($"PT{renewalIntervalInHours}H!");
             var actual = entitlement.ExpiryUtc - expiryUtc;
             actual.Hours.Should().Be(renewalIntervalInHours);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestExpiryAdjustTo
         (
             [CombinatorialValues(AutoRenewalMode.Default)] AutoRenewalMode renewal,
@@ -103,12 +99,11 @@ namespace Perkify.Core.Tests
             var clock = new FakeClock(nowUtc.ToInstant());
             var expiryUtc = nowUtc.AddHours(expiryUtcOffsetInHours);
             var grace = TimeSpan.FromHours(gracePeriodInHours);
-            var expiry = new Expiry(expiryUtc, grace);
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
 
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Expiry = expiry,
-                Clock = clock,
             };
             var expectedExpiryUtc = nowUtc.AddHours(expectedExpiryUtcOffsetInHours);
             entitlement.AdjustTo(expectedExpiryUtc);

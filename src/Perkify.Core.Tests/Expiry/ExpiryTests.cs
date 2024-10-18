@@ -6,59 +6,57 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        const string SkipOrNot = null;
-
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateExpiry
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
-            [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving,
+            [CombinatorialValues(0, 2)] int gracePeriodInHours,
             [CombinatorialValues(-1, 0, +1, +2, +3)] int nowUtcOffset
         )
         {
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
+            var grace = TimeSpan.FromHours(gracePeriodInHours);
             var nowUtc = expiryUtc.AddHours(nowUtcOffset);
             var clock = new FakeClock(nowUtc.ToInstant());
 
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock };
+            var expiry = new Expiry(expiryUtc) { Clock = clock, GracePeriod = grace };
             expiry.ExpiryUtc.Should().Be(expiryUtc);
             expiry.GracePeriod.Should().Be(grace);
-            expiry.NowUtc.Should().Be(nowUtc);
+            expiry.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateExpiryWithSystemClock
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
-            [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving
+            [CombinatorialValues(0, 2)] int gracePeriodInHours
         )
         {
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
+            var grace = TimeSpan.FromHours(gracePeriodInHours);
 
-            var expiry = new Expiry(expiryUtc, grace);
+            var expiry = new Expiry(expiryUtc) { GracePeriod = grace } ;
             expiry.ExpiryUtc.Should().Be(expiryUtc);
             expiry.GracePeriod.Should().Be(grace);
-            expiry.NowUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
+            expiry.Clock.GetCurrentInstant().ToDateTimeUtc().Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateExpiryWithRenewal
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
-            [CombinatorialValues(null, "02:00:00")] string? gracePeriodIfHaving,
+            [CombinatorialValues(0, 2)] int gracePeriodInHours,
             [CombinatorialValues(-1)] int nowUtcOffset,
             [CombinatorialValues("P1M!", "PT1H!", "PT1H")] string duration
         )
         {
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
+            var grace = TimeSpan.FromHours(gracePeriodInHours);
             var nowUtc = expiryUtc.AddHours(nowUtcOffset);
             var clock = new FakeClock(nowUtc.ToInstant());
             var calendar = !duration.EndsWith('!');
 
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock }.WithRenewal(duration);
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace }.WithRenewal(duration);
             expiry.Renewal!.Calendar.Should().Be(calendar);
             expiry.Renewal!.Duration.Should().Be(duration);
         }
