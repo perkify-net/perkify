@@ -15,7 +15,6 @@ namespace Perkify.Core
     /// <param name="autorenewal">The auto-renewal mode.</param>
     /// <param name="clock">The clock instance used to retrieve the current time.</param>
     public partial class Entitlement(AutoRenewalMode autorenewal = AutoRenewalMode.Default, IClock? clock = null)
-        : IEligible
     {
         private Balance? balance;
         private Enablement? enablement;
@@ -115,12 +114,5 @@ namespace Perkify.Core
         /// Gets the auto-renewal mode connecting balance and expiry.
         /// </summary>
         public AutoRenewalMode AutoRenewalMode { get; } = autorenewal;
-
-        /// <inheritdoc/>
-        public virtual bool IsEligible =>
-            (this.balance?.IsEligible ?? true)
-            && (this.expiry?.IsEligible ?? true)
-            && (this.enablement?.IsEligible ?? true)
-            && (this.Prerequesite?.IsEligible ?? true);
     }
 }

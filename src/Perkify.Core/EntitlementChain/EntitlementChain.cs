@@ -17,7 +17,6 @@ namespace Perkify.Core
     /// <param name="comparer">The comparer used to sort entitlements.</param>
     /// <param name="clock">The clock used to determine the current time.</param>
     public partial class EntitlementChain(EntitlementFactory? factory = null, EntitlementComparer? comparer = null, IClock? clock = null)
-        : IEligible
     {
         private ImmutableSortedSet<Entitlement> entitlements = ImmutableSortedSet<Entitlement>.Empty;
 
@@ -49,8 +48,5 @@ namespace Perkify.Core
         /// Gets the clock used to determine the current time.
         /// </summary>
         public IClock Clock { get; } = clock ?? SystemClock.Instance;
-
-        /// <inheritdoc/>
-        public virtual bool IsEligible => this.entitlements.Any(entitlement => entitlement.IsEligible);
     }
 }
