@@ -9,13 +9,13 @@ namespace Perkify.Core
     /// <summary>
     /// The activator managing activation and deactivation for eligibility.
     /// </summary>
-    public partial class Enablement(bool isActive = true)
+    public partial class Enablement(bool isActive = true, IClock? clock = null)
         : IEligible
     {
         /// <summary>
         /// Gets or sets the clock instance used to retrieve the current time.
         /// </summary>
-        public IClock Clock { get; set; } = SystemClock.Instance;
+        public IClock Clock { get; set; } = clock ?? SystemClock.Instance;
 
         /// <inheritdoc/>
         public virtual bool IsEligible =>

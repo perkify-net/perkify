@@ -4,7 +4,7 @@
     {
         const string SkipOrNot = null;
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateBalance
         (
             [CombinatorialValues(-10L, 0L, 10L)] long threshold,
@@ -25,7 +25,7 @@
             balance.Policy.Should().Be(policy);
         }
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData(BalanceExceedancePolicy.Reject)]
         [InlineData(BalanceExceedancePolicy.Overflow)]
         [InlineData(BalanceExceedancePolicy.Overdraft)]
@@ -41,7 +41,7 @@
             debit.BalanceType.Should().Be(BalanceType.Debit);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateCreditBalanceDirectly
         (
             [CombinatorialValues(-10)] long threshold,
@@ -64,7 +64,7 @@
             credit.BalanceType.Should().Be(BalanceType.Credit);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateCreditBalanceDirectlyWithInvalidThreshold
         (
             [CombinatorialValues(0, 10)] long threshold,
@@ -86,7 +86,7 @@
                 .WithMessage($"Amount must be negative (Parameter '{parameter}')");
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestWithBalance
         (
             [CombinatorialValues(0, 100, 200)] long incoming,
@@ -98,7 +98,7 @@
             balance.Outgoing.Should().Be(outgoing);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestWithBalanceInNegativeAmount
         (
             [CombinatorialValues(-100)] long amount,

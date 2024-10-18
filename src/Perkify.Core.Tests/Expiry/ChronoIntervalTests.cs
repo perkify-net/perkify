@@ -4,7 +4,7 @@ namespace Perkify.Core.Tests
     {
         const string SkipOrNot = null;
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData("P1M", true)]
         [InlineData("PT1H!", false)]
         public void TestCreateInterval(string duration, bool calendar)
@@ -14,7 +14,7 @@ namespace Perkify.Core.Tests
             renewal.Calendar.Should().Be(calendar);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateIntervalTrimmed
         (
             [CombinatorialValues("P1M", "PT1H!")] string duration,
@@ -27,7 +27,7 @@ namespace Perkify.Core.Tests
             renewal.Duration.Should().Be(duration);
         }
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData("INCORRECT")]
         [InlineData("INCORRECT!")]
         [InlineData("!")]
@@ -41,7 +41,7 @@ namespace Perkify.Core.Tests
             .WithMessage("Incorrect ISO8601 duration string.");
         }
 
-        [Fact(Skip = SkipOrNot)]
+        [Fact]
         public void TestCreateIntervalIso8601IsNull()
         {
             var iso8601 = (string)null!;
@@ -54,7 +54,7 @@ namespace Perkify.Core.Tests
             .WithMessage($"Value cannot be null. (Parameter '{parameter}')");
         }
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData("P1M", "2024-06-09T17:00:00Z", "2024-07-09T17:00:00Z")]
         [InlineData("PT1H!", "2024-06-09T17:00:00Z", "2024-06-09T18:00:00Z")]
         public void TestRenew(string duration, string expiryUtcString, string expectedUtcString)
@@ -66,7 +66,7 @@ namespace Perkify.Core.Tests
             actual.Should().Be(expected);
         }
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData("P1M", "2024-06-09T17:00:00Z", "31.00:00:00")]
         [InlineData("PT1H!", "2024-06-09T17:00:00Z", "01:00:00")]
         public void TestTill(string duration, string expiryUtcString, string expectedString)

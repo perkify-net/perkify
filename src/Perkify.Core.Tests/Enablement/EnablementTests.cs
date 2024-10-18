@@ -8,7 +8,7 @@ namespace Perkify.Core.Tests
     {
         const string SkipOrNot = null;
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateEnablement
         (
             [CombinatorialValues(true, false)]bool isActive
@@ -21,7 +21,7 @@ namespace Perkify.Core.Tests
             enablement.EffectiveUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateEnablementWithFakedClock
         (
             [CombinatorialValues(true, false)] bool isActive,
@@ -39,7 +39,7 @@ namespace Perkify.Core.Tests
             enablement.EffectiveUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestCreateEnablementWithEffectiveUtc
         (
             [CombinatorialValues(true, false)] bool isActive,

@@ -14,14 +14,14 @@ namespace Perkify.Core
     /// Create the expiry time for eligibility.
     /// </remarks>
     /// <param name="expiryUtc">Expiry time in UTC.</param>
-    /// <param name="grace">Grace period.</param>
-    public partial class Expiry(DateTime expiryUtc, TimeSpan? grace = null)
+    /// <param name="clock">Clock instance used to retrieve the current time.</param>
+    public partial class Expiry(DateTime expiryUtc, IClock? clock = null)
         : IEligible
     {
         /// <summary>
         /// Gets or sets the clock instance used to retrieve the current time.
         /// </summary>
-        public IClock Clock { get; set; } = SystemClock.Instance;
+        public IClock Clock { get; set; } = clock ?? SystemClock.Instance;
 
         /// <inheritdoc/>
         public virtual bool IsEligible => this.Clock.GetCurrentInstant().ToDateTimeUtc() < this.DeadlineUtc;

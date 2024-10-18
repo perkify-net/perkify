@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class EnablementTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeactivate
         (
             [CombinatorialValues(true)] bool isActive,
@@ -52,7 +52,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestDeactivateWithIncorrectState
         (
             [CombinatorialValues(false)] bool isActive,
@@ -82,7 +82,7 @@ namespace Perkify.Core.Tests
             enablement.IsActive.Should().Be(isActive);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestActivate
         (
             [CombinatorialValues(false)] bool isActive,
@@ -128,7 +128,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestActivateWithIncorrectState
         (
             [CombinatorialValues(true)] bool isActive,

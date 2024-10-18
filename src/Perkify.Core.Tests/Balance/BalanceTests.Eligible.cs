@@ -2,7 +2,7 @@ namespace Perkify.Core.Tests
 {
     public partial class BalanceTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestIsEligible
         (
             [CombinatorialValues(0, -10)] long threshold,

@@ -4,7 +4,7 @@ namespace Perkify.Core.Tests
     {
         const string SkipOrNot = null;
 
-        [Theory(Skip = SkipOrNot)]
+        [Theory]
         [InlineData(false)]
         [InlineData(true)]
         public void TestDelegation(bool eligible)
@@ -13,7 +13,7 @@ namespace Perkify.Core.Tests
             delegation.IsEligible.Should().Be(eligible);
         }
 
-        [Fact(Skip = SkipOrNot)]
+        [Fact]
         public void TestCheckEligible()
         {
             var delgation = new Delegation(() => true) as IEligible;
@@ -21,7 +21,7 @@ namespace Perkify.Core.Tests
             action.Should().NotThrow();
         }
 
-        [Fact(Skip = SkipOrNot)]
+        [Fact]
         public void TestCheckIneligible()
         {
             var delgation = new Delegation(() => false) as IEligible;

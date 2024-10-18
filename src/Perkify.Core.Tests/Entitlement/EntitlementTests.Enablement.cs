@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class EntitlementTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestEnablementProperties
         (
             [CombinatorialValues(AutoRenewalMode.Default)] AutoRenewalMode renewal,
@@ -20,10 +20,9 @@ namespace Perkify.Core.Tests
             var clock = new FakeClock(nowUtc.ToInstant());
             var effectiveUtc = nowUtc.AddHours(EffectiveUtcOffsetInHours);
             var enablement = new Enablement(isActive).WithEffectiveUtc(effectiveUtc, isImmediateEffective);
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Enablement = enablement,
-                Clock = clock,
             };
 
             entitlement.AutoRenewalMode.Should().Be(renewal);
@@ -33,7 +32,7 @@ namespace Perkify.Core.Tests
             entitlement.EffectiveUtc.Should().Be(enablement.EffectiveUtc);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestEnablementActivate
         (
             [CombinatorialValues(AutoRenewalMode.Default)] AutoRenewalMode renewal,
@@ -50,10 +49,9 @@ namespace Perkify.Core.Tests
             var clock = new FakeClock(nowUtc.ToInstant());
             var initEffectiveUtc = nowUtc.AddHours(initialEffectiveUtcOffsetInHours);
             var enablement = new Enablement(isActive).WithEffectiveUtc(initEffectiveUtc, initialIsImmediateEffective);
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Enablement = enablement,
-                Clock = clock,
             };
 
             EnablementStateChangeEventArgs? stateChangedEvent = null;
@@ -81,7 +79,7 @@ namespace Perkify.Core.Tests
             }
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestEnablementDeactivate
         (
             [CombinatorialValues(AutoRenewalMode.Default)] AutoRenewalMode renewal,
@@ -98,10 +96,9 @@ namespace Perkify.Core.Tests
             var clock = new FakeClock(nowUtc.ToInstant());
             var initEffectiveUtc = nowUtc.AddHours(initialEffectiveUtcOffsetInHours);
             var enablement = new Enablement(isActive).WithEffectiveUtc(initEffectiveUtc, initialIsImmediateEffective);
-            var entitlement = new Entitlement(renewal)
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Enablement = enablement,
-                Clock = clock,
             };
 
             EnablementStateChangeEventArgs? stateChangedEvent = null;
@@ -181,7 +178,7 @@ namespace Perkify.Core.Tests
             ),
         ];
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestEnablementActivateWithAutoRenewal
         (
             [CombinatorialValues(AutoRenewalMode.All)] AutoRenewalMode renewal,
@@ -203,13 +200,12 @@ namespace Perkify.Core.Tests
             var nowUtc = expiryUtc.AddHours(nowUtcOffsetInHours);
             var clock = new FakeClock(nowUtc.ToInstant());
             var grace = TimeSpan.FromHours(gracePeriodInHours);
-            var expiry = new Expiry(expiryUtc, grace);
-            var enablement = new Enablement(isActive).WithEffectiveUtc(nowUtc, true);
-            var entitlement = new Entitlement(renewal)
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
+            var enablement = new Enablement(isActive, clock).WithEffectiveUtc(nowUtc, true);
+            var entitlement = new Entitlement(renewal, clock)
             {
                 Enablement = enablement,
                 Expiry = expiry,
-                Clock = clock,
             };
 
             var deactivationUtc = expiryUtc.AddHours(timeline.DeactivationUtcOffsetInHours);

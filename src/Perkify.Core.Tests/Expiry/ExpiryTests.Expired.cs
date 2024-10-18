@@ -6,7 +6,7 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestIsExpired
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
@@ -15,16 +15,16 @@ namespace Perkify.Core.Tests
         )
         {
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : (TimeSpan?)null;
+            var grace = gracePeriodIfHaving != null ? TimeSpan.Parse(gracePeriodIfHaving, CultureInfo.InvariantCulture) : TimeSpan.Zero;
             var nowUtc = expiryUtc.AddHours(nowUtcOffset);
             var clock = new FakeClock(nowUtc.ToInstant());
 
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock };
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
             var expected = nowUtcOffset >= 0;
             expiry.IsExpired.Should().Be(expected);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestRemainingNoGracePeriod
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
@@ -41,7 +41,7 @@ namespace Perkify.Core.Tests
             expiry.Remaining(true).Should().Be(expected);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestRemainingWithinGracePeriod
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
@@ -55,14 +55,14 @@ namespace Perkify.Core.Tests
             var nowUtc = expiryUtc.AddHours(nowUtcOffsetInHours);
             var clock = new FakeClock(nowUtc.ToInstant());
 
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock };
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
             var expectRemainingUntilExpiry = TimeSpan.FromHours(Math.Max(-nowUtcOffsetInHours, 0));
             var expectRemainingUntilDeadline = TimeSpan.FromHours(Math.Max(-nowUtcOffsetInHours + gracePeriodInHours, 0));
             expiry.Remaining(false).Should().Be(expectRemainingUntilExpiry);
             expiry.Remaining(true).Should().Be(expectRemainingUntilDeadline);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestOverdueNoGracePeriod
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
@@ -76,7 +76,7 @@ namespace Perkify.Core.Tests
             expiry.Overdue.Should().Be(TimeSpan.Zero);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestOverdueWithinGracePeriod
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
@@ -89,11 +89,11 @@ namespace Perkify.Core.Tests
             var nowUtc = expiryUtc.AddHours(nowUtcOffsetInHours);
             var clock = new FakeClock(nowUtc.ToInstant());
             var overdue = nowUtcOffsetInHours > 0 ? TimeSpan.FromHours(nowUtcOffsetInHours) : TimeSpan.Zero;
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock };
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
             expiry.Overdue.Should().Be(overdue);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestOverdueAfterGracePeriod
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
@@ -105,12 +105,12 @@ namespace Perkify.Core.Tests
             var grace = TimeSpan.FromHours(gracePeriodInHours);
             var nowUtc = expiryUtc.AddHours(nowUtcOffsetInHours);
             var clock = new FakeClock(nowUtc.ToInstant());
-            var expiry = new Expiry(expiryUtc, grace) { Clock = clock };
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = grace };
             var overdue = nowUtcOffsetInHours > 0 ? TimeSpan.FromHours(gracePeriodInHours) : TimeSpan.Zero;
             expiry.Overdue.Should().Be(overdue);
         }
 
-        [Theory(Skip = SkipOrNot), CombinatorialData]
+        [Theory, CombinatorialData]
         public void TestSetGracePeriod
         (
             [CombinatorialValues("2024-06-09T16:00:00Z")] string expiryUtcString,
@@ -120,13 +120,13 @@ namespace Perkify.Core.Tests
         )
         {
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
-            var initial = initialGracePeriodInHours != null ? TimeSpan.FromHours(initialGracePeriodInHours.Value) : (TimeSpan?) null;
+            var initial = initialGracePeriodInHours != null ? TimeSpan.FromHours(initialGracePeriodInHours.Value) : TimeSpan.Zero;
             var nowUtc = expiryUtc.AddHours(nowUtcOffsetInHours);
             var clock = new FakeClock(nowUtc.ToInstant());
-            var expiry = new Expiry(expiryUtc, initial) { Clock = clock };
+            var expiry = new Expiry(expiryUtc, clock) { GracePeriod = initial };
             expiry.GracePeriod.Should().Be(initial);
 
-            var expected = expectedGracePeriodInHours != null ? TimeSpan.FromHours(expectedGracePeriodInHours.Value) : (TimeSpan?)null;
+            var expected = expectedGracePeriodInHours != null ? TimeSpan.FromHours(expectedGracePeriodInHours.Value) : TimeSpan.Zero;
             expiry.GracePeriod = expected;
             expiry.GracePeriod.Should().Be(expected);
         }
