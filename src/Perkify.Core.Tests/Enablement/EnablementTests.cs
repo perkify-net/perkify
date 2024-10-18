@@ -6,8 +6,6 @@ namespace Perkify.Core.Tests
 
     public partial class EnablementTests
     {
-        const string SkipOrNot = null;
-
         [Theory, CombinatorialData]
         public void TestCreateEnablement
         (

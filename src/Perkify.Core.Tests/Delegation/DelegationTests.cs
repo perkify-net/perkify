@@ -2,8 +2,6 @@ namespace Perkify.Core.Tests
 {
     public class DelegationTests
     {
-        const string SkipOrNot = null;
-
         [Theory]
         [InlineData(false)]
         [InlineData(true)]

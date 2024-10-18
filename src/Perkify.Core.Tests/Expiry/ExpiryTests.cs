@@ -6,8 +6,6 @@ namespace Perkify.Core.Tests
 
     public partial class ExpiryTests
     {
-        const string SkipOrNot = null;
-
         [Theory, CombinatorialData]
         public void TestCreateExpiry
         (

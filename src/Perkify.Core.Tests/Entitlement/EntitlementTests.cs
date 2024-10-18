@@ -6,8 +6,6 @@ namespace Perkify.Core.Tests
 
     public partial class EntitlementTests
     {
-        const string SkipOrNot = null;
-
         [Theory, CombinatorialData]
         public void TestCreateEntitlement
         (
@@ -173,7 +171,7 @@ namespace Perkify.Core.Tests
             entitlement.IsEligible.Should().Be(expected);
         }
 
-        [Fact(Skip = SkipOrNot)]
+        [Fact]
         public void TestIsEligibleNotInitialized()
         {
             var entitlement = new Entitlement(AutoRenewalMode.None);

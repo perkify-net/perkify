@@ -2,8 +2,6 @@ namespace Perkify.Core.Tests
 {
     public class ChronoIntervalTests
     {
-        const string SkipOrNot = null;
-
         [Theory]
         [InlineData("P1M", true)]
         [InlineData("PT1H!", false)]

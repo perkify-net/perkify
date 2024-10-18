@@ -2,8 +2,6 @@
 {
     public partial class BalanceTests
     {
-        const string SkipOrNot = null;
-
         [Theory, CombinatorialData]
         public void TestCreateBalance
         (
