@@ -39,7 +39,7 @@ namespace Perkify.Core
                 this.IsActive = true;
             }
 
-            this.EnablementStateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablemenStateOperation.Activate)
+            this.EnablementStateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablementStateOperation.Activate)
             {
                 From = previous,
                 To = new EnablementState(this.IsActive)
@@ -70,7 +70,7 @@ namespace Perkify.Core
                 this.IsActive = false;
             }
 
-            this.EnablementStateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablemenStateOperation.Deactivate)
+            this.EnablementStateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablementStateOperation.Deactivate)
             {
                 From = previous,
                 To = new EnablementState(this.IsActive)

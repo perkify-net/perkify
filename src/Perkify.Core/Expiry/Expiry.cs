@@ -16,15 +16,11 @@ namespace Perkify.Core
     /// <param name="expiryUtc">Expiry time in UTC.</param>
     /// <param name="clock">Clock instance used to retrieve the current time.</param>
     public partial class Expiry(DateTime expiryUtc, IClock? clock = null)
-        : IEligible
     {
         /// <summary>
         /// Gets or sets the clock instance used to retrieve the current time.
         /// </summary>
         public IClock Clock { get; set; } = clock ?? SystemClock.Instance;
-
-        /// <inheritdoc/>
-        public virtual bool IsEligible => this.Clock.GetCurrentInstant().ToDateTimeUtc() < this.DeadlineUtc;
 
         /// <summary>Specify the renewal period.</summary>
         /// <param name="interval">The renewal interval, specified as an ISO 8601 duration string.</param>

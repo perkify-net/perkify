@@ -14,15 +14,11 @@ namespace Perkify.Core
     /// <param name="threshold">The threshold amount for the balance.</param>
     /// <param name="policy">The policy to apply when the balance exceeds the threshold.</param>
     public partial class Balance(long threshold, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
-        : IEligible
     {
         /// <summary>
         /// Gets the balance exceedance policy.
         /// </summary>
         public BalanceExceedancePolicy Policy => policy;
-
-        /// <inheritdoc/>
-        public virtual bool IsEligible => this.Gross >= this.Threshold;
 
         /// <summary>
         /// Creates a new balance with a threshold of 0.

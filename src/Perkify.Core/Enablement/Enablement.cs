@@ -17,12 +17,6 @@ namespace Perkify.Core
         /// </summary>
         public IClock Clock { get; set; } = clock ?? SystemClock.Instance;
 
-        /// <inheritdoc/>
-        public virtual bool IsEligible =>
-            this.IsImmediateEffective || this.Clock.GetCurrentInstant().ToDateTimeUtc() < this.EffectiveUtc
-                ? this.IsActive
-                : !this.IsActive;
-
         /// <summary>
         /// Sets the effective date and time in UTC and whether it is immediately effective.
         /// </summary>

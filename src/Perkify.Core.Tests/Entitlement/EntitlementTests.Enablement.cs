@@ -69,7 +69,7 @@ namespace Perkify.Core.Tests
             if (isStateChangedEventHooked)
             {
                 stateChangedEvent.Should().NotBeNull();
-                stateChangedEvent!.Operation.Should().Be(EnablemenStateOperation.Activate);
+                stateChangedEvent!.Operation.Should().Be(EnablementStateOperation.Activate);
                 stateChangedEvent!.From.IsActive.Should().Be(isActive);
                 stateChangedEvent!.From.EffectiveUtc.Should().Be(initEffectiveUtc);
                 stateChangedEvent!.From.IsImmediateEffective.Should().Be(initialIsImmediateEffective);
@@ -116,7 +116,7 @@ namespace Perkify.Core.Tests
             if (isStateChangedEventHooked)
             {
                 stateChangedEvent.Should().NotBeNull();
-                stateChangedEvent!.Operation.Should().Be(EnablemenStateOperation.Deactivate);
+                stateChangedEvent!.Operation.Should().Be(EnablementStateOperation.Deactivate);
                 stateChangedEvent!.From.IsActive.Should().Be(isActive);
                 stateChangedEvent!.From.EffectiveUtc.Should().Be(initEffectiveUtc);
                 stateChangedEvent!.From.IsImmediateEffective.Should().Be(initialIsImmediateEffective);

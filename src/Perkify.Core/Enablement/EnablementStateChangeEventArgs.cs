@@ -11,13 +11,13 @@ namespace Perkify.Core
     /// Initializes a new instance of the <see cref="EnablementStateChangeEventArgs"/> class.
     /// </remarks>
     /// <param name="operation">The operation to be performed on the enablement state.</param>
-    public class EnablementStateChangeEventArgs(EnablemenStateOperation operation)
+    public class EnablementStateChangeEventArgs(EnablementStateOperation operation)
         : EventArgs
     {
         /// <summary>
         /// Gets the operation to be performed on the enablement state.
         /// </summary>
-        public EnablemenStateOperation Operation { get; } = operation;
+        public EnablementStateOperation Operation { get; } = operation;
 
         /// <summary>
         /// Gets the previous enablement state.
