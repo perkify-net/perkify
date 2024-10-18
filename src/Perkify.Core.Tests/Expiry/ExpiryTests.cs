@@ -24,7 +24,7 @@ namespace Perkify.Core.Tests
             var expiry = new Expiry(expiryUtc, grace) { Clock = clock };
             expiry.ExpiryUtc.Should().Be(expiryUtc);
             expiry.GracePeriod.Should().Be(grace);
-            expiry.NowUtc.Should().Be(nowUtc);
+            expiry.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]
@@ -40,7 +40,7 @@ namespace Perkify.Core.Tests
             var expiry = new Expiry(expiryUtc, grace);
             expiry.ExpiryUtc.Should().Be(expiryUtc);
             expiry.GracePeriod.Should().Be(grace);
-            expiry.NowUtc.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
+            expiry.Clock.GetCurrentInstant().ToDateTimeUtc().Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
         }
 
         [Theory(Skip = SkipOrNot), CombinatorialData]

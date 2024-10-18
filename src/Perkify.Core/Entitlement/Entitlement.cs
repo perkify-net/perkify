@@ -14,7 +14,7 @@ namespace Perkify.Core
     /// </remarks>
     /// <param name="autorenewal">The auto-renewal mode.</param>
     public partial class Entitlement(AutoRenewalMode autorenewal = AutoRenewalMode.Default)
-        : INowUtc, IEligible
+        : IEligible
     {
         private IClock clock = SystemClock.Instance;
 
@@ -46,9 +46,6 @@ namespace Perkify.Core
                 }
             }
         }
-
-        /// <inheritdoc/>
-        public DateTime NowUtc => this.clock.GetCurrentInstant().ToDateTimeUtc();
 
         /// <summary>
         /// Gets the balance associated with the entitlement.

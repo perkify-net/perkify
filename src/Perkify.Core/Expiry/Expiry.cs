@@ -16,7 +16,7 @@ namespace Perkify.Core
     /// <param name="expiryUtc">Expiry time in UTC.</param>
     /// <param name="grace">Grace period.</param>
     public partial class Expiry(DateTime expiryUtc, TimeSpan? grace = null)
-        : IEligible, INowUtc
+        : IEligible
     {
         /// <summary>
         /// Gets or sets the clock instance used to retrieve the current time.
@@ -24,10 +24,7 @@ namespace Perkify.Core
         public IClock Clock { get; set; } = SystemClock.Instance;
 
         /// <inheritdoc/>
-        public DateTime NowUtc => this.Clock.GetCurrentInstant().ToDateTimeUtc();
-
-        /// <inheritdoc/>
-        public virtual bool IsEligible => this.NowUtc < this.DeadlineUtc;
+        public virtual bool IsEligible => this.Clock.GetCurrentInstant().ToDateTimeUtc() < this.DeadlineUtc;
 
         /// <summary>Specify the renewal period.</summary>
         /// <param name="interval">The renewal interval, specified as an ISO 8601 duration string.</param>

@@ -26,7 +26,7 @@ namespace Perkify.Core.Tests
             };
 
             entitlement.AutoRenewalMode.Should().Be(renewal);
-            entitlement.NowUtc.Should().Be(nowUtc);
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
             entitlement.Incoming.Should().Be(balance.Incoming);
             entitlement.Outgoing.Should().Be(balance.Outgoing);
             entitlement.Threshold.Should().Be(balance.Threshold);

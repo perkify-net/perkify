@@ -34,7 +34,7 @@ namespace Perkify.Core.Tests
             };
 
             entitlement.AutoRenewalMode.Should().Be(renewal);
-            entitlement.NowUtc.Should().Be(nowUtc);
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
 
             entitlement.HasBalance.Should().BeTrue();
             entitlement.HasExpiry.Should().BeTrue();
@@ -58,7 +58,7 @@ namespace Perkify.Core.Tests
             var clock = new FakeClock(nowUtc.ToInstant());
             var entitlement = new Entitlement(renewal) { Clock = clock };
             entitlement.AutoRenewalMode.Should().Be(renewal);
-            entitlement.NowUtc.Should().Be(nowUtc);
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
 
             entitlement.HasBalance.Should().BeFalse();
             entitlement.HasExpiry.Should().BeFalse();

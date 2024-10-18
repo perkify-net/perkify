@@ -21,10 +21,10 @@ namespace Perkify.Core
         public DateTime DeadlineUtc => this.ExpiryUtc + (this.GracePeriod ?? TimeSpan.Zero);
 
         /// <inheritdoc/>
-        public bool IsExpired => this.NowUtc >= this.ExpiryUtc;
+        public bool IsExpired => this.Clock.GetCurrentInstant().ToDateTimeUtc() >= this.ExpiryUtc;
 
         /// <inheritdoc/>
-        public TimeSpan Overdue => this.NowUtc switch
+        public TimeSpan Overdue => this.Clock.GetCurrentInstant().ToDateTimeUtc() switch
         {
             var nowUtc when nowUtc <= this.ExpiryUtc => TimeSpan.Zero,
             var nowUtc when nowUtc < this.DeadlineUtc => nowUtc - this.ExpiryUtc,
@@ -38,7 +38,7 @@ namespace Perkify.Core
         public TimeSpan Remaining(bool deadline = false)
         {
             var origin = deadline ? this.DeadlineUtc : this.ExpiryUtc;
-            var delta = origin - this.NowUtc;
+            var delta = origin - this.Clock.GetCurrentInstant().ToDateTimeUtc();
             return delta >= TimeSpan.Zero ? delta : TimeSpan.Zero;
         }
 

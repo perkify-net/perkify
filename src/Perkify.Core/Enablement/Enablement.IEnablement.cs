@@ -32,7 +32,7 @@ namespace Perkify.Core
                 EffectiveUtc = this.EffectiveUtc,
                 IsImmediateEffective = this.IsImmediateEffective,
             };
-            this.EffectiveUtc = effectiveUtc ?? this.NowUtc;
+            this.EffectiveUtc = effectiveUtc ?? this.Clock.GetCurrentInstant().ToDateTimeUtc();
             this.IsImmediateEffective = isImmediateEffective;
             if (isImmediateEffective)
             {
@@ -63,7 +63,7 @@ namespace Perkify.Core
                 EffectiveUtc = this.EffectiveUtc,
                 IsImmediateEffective = this.IsImmediateEffective,
             };
-            this.EffectiveUtc = effectiveUtc ?? this.NowUtc;
+            this.EffectiveUtc = effectiveUtc ?? this.Clock.GetCurrentInstant().ToDateTimeUtc();
             this.IsImmediateEffective = isImmediateEffective;
             if (isImmediateEffective)
             {

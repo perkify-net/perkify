@@ -10,7 +10,7 @@ namespace Perkify.Core
     /// The activator managing activation and deactivation for eligibility.
     /// </summary>
     public partial class Enablement(bool isActive = true)
-        : INowUtc, IEligible
+        : IEligible
     {
         /// <summary>
         /// Gets or sets the clock instance used to retrieve the current time.
@@ -18,11 +18,8 @@ namespace Perkify.Core
         public IClock Clock { get; set; } = SystemClock.Instance;
 
         /// <inheritdoc/>
-        public DateTime NowUtc => this.Clock.GetCurrentInstant().ToDateTimeUtc();
-
-        /// <inheritdoc/>
         public virtual bool IsEligible =>
-            this.IsImmediateEffective || this.NowUtc < this.EffectiveUtc
+            this.IsImmediateEffective || this.Clock.GetCurrentInstant().ToDateTimeUtc() < this.EffectiveUtc
                 ? this.IsActive
                 : !this.IsActive;
 

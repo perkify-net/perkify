@@ -27,7 +27,7 @@ namespace Perkify.Core.Tests
             };
 
             entitlement.AutoRenewalMode.Should().Be(renewal);
-            entitlement.NowUtc.Should().Be(nowUtc);
+            entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
             entitlement.IsActive.Should().Be(enablement.IsActive);
             entitlement.IsImmediateEffective.Should().Be(enablement.IsImmediateEffective);
             entitlement.EffectiveUtc.Should().Be(enablement.EffectiveUtc);
