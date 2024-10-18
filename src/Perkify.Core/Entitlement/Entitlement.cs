@@ -26,7 +26,7 @@ namespace Perkify.Core
         /// <remarks>
         /// The clock is shared used across expiry and activation by default.
         /// </remarks>
-        public IClock Clock => clock ?? SystemClock.Instance;
+        public IClock Clock { get; private set; } = clock ?? SystemClock.Instance;
 
         /// <summary>
         /// Gets the balance associated with the entitlement.
@@ -114,5 +114,28 @@ namespace Perkify.Core
         /// Gets the auto-renewal mode connecting balance and expiry.
         /// </summary>
         public AutoRenewalMode AutoRenewalMode { get; } = autorenewal;
+
+        /// <summary>
+        /// Sets a new clock instance for the entitlement and updates the clock for expiry and enablement if they exist.
+        /// </summary>
+        /// <param name="clock">The new clock instance to be used. If null, the system clock will be used.</param>
+        /// <returns>The updated entitlement instance with the new clock.</returns>
+        public Entitlement WithClock(IClock? clock = null)
+        {
+            clock ??= SystemClock.Instance;
+
+            if (this.expiry != null)
+            {
+                this.expiry.Clock = clock;
+            }
+
+            if (this.enablement != null)
+            {
+                this.enablement.Clock = clock;
+            }
+
+            this.Clock = clock;
+            return this;
+        }
     }
 }
