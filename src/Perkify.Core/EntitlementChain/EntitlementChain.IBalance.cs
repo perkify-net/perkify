@@ -8,19 +8,25 @@ namespace Perkify.Core
     public partial class EntitlementChain : IBalance
     {
         /// <inheritdoc/>
-        public long Incoming => this.entitlements.Sum(entitlement => entitlement.Incoming);
-
-        /// <inheritdoc/>
-        public long Outgoing => this.entitlements.Sum(entitlement => entitlement.Outgoing);
-
-        /// <inheritdoc/>
         public long Threshold => this.entitlements.Sum(entitlement => entitlement.Threshold);
+
+        /// <inheritdoc/>
+        public BalanceExceedancePolicy BalanceExceedancePolicy => this.entitlements switch
+        {
+            _ => throw new NotSupportedException("Please adjust specific entitlement or its balance.")
+        };
 
         /// <inheritdoc/>
         public BalanceType BalanceType
             => this.entitlements.Any(entitlement => entitlement.BalanceType == BalanceType.Credit)
                 ? BalanceType.Credit
                 : BalanceType.Debit;
+
+        /// <inheritdoc/>
+        public long Incoming => this.entitlements.Sum(entitlement => entitlement.Incoming);
+
+        /// <inheritdoc/>
+        public long Outgoing => this.entitlements.Sum(entitlement => entitlement.Outgoing);
 
         /// <inheritdoc/>
         public long Gross => this.entitlements.Sum(entitlement => entitlement.Gross);
@@ -32,40 +38,25 @@ namespace Perkify.Core
         public void Topup(long delta)
         {
             var entitlement = this.Factory.Invoke(delta, this.Clock.GetCurrentInstant().ToDateTimeUtc());
-            this.entitlements.Add(entitlement);
+            this.entitlements = this.entitlements.Add(entitlement);
         }
 
         /// <inheritdoc/>
-        public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
+        public long Deduct(long delta)
         {
-            var entitlements = this.entitlements
-                .Where(entitlement => entitlement.IsEligible)
-                .OrderBy(entitlement => entitlement.ExpiryUtc)
-                .ToList();
-
-            if (entitlements.Count == 0)
+            var available = this.entitlements.Where(entitlement => entitlement.IsEligible).ToList();
+            if (available.Count == 0)
             {
                 throw new InvalidOperationException("Ineligible state.");
             }
 
-            foreach (var entitlement in entitlements)
-            {
-                var processed = delta;
-                delta = entitlement.Deduct(processed, policy);
-                if (delta == 0)
-                {
-                    break;
-                }
-            }
-
+            available.ForEach(entitlement => delta = delta > 0 ? entitlement.Deduct(delta) : delta);
             return delta;
         }
 
         /// <inheritdoc/>
         public void Adjust(long? incoming, long? outgoing)
-        {
-            throw new NotSupportedException("Please adjust specific entitlement or its balance.");
-        }
+            => throw new NotSupportedException("Please adjust specific entitlement or its balance.");
 
         /// <inheritdoc/>
         public void Clear()

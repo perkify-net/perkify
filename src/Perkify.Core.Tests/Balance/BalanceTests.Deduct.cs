@@ -17,13 +17,13 @@ namespace Perkify.Core.Tests
             )] BalanceExceedancePolicy policy
         )
         {
-            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            var balance = new Balance(threshold, policy).WithBalance(incoming, outgoing);
             balance.Threshold.Should().Be(threshold);
             balance.Incoming.Should().Be(incoming);
             balance.Outgoing.Should().Be(outgoing);
 
             delta = incoming - threshold - outgoing - delta;
-            var remained = balance.Deduct(delta, policy);
+            var remained = balance.Deduct(delta);
             var expected = outgoing + delta;
             balance.Outgoing.Should().Be(expected);
             balance.Overspending.Should().Be(0);
@@ -45,14 +45,14 @@ namespace Perkify.Core.Tests
             )] BalanceExceedancePolicy policy
         )
         {
-            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            var balance = new Balance(threshold, policy).WithBalance(incoming, outgoing);
             balance.Threshold.Should().Be(threshold);
             balance.Incoming.Should().Be(incoming);
             balance.Outgoing.Should().Be(outgoing);
             balance.IsEligible.Should().BeTrue();
 
             var parameter = nameof(delta);
-            var action = () => balance.Deduct(delta, policy);
+            var action = () => balance.Deduct(delta);
             action
                 .Should()
                 .Throw<ArgumentOutOfRangeException>()
@@ -77,13 +77,13 @@ namespace Perkify.Core.Tests
             )] BalanceExceedancePolicy policy
         )
         {
-            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            var balance = new Balance(threshold, policy).WithBalance(incoming, outgoing);
             balance.Threshold.Should().Be(threshold);
             balance.Incoming.Should().Be(incoming);
             balance.Outgoing.Should().Be(outgoing);
             balance.IsEligible.Should().BeFalse();
 
-            var action = () => balance.Deduct(delta, policy);
+            var action = () => balance.Deduct(delta);
             action
                 .Should()
                 .Throw<InvalidOperationException>()
@@ -103,7 +103,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues(20L)] long exceed
         )
         {
-            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            var balance = new Balance(threshold, BalanceExceedancePolicy.Reject).WithBalance(incoming, outgoing);
             balance.Threshold.Should().Be(threshold);
             balance.Incoming.Should().Be(incoming);
             balance.Outgoing.Should().Be(outgoing);
@@ -111,7 +111,7 @@ namespace Perkify.Core.Tests
 
             var maximum = incoming - threshold - outgoing;
             var delta = maximum + exceed;
-            var action = () => balance.Deduct(delta, BalanceExceedancePolicy.Reject);
+            var action = () => balance.Deduct(delta);
             var parameter = nameof(delta);
             action
                 .Should()
@@ -131,7 +131,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues(20L)] long exceed
         )
         {
-            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            var balance = new Balance(threshold, BalanceExceedancePolicy.Overflow).WithBalance(incoming, outgoing);
             balance.Threshold.Should().Be(threshold);
             balance.Incoming.Should().Be(incoming);
             balance.Outgoing.Should().Be(outgoing);
@@ -139,7 +139,7 @@ namespace Perkify.Core.Tests
 
             var maximum = incoming - threshold - outgoing;
             var delta = maximum + exceed;
-            var remained = balance.Deduct(delta, BalanceExceedancePolicy.Overflow);
+            var remained = balance.Deduct(delta);
             var expected = outgoing + delta - remained;
             remained.Should().Be(exceed);
             balance.Outgoing.Should().Be(expected);
@@ -156,7 +156,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues(20L)] long exceed
         )
         {
-            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            var balance = new Balance(threshold, BalanceExceedancePolicy.Overdraft).WithBalance(incoming, outgoing);
             balance.Threshold.Should().Be(threshold);
             balance.Incoming.Should().Be(incoming);
             balance.Outgoing.Should().Be(outgoing);
@@ -164,7 +164,7 @@ namespace Perkify.Core.Tests
 
             var maximum = incoming - threshold - outgoing;
             var delta = maximum + exceed;
-            var remained = balance.Deduct(delta, BalanceExceedancePolicy.Overdraft);
+            var remained = balance.Deduct(delta);
             var expected = outgoing + delta - remained;
             remained.Should().Be(0);
             balance.Outgoing.Should().Be(expected);
@@ -181,13 +181,13 @@ namespace Perkify.Core.Tests
             [CombinatorialValues(long.MaxValue - 9)] long delta
         )
         {
-            var balance = new Balance(threshold).WithBalance(incoming, outgoing);
+            var balance = new Balance(threshold, BalanceExceedancePolicy.Overdraft).WithBalance(incoming, outgoing);
             balance.Threshold.Should().Be(threshold);
             balance.Incoming.Should().Be(incoming);
             balance.Outgoing.Should().Be(outgoing);
             balance.IsEligible.Should().BeTrue();
 
-            var action = () => balance.Deduct(delta, BalanceExceedancePolicy.Overdraft);
+            var action = () => balance.Deduct(delta);
             action
                 .Should()
                 .Throw<OverflowException>()

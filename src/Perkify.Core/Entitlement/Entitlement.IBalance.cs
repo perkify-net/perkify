@@ -8,20 +8,24 @@ namespace Perkify.Core
     public partial class Entitlement : IBalance
     {
         /// <inheritdoc/>
+        public long Threshold
+            => this.balance!.Threshold;
+
+        /// <inheritdoc/>
+        public BalanceExceedancePolicy BalanceExceedancePolicy
+            => this.balance!.BalanceExceedancePolicy;
+
+        /// <inheritdoc/>
+        public BalanceType BalanceType
+            => this.balance!.BalanceType;
+
+        /// <inheritdoc/>
         public long Incoming
             => this.balance!.Incoming;
 
         /// <inheritdoc/>
         public long Outgoing
             => this.balance!.Outgoing;
-
-        /// <inheritdoc/>
-        public long Threshold
-            => this.balance!.Threshold;
-
-        /// <inheritdoc/>
-        public BalanceType BalanceType
-            => this.balance!.BalanceType;
 
         /// <inheritdoc/>
         public long Gross
@@ -43,9 +47,9 @@ namespace Perkify.Core
         }
 
         /// <inheritdoc/>
-        public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
+        public long Deduct(long delta)
         {
-            var result = this.balance!.Deduct(delta, policy);
+            var result = this.balance!.Deduct(delta);
 
             if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Deduct))
             {

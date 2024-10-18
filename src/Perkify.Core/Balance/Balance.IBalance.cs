@@ -11,13 +11,16 @@ namespace Perkify.Core
         public long Threshold { get; } = threshold;
 
         /// <inheritdoc/>
+        public BalanceExceedancePolicy BalanceExceedancePolicy { get; } = policy;
+
+        /// <inheritdoc/>
+        public BalanceType BalanceType => this.Threshold >= 0 ? BalanceType.Debit : BalanceType.Credit;
+
+        /// <inheritdoc/>
         public long Incoming { get; private set; }
 
         /// <inheritdoc/>
         public long Outgoing { get; private set; }
-
-        /// <inheritdoc/>
-        public BalanceType BalanceType => this.Threshold >= 0 ? BalanceType.Debit : BalanceType.Credit;
 
         /// <inheritdoc/>
         public long Gross => this.Incoming - this.Outgoing;
@@ -40,7 +43,7 @@ namespace Perkify.Core
         }
 
         /// <inheritdoc/>
-        public long Deduct(long delta, BalanceExceedancePolicy policy = BalanceExceedancePolicy.Reject)
+        public long Deduct(long delta)
         {
             if (delta < 0)
             {
@@ -52,9 +55,9 @@ namespace Perkify.Core
                 throw new InvalidOperationException("Ineligible state.");
             }
 
-            var maximum = policy.GetDeductibleAllowance(this.Gross, this.Threshold);
+            var maximum = this.BalanceExceedancePolicy.GetDeductibleAllowance(this.Gross, this.Threshold);
             var processed = delta;
-            var remaining = policy.Deduct(ref processed, maximum);
+            var remaining = this.BalanceExceedancePolicy.Deduct(ref processed, maximum);
             checked
             {
                 this.Outgoing += processed;
