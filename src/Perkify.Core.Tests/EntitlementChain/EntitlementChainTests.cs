@@ -85,6 +85,27 @@ namespace Perkify.Core.Tests
         }
 
         [Theory, CombinatorialData]
+        public void TestCreateChainWithEntitlementsIsNone
+        (
+            [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString
+        )
+        {
+            var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var chain = new EntitlementChain(clock)
+            {
+                Entitlements = null!,
+            };
+
+            chain.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
+            chain.Factory.Should().NotBeNull();
+            chain.Factory.Should().Be(EntitlementChain.DefaultEntitlementFactory);
+            chain.Comparer.Should().NotBeNull();
+            chain.Comparer.Should().Be(EntitlementChain.DefaultEntitlementComparer);
+            chain.Entitlements.Should().HaveCount(0);
+        }
+
+        [Theory, CombinatorialData]
         public void TestCreateChainWithFakedClock
         (
             [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString
