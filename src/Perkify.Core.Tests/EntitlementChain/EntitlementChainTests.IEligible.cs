@@ -15,7 +15,7 @@ namespace Perkify.Core.Tests
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
-            var chain = new EntitlementChain(clock)
+            var chain = new EntitlementChain(EntitlementChainPolicy.Default, clock)
             {
                 Entitlements =
                 [
@@ -38,7 +38,7 @@ namespace Perkify.Core.Tests
         [Fact]
         public void TestIsEligibleWithEmptyEntitlement()
         {
-            var chain = new EntitlementChain(null);
+            var chain = new EntitlementChain();
             chain.Entitlements.Should().HaveCount(0);
             chain.IsEligible.Should().BeFalse();
         }
