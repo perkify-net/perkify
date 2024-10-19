@@ -1,5 +1,6 @@
 namespace Perkify.Core.Tests
 {
+    using NodaTime;
     using NodaTime.Extensions;
     using NodaTime.Testing;
     using NodaTime.Text;
@@ -9,8 +10,8 @@ namespace Perkify.Core.Tests
         [Fact]
         public void TestCreateChain()
         {
-            var chain = new EntitlementChain(null);
-
+            var chain = new EntitlementChain();
+            chain.EntitlementChainPolicy.Should().Be(EntitlementChainPolicy.Default);
             chain.Clock.GetCurrentInstant().ToDateTimeUtc().Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
             chain.Factory.Should().NotBeNull();
             chain.Factory.Should().Be(EntitlementChain.DefaultEntitlementFactory);
@@ -22,13 +23,14 @@ namespace Perkify.Core.Tests
         [Fact]
         public void TestCreateChainWithFactoryAndComperer()
         {
-            var factory = new Func<long, DateTime, Entitlement>((delta, expiryUtc) => null!);
+            var factory = new Func<long, DateTime?, IClock, Entitlement>((delta, expiryUtc, clock) => null!);
             var comparer = new Mock<IComparer<Entitlement>>().Object;
-            var chain = new EntitlementChain(null)
+            var chain = new EntitlementChain()
             {
                 Factory = factory,
                 Comparer = comparer,
             };
+            chain.EntitlementChainPolicy.Should().Be(EntitlementChainPolicy.Default);
             chain.Clock.GetCurrentInstant().ToDateTimeUtc().Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
             chain.Factory.Should().NotBeNull();
             chain.Factory.Should().Be(factory);
@@ -45,7 +47,7 @@ namespace Perkify.Core.Tests
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
-            var chain = new EntitlementChain(clock)
+            var chain = new EntitlementChain(EntitlementChainPolicy.Default, clock)
             {
                 Entitlements =
                 [
@@ -64,6 +66,7 @@ namespace Perkify.Core.Tests
                 ],
             };
 
+            chain.EntitlementChainPolicy.Should().Be(EntitlementChainPolicy.Default);
             chain.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
             chain.Factory.Should().NotBeNull();
             chain.Factory.Should().Be(EntitlementChain.DefaultEntitlementFactory);
@@ -92,11 +95,12 @@ namespace Perkify.Core.Tests
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
-            var chain = new EntitlementChain(clock)
+            var chain = new EntitlementChain(EntitlementChainPolicy.Default, clock)
             {
                 Entitlements = null!,
             };
 
+            chain.EntitlementChainPolicy.Should().Be(EntitlementChainPolicy.Default);
             chain.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
             chain.Factory.Should().NotBeNull();
             chain.Factory.Should().Be(EntitlementChain.DefaultEntitlementFactory);
@@ -113,7 +117,7 @@ namespace Perkify.Core.Tests
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
-            var chain = new EntitlementChain(null)
+            var chain = new EntitlementChain(EntitlementChainPolicy.Default, null)
             {
                 Entitlements =
                 [
@@ -131,6 +135,7 @@ namespace Perkify.Core.Tests
                     },
                 ],
             }.WithClock(clock);
+            chain.EntitlementChainPolicy.Should().Be(EntitlementChainPolicy.Default);
             chain.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
             chain.Entitlements.First().Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
             chain.Entitlements.Last().Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
@@ -144,7 +149,7 @@ namespace Perkify.Core.Tests
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
             var clock = new FakeClock(nowUtc.ToInstant());
-            var chain = new EntitlementChain(clock)
+            var chain = new EntitlementChain(EntitlementChainPolicy.Default, clock)
             {
                 Entitlements =
                 [
@@ -163,6 +168,7 @@ namespace Perkify.Core.Tests
                 ],
             }.WithClock(null);
 
+            chain.EntitlementChainPolicy.Should().Be(EntitlementChainPolicy.Default);
             chain.Clock.GetCurrentInstant().ToDateTimeUtc().Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
             chain.Entitlements.First().Clock.GetCurrentInstant().ToDateTimeUtc().Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));
             chain.Entitlements.Last().Clock.GetCurrentInstant().ToDateTimeUtc().Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromMilliseconds(1000));

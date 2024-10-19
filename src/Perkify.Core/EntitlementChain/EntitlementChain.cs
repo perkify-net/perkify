@@ -8,22 +8,31 @@ namespace Perkify.Core
     using NodaTime;
 
     using EntitlementComparer = System.Collections.Generic.IComparer<Perkify.Core.Entitlement>;
-    using EntitlementFactory = System.Func<long, System.DateTime, Perkify.Core.Entitlement>;
+    using EntitlementFactory = System.Func<long, System.DateTime?, NodaTime.IClock, Perkify.Core.Entitlement>;
 
     /// <summary>
     /// The entitlement chain for eligibility.
     /// </summary>
+    /// <param name="policy">The policy to be applied to the entitlement chain.</param>
     /// <param name="clock">The clock used to determine the current time.</param>
-    public partial class EntitlementChain(IClock? clock = null)
+    public partial class EntitlementChain(EntitlementChainPolicy policy = EntitlementChainPolicy.Default, IClock? clock = null)
     {
         /// <summary>
         /// The default factory function to build new entitlements.
         /// </summary>
-        public static readonly EntitlementFactory DefaultEntitlementFactory = (delta, expiryUtc) => new Entitlement(AutoRenewalMode.Default)
+        public static readonly EntitlementFactory DefaultEntitlementFactory = (delta, expiryUtc, clock) =>
         {
-            Balance = new Balance(delta, BalanceExceedancePolicy.Reject),
-            Expiry = new Expiry(expiryUtc, null),
-            Enablement = new Enablement(true),
+            var balance = Balance.Debit(BalanceExceedancePolicy.Reject);
+            var expiry = expiryUtc != null ? new Expiry(expiryUtc.Value, clock).WithRenewal("P90D!") : null;
+            var enablement = new Enablement(true, clock);
+            var entitlement = new Entitlement(AutoRenewalMode.Default, clock)
+            {
+                Balance = balance,
+                Expiry = expiry,
+                Enablement = enablement,
+            };
+            entitlement.Topup(delta);
+            return entitlement;
         };
 
         /// <summary>
@@ -33,6 +42,11 @@ namespace Perkify.Core
 
         // The collection of entitlements in the chain.
         private ImmutableSortedSet<Entitlement> entitlements = ImmutableSortedSet<Entitlement>.Empty;
+
+        /// <summary>
+        /// Gets the policy applied to the entitlement chain.
+        /// </summary>
+        public EntitlementChainPolicy EntitlementChainPolicy => policy;
 
         /// <summary>
         /// Gets the clock used to determine the current time.

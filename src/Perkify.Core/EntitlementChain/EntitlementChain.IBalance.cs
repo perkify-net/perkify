@@ -8,36 +8,52 @@ namespace Perkify.Core
     public partial class EntitlementChain : IBalance
     {
         /// <inheritdoc/>
-        public long Threshold => this.entitlements.Sum(entitlement => entitlement.Threshold);
+        public long Threshold
+            => this.entitlements
+                .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+                .Sum(entitlement => entitlement.Threshold);
 
         /// <inheritdoc/>
-        public BalanceExceedancePolicy BalanceExceedancePolicy => this.entitlements switch
-        {
-            _ => throw new NotSupportedException("Please adjust specific entitlement or its balance.")
-        };
+        public BalanceExceedancePolicy BalanceExceedancePolicy
+            => this.entitlements
+                .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+                .Select(entitlement => entitlement.BalanceExceedancePolicy)
+                .DefaultIfEmpty(BalanceExceedancePolicy.Reject)
+                .Max();
 
         /// <inheritdoc/>
         public BalanceType BalanceType
-            => this.entitlements.Any(entitlement => entitlement.BalanceType == BalanceType.Credit)
-                ? BalanceType.Credit
-                : BalanceType.Debit;
+            => this.entitlements
+                .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+                .Select(entitlement => entitlement.BalanceType)
+                .DefaultIfEmpty(BalanceType.Debit)
+                .Max();
 
         /// <inheritdoc/>
-        public long Incoming => this.entitlements.Sum(entitlement => entitlement.Incoming);
+        public long Incoming => this.entitlements
+            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+            .Sum(entitlement => entitlement.Incoming);
 
         /// <inheritdoc/>
-        public long Outgoing => this.entitlements.Sum(entitlement => entitlement.Outgoing);
+        public long Outgoing => this.entitlements
+            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+            .Sum(entitlement => entitlement.Outgoing);
 
         /// <inheritdoc/>
-        public long Gross => this.entitlements.Sum(entitlement => entitlement.Gross);
+        public long Gross => this.entitlements
+            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+            .Sum(entitlement => entitlement.Gross);
 
         /// <inheritdoc/>
-        public long Overspending => this.entitlements.Sum(entitlement => entitlement.Gross);
+        public long Overspending => this.entitlements
+            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+            .Sum(entitlement => entitlement.Overspending);
 
         /// <inheritdoc/>
         public void Topup(long delta)
         {
-            var entitlement = this.Factory.Invoke(delta, this.Clock.GetCurrentInstant().ToDateTimeUtc());
+            var nowUtc = this.Clock.GetCurrentInstant().ToDateTimeUtc();
+            var entitlement = this.Factory.Invoke(delta, nowUtc, this.Clock);
             this.entitlements = this.entitlements.Add(entitlement);
         }
 
@@ -50,8 +66,16 @@ namespace Perkify.Core
                 throw new InvalidOperationException("Ineligible state.");
             }
 
-            available.ForEach(entitlement => delta = delta > 0 ? entitlement.Deduct(delta) : delta);
-            return delta;
+            if (this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.SplitDeductionAllowed))
+            {
+                available.ForEach(entitlement => delta = delta > 0 ? entitlement.Deduct(delta) : delta);
+                return delta;
+            }
+            else
+            {
+                var entitlement = available.FirstOrDefault(entitlement => entitlement.BalanceExceedancePolicy.GetDeductibleAllowance(entitlement.Gross, entitlement.Threshold) > delta);
+                return entitlement?.Deduct(delta) ?? throw new InvalidOperationException("No availble entitlement.");
+            }
         }
 
         /// <inheritdoc/>
