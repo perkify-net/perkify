@@ -14,7 +14,7 @@
   <!-- See instruction in https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file?view=vs-2022#datacollectors-element-diagnostic-data-adapters -->
   <DataCollectionRunSettings>
     <DataCollectors>
-      <DataCollector friendlyName="Perkify Code Coverage">
+      <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <!-- Test coverage for all runtime/core projects under SourceDir -->
           <Include>
