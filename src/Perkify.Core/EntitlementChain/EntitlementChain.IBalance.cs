@@ -45,6 +45,11 @@ namespace Perkify.Core
             .Sum(entitlement => entitlement.Gross);
 
         /// <inheritdoc/>
+        public long Available => this.entitlements
+            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+            .Sum(entitlement => entitlement.Available);
+
+        /// <inheritdoc/>
         public long Overspending => this.entitlements
             .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
             .Sum(entitlement => entitlement.Overspending);
@@ -60,10 +65,14 @@ namespace Perkify.Core
         /// <inheritdoc/>
         public long Deduct(long delta)
         {
-            var available = this.entitlements.Where(entitlement => entitlement.IsEligible).ToList();
+            var available = this.entitlements
+                .Where(entitlement => entitlement.IsEligible)
+                .Where(entitlement => entitlement.BalanceExceedancePolicy != BalanceExceedancePolicy.Reject || entitlement.Available >= delta)
+                .ToList();
+
             if (available.Count == 0)
             {
-                throw new InvalidOperationException("Ineligible state.");
+                throw new InvalidOperationException("No availble entitlement.");
             }
 
             if (this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.SplitDeductionAllowed))
@@ -73,8 +82,9 @@ namespace Perkify.Core
             }
             else
             {
-                var entitlement = available.FirstOrDefault(entitlement => entitlement.BalanceExceedancePolicy.GetDeductibleAllowance(entitlement.Gross, entitlement.Threshold) > delta);
-                return entitlement?.Deduct(delta) ?? throw new InvalidOperationException("No availble entitlement.");
+                // TODO: Refactor
+                var entitlement = available.First(entitlement => entitlement.BalanceExceedancePolicy.GetDeductibleAllowance(entitlement.Gross, entitlement.Threshold) >= delta);
+                return entitlement.Deduct(delta);
             }
         }
 

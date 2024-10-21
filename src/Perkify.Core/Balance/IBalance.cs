@@ -40,6 +40,11 @@ namespace Perkify.Core
         public long Gross { get; }
 
         /// <summary>
+        /// Gets the available balance amount.
+        /// </summary>
+        public long Available { get; }
+
+        /// <summary>
         /// Gets the overspending amount.
         /// </summary>
         public long Overspending { get; }
