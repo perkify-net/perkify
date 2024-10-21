@@ -183,6 +183,27 @@ namespace Perkify.Core.Tests
             chain.Entitlements.First().Incoming.Should().Be(incoming);
             chain.Entitlements.First().Outgoing.Should().Be(0L);
             chain.Entitlements.First().Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
+            chain.Entitlements.First().HasExpiry.Should().BeTrue();
+            chain.IsEligible.Should().BeTrue();
+            chain.Incoming.Should().Be(incoming);
+        }
+
+        [Theory]
+        [InlineData(100L)]
+        public void TestBalanceTopupNoExpiry(long incoming)
+        {
+            var nowUtc = InstantPattern.General.Parse("2024-10-09T15:00:00Z").Value.ToDateTimeUtc();
+            var clock = new FakeClock(nowUtc.ToInstant());
+            var chain = new EntitlementChain(EntitlementChainPolicy.None, clock);
+            chain.Entitlements.Should().HaveCount(0);
+            chain.IsEligible.Should().BeFalse();
+
+            chain.Topup(incoming);
+            chain.Entitlements.Should().HaveCount(1);
+            chain.Entitlements.First().Incoming.Should().Be(incoming);
+            chain.Entitlements.First().Outgoing.Should().Be(0L);
+            chain.Entitlements.First().Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
+            chain.Entitlements.First().HasExpiry.Should().BeFalse();
             chain.IsEligible.Should().BeTrue();
             chain.Incoming.Should().Be(incoming);
         }

@@ -21,18 +21,23 @@ namespace Perkify.Core
         EligibleOnlyView = 0x0001,
 
         /// <summary>
-        /// The flag to indicate if split deduction is allowed.
+        /// The flag to indicate if auto renewal expiry is enabled (top-up).
         /// </summary>
-        SplitDeductionAllowed = 0x0002,
+        WithAutoRenewalExpiry = 0x0002,
+
+        /// <summary>
+        /// The flag to indicate if split deduction is allowed (deduction).
+        /// </summary>
+        SplitDeductionAllowed = 0x0004,
 
         /// <summary>
         /// The default policy to enable split deduction.
         /// </summary>
-        Default = SplitDeductionAllowed,
+        Default = WithAutoRenewalExpiry | SplitDeductionAllowed,
 
         /// <summary>
         /// The policy to enable all features.
         /// </summary>
-        All = EligibleOnlyView | SplitDeductionAllowed,
+        All = EligibleOnlyView | WithAutoRenewalExpiry | SplitDeductionAllowed,
     }
 }
