@@ -37,14 +37,12 @@ namespace Perkify.Core
         /// Activate and switch to active state.
         /// </summary>
         /// <param name="effectiveUtc">The activation time in UTC.</param>
-        /// <param name="isImmediateEffective">Indicates if the activation is immediate.</param>
-        public void Activate(DateTime? effectiveUtc = null, bool isImmediateEffective = true);
+        public void Activate(DateTime? effectiveUtc = null);
 
         /// <summary>
         /// Deactivate and switch to inactive state.
         /// </summary>
         /// <param name="effectiveUtc">The deactivation time in UTC.</param>
-        /// <param name="isImmediateEffective">Indicates if the deactivation is immediate.</param>
-        public void Deactivate(DateTime? effectiveUtc = null, bool isImmediateEffective = true);
+        public void Deactivate(DateTime? effectiveUtc = null);
     }
 }

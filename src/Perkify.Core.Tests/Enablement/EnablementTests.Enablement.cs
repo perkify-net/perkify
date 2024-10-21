@@ -13,9 +13,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
             [CombinatorialValues(-1, 0, +1)] int initialEffectiveUtcOffsetInHours,
             [CombinatorialValues(true)] bool initialIsImmediateEffective,
-
             [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours,
-            [CombinatorialValues(true, false)] bool isImmediateEffective,
             [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
@@ -35,10 +33,10 @@ namespace Perkify.Core.Tests
             }
 
             var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
-            enablement.Deactivate(effectiveUtc, isImmediateEffective);
-            enablement.IsImmediateEffective.Should().Be(isImmediateEffective);
+            enablement.Deactivate(effectiveUtc);
+            enablement.IsImmediateEffective.Should().Be(effectiveUtcOffsetInHours == null);
             enablement.EffectiveUtc.Should().Be(effectiveUtc ?? nowUtc);
-            enablement.IsActive.Should().Be(isImmediateEffective ? !isActive : isActive);
+            enablement.IsActive.Should().Be(effectiveUtcOffsetInHours == null ? !isActive : isActive);
             if (isStateChangedEventHooked)
             {
                 stateChangedEvent.Should().NotBeNull();
@@ -59,9 +57,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
             [CombinatorialValues(-1, 0, +1)] int initialEffectiveUtcOffsetInHours,
             [CombinatorialValues(true)] bool initialIsImmediateEffective,
-
-            [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours,
-            [CombinatorialValues(true, false)] bool isImmediateEffective
+            [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours
         )
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
@@ -75,7 +71,7 @@ namespace Perkify.Core.Tests
             enablement.IsActive.Should().Be(isActive);
 
             var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
-            var action = () => enablement.Deactivate(effectiveUtc, isImmediateEffective);
+            var action = () => enablement.Deactivate(effectiveUtc);
             action.Should()
                 .Throw<InvalidOperationException>()
                 .WithMessage("Already in inactive state.");
@@ -89,9 +85,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
             [CombinatorialValues(-1, 0, +1)] int initialEffectiveUtcOffsetInHours,
             [CombinatorialValues(true)] bool initialIsImmediateEffective,
-
             [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours,
-            [CombinatorialValues(true, false)] bool isImmediateEffective,
             [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
@@ -111,10 +105,10 @@ namespace Perkify.Core.Tests
             }
 
             var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
-            enablement.Activate(effectiveUtc, isImmediateEffective);
-            enablement.IsImmediateEffective.Should().Be(isImmediateEffective);
+            enablement.Activate(effectiveUtc);
+            enablement.IsImmediateEffective.Should().Be(effectiveUtcOffsetInHours == null);
             enablement.EffectiveUtc.Should().Be(effectiveUtc ?? nowUtc);
-            enablement.IsActive.Should().Be(isImmediateEffective ? !isActive : isActive);
+            enablement.IsActive.Should().Be(effectiveUtcOffsetInHours == null ? !isActive : isActive);
             if (isStateChangedEventHooked)
             {
                 stateChangedEvent.Should().NotBeNull();
@@ -135,9 +129,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues("2024-10-15T16:00:00Z")] string nowUtcString,
             [CombinatorialValues(-1, 0, +1)] int initialEffectiveUtcOffsetInHours,
             [CombinatorialValues(true)] bool initialIsImmediateEffective,
-
-            [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours,
-            [CombinatorialValues(true, false)] bool isImmediateEffective
+            [CombinatorialValues(+1, 0, -1, null)] int? effectiveUtcOffsetInHours
         )
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
@@ -151,7 +143,7 @@ namespace Perkify.Core.Tests
             enablement.IsActive.Should().Be(isActive);
 
             var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
-            var action = () => enablement.Activate(effectiveUtc, isImmediateEffective);
+            var action = () => enablement.Activate(effectiveUtc);
             action.Should()
                 .Throw<InvalidOperationException>()
                 .WithMessage("Already in active state.");
