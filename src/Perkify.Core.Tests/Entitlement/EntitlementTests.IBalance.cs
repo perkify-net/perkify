@@ -32,6 +32,7 @@ namespace Perkify.Core.Tests
             entitlement.Incoming.Should().Be(balance.Incoming);
             entitlement.Outgoing.Should().Be(balance.Outgoing);
             entitlement.Gross.Should().Be(balance.Gross);
+            entitlement.Available.Should().Be(balance.Available);
             entitlement.Overspending.Should().Be(balance.Overspending);
         }
 

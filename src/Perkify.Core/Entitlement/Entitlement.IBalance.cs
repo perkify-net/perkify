@@ -32,6 +32,10 @@ namespace Perkify.Core
             => this.balance!.Gross;
 
         /// <inheritdoc/>
+        public long Available
+            => this.balance!.Available;
+
+        /// <inheritdoc/>
         public long Overspending
             => this.balance!.Overspending;
 

@@ -30,19 +30,19 @@
         public void TestCreateDebitBalanceDirectly(BalanceExceedancePolicy policy)
         {
             var debit = Balance.Debit(policy);
-
-            debit.Incoming.Should().Be(0);
-            debit.Outgoing.Should().Be(0);
-            debit.Gross.Should().Be(0);
-            debit.Threshold.Should().Be(0);
-            debit.BalanceExceedancePolicy.Should().Be(policy);
+            debit.Threshold.Should().Be(0L);
             debit.BalanceType.Should().Be(BalanceType.Debit);
+            debit.Incoming.Should().Be(0L);
+            debit.Outgoing.Should().Be(0L);
+            debit.Gross.Should().Be(0L);
+            debit.Available.Should().Be(0L);
+            debit.BalanceExceedancePolicy.Should().Be(policy);
         }
 
         [Theory, CombinatorialData]
         public void TestCreateCreditBalanceDirectly
         (
-            [CombinatorialValues(-10)] long threshold,
+            [CombinatorialValues(-10L)] long threshold,
             [CombinatorialValues
             (
                 BalanceExceedancePolicy.Reject,
@@ -52,14 +52,15 @@
         )
         {
             var credit = Balance.Credit(threshold, policy);
-
-            credit.Incoming.Should().Be(0);
-            credit.Outgoing.Should().Be(0);
-            credit.Gross.Should().Be(0);
             credit.Threshold.Should().Be(threshold);
             credit.Threshold.Should().BeNegative();
-            credit.BalanceExceedancePolicy.Should().Be(policy);
             credit.BalanceType.Should().Be(BalanceType.Credit);
+            credit.Incoming.Should().Be(0L);
+            credit.Outgoing.Should().Be(0L);
+            credit.Gross.Should().Be(0L);
+            credit.Available.Should().BePositive();
+            credit.Available.Should().Be(-threshold);
+            credit.BalanceExceedancePolicy.Should().Be(policy);
         }
 
         [Theory, CombinatorialData]

@@ -26,7 +26,10 @@ namespace Perkify.Core
         public long Gross => this.Incoming - this.Outgoing;
 
         /// <inheritdoc/>
-        public long Overspending => this.Gross >= this.Threshold ? 0 : this.Threshold - this.Gross;
+        public long Available => this.Gross >= this.Threshold ? this.Gross - this.Threshold : 0L;
+
+        /// <inheritdoc/>
+        public long Overspending => this.Gross >= this.Threshold ? 0L : this.Threshold - this.Gross;
 
         /// <inheritdoc/>
         public void Topup(long delta)
