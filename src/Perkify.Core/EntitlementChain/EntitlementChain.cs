@@ -22,7 +22,7 @@ namespace Perkify.Core
         /// </summary>
         public static readonly EntitlementFactory DefaultEntitlementFactory = (delta, expiryUtc, clock) =>
         {
-            var balance = Balance.Debit(BalanceExceedancePolicy.Reject);
+            var balance = Balance.Debit(BalanceExceedancePolicy.Overflow);
             var expiry = expiryUtc != null ? new Expiry(expiryUtc.Value, clock).WithRenewal("P90D!") : null;
             var enablement = new Enablement(true, clock);
             var entitlement = new Entitlement(AutoRenewalMode.Default, clock)

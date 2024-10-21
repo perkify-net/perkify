@@ -209,8 +209,9 @@ namespace Perkify.Core.Tests
         }
 
         [Theory]
-        [InlineData(EntitlementChainPolicy.EligibleOnlyView, 50L, 150L)]
-        [InlineData(EntitlementChainPolicy.EligibleOnlyView | EntitlementChainPolicy.SplitDeductionAllowed, 150L, 50L)]
+        [InlineData(EntitlementChainPolicy.EligibleOnlyView, 50L, -50L)]
+        [InlineData(EntitlementChainPolicy.EligibleOnlyView | EntitlementChainPolicy.SplitDeductionAllowed, 50L, -50L)]
+        [InlineData(EntitlementChainPolicy.EligibleOnlyView | EntitlementChainPolicy.SplitDeductionAllowed, 150L, -150L)]
         public void TestBalanceDeduct(EntitlementChainPolicy policy, long delta, long gross)
         {
             var nowUtc = InstantPattern.General.Parse("2024-10-09T15:00:00Z").Value.ToDateTimeUtc();
@@ -227,20 +228,20 @@ namespace Perkify.Core.Tests
                     },
                     new Entitlement(AutoRenewalMode.None, clock)
                     {
-                        Balance = Balance.Credit(-100).WithBalance(100L, 0L),
+                        Balance = Balance.Credit(-100, BalanceExceedancePolicy.Overflow).WithBalance(0L, 0L),
                         Expiry = new Expiry(nowUtc.AddHours(2)),
                         Enablement = new Enablement(true),
                     },
                     new Entitlement(AutoRenewalMode.None, clock)
                     {
-                        Balance = Balance.Credit(-100).WithBalance(100L, 0L),
+                        Balance = Balance.Credit(-100, BalanceExceedancePolicy.Overflow).WithBalance(0L, 0L),
                         Expiry = new Expiry(nowUtc.AddHours(3)),
                         Enablement = new Enablement(true),
                     },
                 ],
             };
             chain.Entitlements.Should().HaveCount(3);
-            chain.Gross.Should().Be(200L);
+            chain.Available.Should().Be(200L);
             var remained = chain.Deduct(delta);
             remained.Should().Be(0L);
             chain.Gross.Should().Be(gross);
