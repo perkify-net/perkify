@@ -21,7 +21,7 @@ namespace Perkify.Core.Tests
         }
 
         [Fact]
-        public void TestCreateChainWithFactoryAndComperer()
+        public void TestCreateChainWithCustomFactoryAndComperer()
         {
             var factory = new Func<long, DateTime?, IClock, Entitlement>((delta, expiryUtc, clock) => null!);
             var comparer = new Mock<IComparer<Entitlement>>().Object;

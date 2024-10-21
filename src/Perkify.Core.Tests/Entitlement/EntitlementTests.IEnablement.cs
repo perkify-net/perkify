@@ -40,8 +40,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues(false)] bool isActive,
             [CombinatorialValues(+1)] int initialEffectiveUtcOffsetInHours,
             [CombinatorialValues(true, false)] bool initialIsImmediateEffective,
-            [CombinatorialValues(+2)] int effectiveUtcOffsetInHours,
-            [CombinatorialValues(true, false)] bool isImmediateEffective,
+            [CombinatorialValues(+2, null)] int? effectiveUtcOffsetInHours,
             [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
@@ -60,8 +59,8 @@ namespace Perkify.Core.Tests
                 entitlement.EnablementStateChanged += (sender, e) => { stateChangedEvent = e; };
             }
 
-            var effectiveUtc = nowUtc.AddHours(effectiveUtcOffsetInHours);
-            entitlement.Activate(effectiveUtc, isImmediateEffective);
+            var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
+            entitlement.Activate(effectiveUtc);
             entitlement.IsActive.Should().Be(enablement.IsActive);
             entitlement.IsImmediateEffective.Should().Be(enablement.IsImmediateEffective);
             entitlement.EffectiveUtc.Should().Be(enablement.EffectiveUtc);
@@ -87,8 +86,7 @@ namespace Perkify.Core.Tests
             [CombinatorialValues(true)] bool isActive,
             [CombinatorialValues(+1)] int initialEffectiveUtcOffsetInHours,
             [CombinatorialValues(true, false)] bool initialIsImmediateEffective,
-            [CombinatorialValues(+2)] int effectiveUtcOffsetInHours,
-            [CombinatorialValues(true, false)] bool isImmediateEffective,
+            [CombinatorialValues(+2, null)] int? effectiveUtcOffsetInHours,
             [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
@@ -107,8 +105,8 @@ namespace Perkify.Core.Tests
                 entitlement.EnablementStateChanged += (sender, e) => { stateChangedEvent = e; };
             }
 
-            var effectiveUtc = nowUtc.AddHours(effectiveUtcOffsetInHours);
-            entitlement.Deactivate(effectiveUtc, isImmediateEffective);
+            var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
+            entitlement.Deactivate(effectiveUtc);
             entitlement.IsActive.Should().Be(enablement.IsActive);
             entitlement.IsImmediateEffective.Should().Be(enablement.IsImmediateEffective);
             entitlement.EffectiveUtc.Should().Be(enablement.EffectiveUtc);
@@ -191,9 +189,7 @@ namespace Perkify.Core.Tests
                 int DeactivationUtcOffsetInHours,
                 int ActivationUtcOffsetInHours,
                 int ExpectedExpiryUtcOffsetInHours
-            ) timeline,
-            [CombinatorialValues(true, false)] bool isImmediateDeactivated,
-            [CombinatorialValues(true, false)] bool isImmediateActivated
+            ) timeline
         )
         {
             var expiryUtc = InstantPattern.General.Parse(expiryUtcString).Value.ToDateTimeUtc();
@@ -210,13 +206,12 @@ namespace Perkify.Core.Tests
 
             var deactivationUtc = expiryUtc.AddHours(timeline.DeactivationUtcOffsetInHours);
             clock.Reset(deactivationUtc.ToInstant());
-            entitlement.Deactivate(deactivationUtc, isImmediateDeactivated);
+            entitlement.Deactivate(deactivationUtc);
             var activationUtc = expiryUtc.AddHours(timeline.ActivationUtcOffsetInHours);
             clock.Reset(activationUtc.ToInstant());
-            entitlement.Activate(activationUtc, isImmediateActivated);
+            entitlement.Activate(activationUtc);
 
             entitlement.IsActive.Should().Be(enablement.IsActive);
-            entitlement.IsImmediateEffective.Should().Be(isImmediateActivated);
             entitlement.EffectiveUtc.Should().Be(activationUtc);
             var expectedExpiryUtc = expiryUtc.AddHours(timeline.ExpectedExpiryUtcOffsetInHours);
             entitlement.ExpiryUtc.Should().Be(expectedExpiryUtc);

@@ -20,7 +20,7 @@ namespace Perkify.Core
         public bool IsImmediateEffective { get; private set; } = true;
 
         /// <inheritdoc/>
-        public void Activate(DateTime? effectiveUtc, bool isImmediateEffective)
+        public void Activate(DateTime? effectiveUtc)
         {
             if (this.IsEligible)
             {
@@ -33,8 +33,8 @@ namespace Perkify.Core
                 IsImmediateEffective = this.IsImmediateEffective,
             };
             this.EffectiveUtc = effectiveUtc ?? this.Clock.GetCurrentInstant().ToDateTimeUtc();
-            this.IsImmediateEffective = isImmediateEffective;
-            if (isImmediateEffective)
+            this.IsImmediateEffective = effectiveUtc == null;
+            if (this.IsImmediateEffective)
             {
                 this.IsActive = true;
             }
@@ -51,7 +51,7 @@ namespace Perkify.Core
         }
 
         /// <inheritdoc/>
-        public void Deactivate(DateTime? effectiveUtc, bool isImmediateEffective)
+        public void Deactivate(DateTime? effectiveUtc)
         {
             if (!this.IsEligible)
             {
@@ -64,8 +64,8 @@ namespace Perkify.Core
                 IsImmediateEffective = this.IsImmediateEffective,
             };
             this.EffectiveUtc = effectiveUtc ?? this.Clock.GetCurrentInstant().ToDateTimeUtc();
-            this.IsImmediateEffective = isImmediateEffective;
-            if (isImmediateEffective)
+            this.IsImmediateEffective = effectiveUtc == null;
+            if (this.IsImmediateEffective)
             {
                 this.IsActive = false;
             }

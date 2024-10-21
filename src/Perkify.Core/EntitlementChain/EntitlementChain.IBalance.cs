@@ -58,7 +58,8 @@ namespace Perkify.Core
         public void Topup(long delta)
         {
             var nowUtc = this.Clock.GetCurrentInstant().ToDateTimeUtc();
-            var entitlement = this.Factory.Invoke(delta, nowUtc, this.Clock);
+            var expiryUtc = this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.WithAutoRenewalExpiry) ? nowUtc : (DateTime?)null;
+            var entitlement = this.Factory.Invoke(delta, expiryUtc, this.Clock);
             this.entitlements = this.entitlements.Add(entitlement);
         }
 

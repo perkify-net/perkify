@@ -23,11 +23,11 @@ namespace Perkify.Core
             => this.enablement!.IsImmediateEffective;
 
         /// <inheritdoc/>
-        public void Deactivate(DateTime? effectiveUtc = null, bool isImmediateEffective = true)
-            => this.enablement!.Deactivate(effectiveUtc, isImmediateEffective);
+        public void Deactivate(DateTime? effectiveUtc = null)
+            => this.enablement!.Deactivate(effectiveUtc);
 
         /// <inheritdoc/>
-        public void Activate(DateTime? effectiveUtc = null, bool isImmediateEffective = true)
+        public void Activate(DateTime? effectiveUtc = null)
         {
             // Deduct overdue time from activation time if need.
             var overdue = TimeSpan.Zero;
@@ -39,7 +39,7 @@ namespace Perkify.Core
                 overdue = overdueOnDeactivation < overdueOnExpiry ? overdueOnDeactivation : overdueOnExpiry;
             }
 
-            this.enablement!.Activate(effectiveUtc, isImmediateEffective);
+            this.enablement!.Activate(effectiveUtc);
             if (this.expiry != null && this.AutoRenewalMode.HasFlag(AutoRenewalMode.Enablement))
             {
                 var activationUtc = this.enablement.EffectiveUtc;
