@@ -10,11 +10,6 @@ namespace Perkify.Core
     public interface IEnablement
     {
         /// <summary>
-        /// Occurs when the enablement state changes.
-        /// </summary>
-        public event EventHandler<EnablementStateChangeEventArgs>? EnablementStateChanged;
-
-        /// <summary>
         /// Gets a value indicating whether the state is active.
         /// - true if the state is active (activated or not suspended).
         /// - false if the state is inactive (deactivated or suspended).
