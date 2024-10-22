@@ -8,9 +8,6 @@ namespace Perkify.Core
     public partial class Enablement : IEnablement
     {
         /// <inheritdoc/>
-        public event EventHandler<EnablementStateChangeEventArgs>? EnablementStateChanged;
-
-        /// <inheritdoc/>
         public bool IsActive { get; private set; } = isActive;
 
         /// <inheritdoc/>
@@ -27,26 +24,14 @@ namespace Perkify.Core
                 throw new InvalidOperationException("Already in active state.");
             }
 
-            var previous = new EnablementState(this.IsActive)
+            this.StateChangeExecutor.Execute(EnablementStateOperation.Activate, () =>
             {
-                EffectiveUtc = this.EffectiveUtc,
-                IsImmediateEffective = this.IsImmediateEffective,
-            };
-            this.EffectiveUtc = effectiveUtc ?? this.Clock.GetCurrentInstant().ToDateTimeUtc();
-            this.IsImmediateEffective = effectiveUtc == null;
-            if (this.IsImmediateEffective)
-            {
-                this.IsActive = true;
-            }
-
-            this.EnablementStateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablementStateOperation.Activate)
-            {
-                From = previous,
-                To = new EnablementState(this.IsActive)
+                this.EffectiveUtc = effectiveUtc ?? this.Clock.GetCurrentInstant().ToDateTimeUtc();
+                this.IsImmediateEffective = effectiveUtc == null;
+                if (this.IsImmediateEffective)
                 {
-                    EffectiveUtc = this.EffectiveUtc,
-                    IsImmediateEffective = this.IsImmediateEffective,
-                },
+                    this.IsActive = true;
+                }
             });
         }
 
@@ -58,26 +43,14 @@ namespace Perkify.Core
                 throw new InvalidOperationException("Already in inactive state.");
             }
 
-            var previous = new EnablementState(this.IsActive)
+            this.StateChangeExecutor.Execute(EnablementStateOperation.Deactivate, () =>
             {
-                EffectiveUtc = this.EffectiveUtc,
-                IsImmediateEffective = this.IsImmediateEffective,
-            };
-            this.EffectiveUtc = effectiveUtc ?? this.Clock.GetCurrentInstant().ToDateTimeUtc();
-            this.IsImmediateEffective = effectiveUtc == null;
-            if (this.IsImmediateEffective)
-            {
-                this.IsActive = false;
-            }
-
-            this.EnablementStateChanged?.Invoke(this, new EnablementStateChangeEventArgs(EnablementStateOperation.Deactivate)
-            {
-                From = previous,
-                To = new EnablementState(this.IsActive)
+                this.EffectiveUtc = effectiveUtc ?? this.Clock.GetCurrentInstant().ToDateTimeUtc();
+                this.IsImmediateEffective = effectiveUtc == null;
+                if (this.IsImmediateEffective)
                 {
-                    EffectiveUtc = this.EffectiveUtc,
-                    IsImmediateEffective = this.IsImmediateEffective,
-                },
+                    this.IsActive = false;
+                }
             });
         }
     }

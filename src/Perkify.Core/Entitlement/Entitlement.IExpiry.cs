@@ -4,6 +4,8 @@
 
 namespace Perkify.Core
 {
+    using ExpiryStateChangeEventArgs = StateChangeEventArgs<ExpiryState, ExpiryStateOperation>;
+
     /// <inheritdoc/>
     public partial class Entitlement : IExpiry
     {

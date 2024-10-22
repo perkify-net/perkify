@@ -4,6 +4,8 @@ namespace Perkify.Core.Tests
     using NodaTime.Testing;
     using NodaTime.Text;
 
+    using EnablementStateChangeEventArgs = StateChangeEventArgs<EnablementState, EnablementStateOperation>;
+
     public partial class EnablementTests
     {
         [Theory, CombinatorialData]
@@ -29,7 +31,7 @@ namespace Perkify.Core.Tests
             EnablementStateChangeEventArgs? stateChangedEvent = null;
             if (isStateChangedEventHooked)
             {
-                enablement.EnablementStateChanged += (sender, e) => { stateChangedEvent = e; };
+                enablement.StateChanged += (sender, e) => { stateChangedEvent = e; };
             }
 
             var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;
@@ -101,7 +103,7 @@ namespace Perkify.Core.Tests
             EnablementStateChangeEventArgs? stateChangedEvent = null;
             if (isStateChangedEventHooked)
             {
-                enablement.EnablementStateChanged += (sender, e) => { stateChangedEvent = e; };
+                enablement.StateChanged += (sender, e) => { stateChangedEvent = e; };
             }
 
             var effectiveUtc = effectiveUtcOffsetInHours != null ? nowUtc.AddHours(effectiveUtcOffsetInHours.Value) : (DateTime?)null;

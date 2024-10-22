@@ -4,6 +4,8 @@ namespace Perkify.Core.Tests
     using NodaTime.Testing;
     using NodaTime.Text;
 
+    using EnablementStateChangeEventArgs = StateChangeEventArgs<EnablementState, EnablementStateOperation>;
+
     public partial class EntitlementTests
     {
         [Theory, CombinatorialData]

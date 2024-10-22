@@ -40,7 +40,15 @@ namespace Perkify.Core
             // - Do not expose inner object to prevent state mutation with synchronization issues.
             // - Another solution is to use private getter, but it will raise CA1822 warning.
             get => throw new InvalidOperationException("Access denied (inner balance).");
-            init => this.balance = value;
+            init
+            {
+                this.balance = value;
+
+                if (this.balance != null)
+                {
+                    this.balance.StateChanged += (sender, args) => this.BalanceStateChanged?.Invoke(this, args);
+                }
+            }
         }
 
         /// <summary>
@@ -67,6 +75,7 @@ namespace Perkify.Core
                 if (this.expiry != null)
                 {
                     this.expiry.Clock = this.Clock;
+                    this.expiry.StateChanged += (sender, args) => this.ExpiryStateChanged?.Invoke(this, args);
                 }
             }
         }
@@ -95,7 +104,7 @@ namespace Perkify.Core
                 if (this.enablement != null)
                 {
                     this.enablement.Clock = this.Clock;
-                    this.enablement.EnablementStateChanged += (sender, args) => this.EnablementStateChanged?.Invoke(this, args);
+                    this.enablement.StateChanged += (sender, args) => this.EnablementStateChanged?.Invoke(this, args);
                 }
             }
         }
