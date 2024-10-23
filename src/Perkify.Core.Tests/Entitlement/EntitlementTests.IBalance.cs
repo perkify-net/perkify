@@ -4,6 +4,8 @@ namespace Perkify.Core.Tests
     using NodaTime.Testing;
     using NodaTime.Text;
 
+    using BalanceStateChangeEventArgs = StateChangeEventArgs<BalanceState, BalanceStateOperation>;
+
     public partial class EntitlementTests
     {
         [Theory, CombinatorialData]
@@ -46,7 +48,8 @@ namespace Perkify.Core.Tests
             [CombinatorialValues(50L)] long outgoing,
             [CombinatorialValues(null, +5)] int? expiryUtcOffsetInHoursIfHaving,
             [CombinatorialValues(1)] int autoRenewalIntervalInHours,
-            [CombinatorialValues(10L)] long delta
+            [CombinatorialValues(10L)] long delta,
+            [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
@@ -59,6 +62,11 @@ namespace Perkify.Core.Tests
                 Balance = balance,
                 Expiry = expiry,
             };
+            BalanceStateChangeEventArgs? stateChangedEvent = null;
+            if (isStateChangedEventHooked)
+            {
+                entitlement.BalanceStateChanged += (sender, e) => { stateChangedEvent = e; };
+            }
 
             entitlement.Topup(delta);
             var actualIncomingDelta = entitlement.Incoming - incoming;
@@ -68,6 +76,19 @@ namespace Perkify.Core.Tests
                 var actual = entitlement.ExpiryUtc - expiryUtc!.Value;
                 var expected = renewal.HasFlag(AutoRenewalMode.Adjust) ? TimeSpan.FromHours(autoRenewalIntervalInHours) : TimeSpan.Zero;
                 actual.Should().Be(expected);
+            }
+            if (isStateChangedEventHooked)
+            {
+                stateChangedEvent.Should().NotBeNull();
+                stateChangedEvent!.Operation.Should().Be(BalanceStateOperation.Topup);
+                stateChangedEvent!.From.BalanceExceedancePolicy.Should().Be(BalanceExceedancePolicy.Reject);
+                stateChangedEvent!.From.Threshold.Should().Be(threshold);
+                stateChangedEvent!.From.Incoming.Should().Be(incoming);
+                stateChangedEvent!.From.Outgoing.Should().Be(outgoing);
+                stateChangedEvent!.To.BalanceExceedancePolicy.Should().Be(BalanceExceedancePolicy.Reject);
+                stateChangedEvent!.To.Threshold.Should().Be(threshold);
+                stateChangedEvent!.To.Incoming.Should().Be(entitlement.Incoming);
+                stateChangedEvent!.To.Outgoing.Should().Be(outgoing);
             }
         }
 

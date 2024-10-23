@@ -1,5 +1,7 @@
 namespace Perkify.Core.Tests
 {
+    using BalanceStateChangeEventArgs = StateChangeEventArgs<BalanceState, BalanceStateOperation>;
+
     public partial class BalanceTests
     {
         [Theory, CombinatorialData]
@@ -14,13 +16,19 @@ namespace Perkify.Core.Tests
                 BalanceExceedancePolicy.Overdraft,
                 BalanceExceedancePolicy.Overflow,
                 BalanceExceedancePolicy.Reject
-            )] BalanceExceedancePolicy policy
+            )] BalanceExceedancePolicy policy,
+            [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
             var balance = new Balance(threshold, policy).WithBalance(incoming, outgoing);
             balance.Threshold.Should().Be(threshold);
             balance.Incoming.Should().Be(incoming);
             balance.Outgoing.Should().Be(outgoing);
+            BalanceStateChangeEventArgs? stateChangedEvent = null;
+            if (isStateChangedEventHooked)
+            {
+                balance.StateChanged += (sender, e) => { stateChangedEvent = e; };
+            }
 
             delta = incoming - threshold - outgoing - delta;
             var remained = balance.Deduct(delta);
@@ -28,6 +36,19 @@ namespace Perkify.Core.Tests
             balance.Outgoing.Should().Be(expected);
             balance.Overspending.Should().Be(0);
             remained.Should().Be(0);
+            if (isStateChangedEventHooked)
+            {
+                stateChangedEvent.Should().NotBeNull();
+                stateChangedEvent!.Operation.Should().Be(BalanceStateOperation.Deduct);
+                stateChangedEvent!.From.BalanceExceedancePolicy.Should().Be(policy);
+                stateChangedEvent!.From.Threshold.Should().Be(threshold);
+                stateChangedEvent!.From.Incoming.Should().Be(incoming);
+                stateChangedEvent!.From.Outgoing.Should().Be(outgoing);
+                stateChangedEvent!.To.BalanceExceedancePolicy.Should().Be(policy);
+                stateChangedEvent!.To.Threshold.Should().Be(threshold);
+                stateChangedEvent!.To.Incoming.Should().Be(incoming);
+                stateChangedEvent!.To.Outgoing.Should().Be(expected);
+            }
         }
 
         [Theory, CombinatorialData]

@@ -4,6 +4,8 @@ namespace Perkify.Core.Tests
     using NodaTime.Testing;
     using NodaTime.Text;
 
+    using ExpiryStateChangeEventArgs = StateChangeEventArgs<ExpiryState, ExpiryStateOperation>;
+
     public partial class EntitlementTests
     {
         [Theory, CombinatorialData]
@@ -67,7 +69,8 @@ namespace Perkify.Core.Tests
             [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString,
             [CombinatorialValues(+5)] int expiryUtcOffsetInHours,
             [CombinatorialValues(2)] int gracePeriodInHours,
-            [CombinatorialValues(1)] int renewalIntervalInHours
+            [CombinatorialValues(1)] int renewalIntervalInHours,
+            [CombinatorialValues(true, false)] bool isStateChangedEventHooked
         )
         {
             var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
@@ -80,9 +83,24 @@ namespace Perkify.Core.Tests
             {
                 Expiry = expiry,
             };
+            ExpiryStateChangeEventArgs? stateChangedEvent = null;
+            if (isStateChangedEventHooked)
+            {
+                entitlement.ExpiryStateChanged += (sender, e) => { stateChangedEvent = e; };
+            }
+
             entitlement.Renew($"PT{renewalIntervalInHours}H!");
             var actual = entitlement.ExpiryUtc - expiryUtc;
             actual.Hours.Should().Be(renewalIntervalInHours);
+            if (isStateChangedEventHooked)
+            {
+                stateChangedEvent.Should().NotBeNull();
+                stateChangedEvent!.Operation.Should().Be(ExpiryStateOperation.Renew);
+                stateChangedEvent!.From.ExpiryUtc.Should().Be(expiryUtc);
+                stateChangedEvent!.From.GracePeriod.Should().Be(grace);
+                stateChangedEvent!.To.ExpiryUtc.Should().Be(entitlement.ExpiryUtc);
+                stateChangedEvent!.To.GracePeriod.Should().Be(grace);
+            }
         }
 
         [Theory, CombinatorialData]
