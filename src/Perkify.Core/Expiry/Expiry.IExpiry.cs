@@ -52,15 +52,20 @@ namespace Perkify.Core
                 throw new InvalidOperationException("Negative ISO8601 duration.");
             }
 
-            this.ExpiryUtc = nextExpiryUtc;
-            if (interval != null)
+            this.StateChangeExecutor.Execute(ExpiryStateOperation.Renew, () =>
             {
-                this.Renewal = renewal;
-            }
+                this.ExpiryUtc = nextExpiryUtc;
+                if (interval != null)
+                {
+                    this.Renewal = renewal;
+                }
+            });
         }
 
         /// <inheritdoc/>
-        public void AdjustTo(DateTime expiryUtc)
-            => this.ExpiryUtc = expiryUtc;
+        public void AdjustTo(DateTime expiryUtc) => this.StateChangeExecutor.Execute(ExpiryStateOperation.Adjust, () =>
+        {
+            this.ExpiryUtc = expiryUtc;
+        });
     }
 }

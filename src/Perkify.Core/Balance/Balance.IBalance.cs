@@ -39,10 +39,13 @@ namespace Perkify.Core
                 throw new ArgumentOutOfRangeException(nameof(delta), "Amount must be positive or zero.");
             }
 
-            checked
+            this.StateChangeExecutor.Execute(BalanceStateOperation.Topup, () =>
             {
-                this.Incoming += delta;
-            }
+                checked
+                {
+                    this.Incoming += delta;
+                }
+            });
         }
 
         /// <inheritdoc/>
@@ -61,10 +64,13 @@ namespace Perkify.Core
             var maximum = this.BalanceExceedancePolicy.GetDeductibleAllowance(this.Gross, this.Threshold);
             var processed = delta;
             var remaining = this.BalanceExceedancePolicy.Deduct(ref processed, maximum);
-            checked
+            this.StateChangeExecutor.Execute(BalanceStateOperation.Deduct, () =>
             {
-                this.Outgoing += processed;
-            }
+                checked
+                {
+                    this.Outgoing += processed;
+                }
+            });
 
             return remaining;
         }
@@ -72,18 +78,24 @@ namespace Perkify.Core
         /// <inheritdoc/>
         public void Adjust(long? incoming, long? outgoing)
         {
-            checked
+            this.StateChangeExecutor.Execute(BalanceStateOperation.Adjust, () =>
             {
-                this.Incoming += incoming ?? 0;
-                this.Outgoing += outgoing ?? 0;
-            }
+                checked
+                {
+                    this.Incoming += incoming ?? 0;
+                    this.Outgoing += outgoing ?? 0;
+                }
+            });
         }
 
         /// <inheritdoc/>
         public void Clear()
         {
-            this.Incoming = 0;
-            this.Outgoing = 0;
+            this.StateChangeExecutor.Execute(BalanceStateOperation.Adjust, () =>
+            {
+                this.Incoming = 0;
+                this.Outgoing = 0;
+            });
         }
     }
 }
