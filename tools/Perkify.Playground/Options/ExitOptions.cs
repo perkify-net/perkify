@@ -1,9 +1,8 @@
-﻿namespace Perkify.Demo
-{
-    using CommandLine;
+﻿namespace Perkify.Playgournd;
 
-    [Verb("exit", HelpText = "Exit.")]
-    public class ExitOptions
-    {
-    }
+using CommandLine;
+
+[Verb("exit", HelpText = "Exit.")]
+public class ExitOptions
+{
 }

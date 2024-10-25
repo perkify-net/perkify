@@ -1,8 +1,6 @@
-﻿namespace Perkify.Demo
+﻿namespace Perkify.Playgournd
 {
     using NodaTime;
-    using NodaTime.Extensions;
-    using NodaTime.Text;
     using Spectre.Console;
 
     using Perkify.Core;

@@ -1,17 +1,15 @@
 ﻿// <copyright file="Entitlement.IEligible.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
+namespace Perkify.Core;
 
-namespace Perkify.Core
+/// <inheritdoc/>
+public partial class Entitlement : IEligible
 {
     /// <inheritdoc/>
-    public partial class Entitlement : IEligible
-    {
-        /// <inheritdoc/>
-        public virtual bool IsEligible =>
-            (this.balance?.IsEligible ?? true)
-            && (this.expiry?.IsEligible ?? true)
-            && (this.enablement?.IsEligible ?? true)
-            && (this.Prerequesite?.IsEligible ?? true);
-    }
+    public virtual bool IsEligible =>
+        (this.balance?.IsEligible ?? true)
+        && (this.expiry?.IsEligible ?? true)
+        && (this.enablement?.IsEligible ?? true)
+        && (this.Prerequesite?.IsEligible ?? true);
 }

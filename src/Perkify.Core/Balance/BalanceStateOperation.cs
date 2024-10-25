@@ -1,27 +1,25 @@
 ﻿// <copyright file="BalanceStateOperation.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
+namespace Perkify.Core;
 
-namespace Perkify.Core
+/// <summary>
+/// Represents the operations that can be performed on a balance state.
+/// </summary>
+public enum BalanceStateOperation
 {
     /// <summary>
-    /// Represents the operations that can be performed on a balance state.
+    /// Represents a top-up operation.
     /// </summary>
-    public enum BalanceStateOperation
-    {
-        /// <summary>
-        /// Represents a top-up operation.
-        /// </summary>
-        Topup,
+    Topup,
 
-        /// <summary>
-        /// Represents a deduction operation.
-        /// </summary>
-        Deduct,
+    /// <summary>
+    /// Represents a deduction operation.
+    /// </summary>
+    Deduct,
 
-        /// <summary>
-        /// Represents an adjustment operation.
-        /// </summary>
-        Adjust,
-    }
+    /// <summary>
+    /// Represents an adjustment operation.
+    /// </summary>
+    Adjust,
 }
