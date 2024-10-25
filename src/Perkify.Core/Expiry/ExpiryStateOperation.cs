@@ -1,27 +1,25 @@
 ﻿// <copyright file="ExpiryStateOperation.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
+namespace Perkify.Core;
 
-namespace Perkify.Core
+/// <summary>
+/// Represents the operations that can be performed on an expiry state.
+/// </summary>
+public enum ExpiryStateOperation
 {
     /// <summary>
-    /// Represents the operations that can be performed on an expiry state.
+    /// Renew the expiry state.
     /// </summary>
-    public enum ExpiryStateOperation
-    {
-        /// <summary>
-        /// Renew the expiry state.
-        /// </summary>
-        Renew,
+    Renew,
 
-        /// <summary>
-        /// Adjust the expiry state.
-        /// </summary>
-        Adjust,
+    /// <summary>
+    /// Adjust the expiry state.
+    /// </summary>
+    Adjust,
 
-        /// <summary>
-        /// Setup the expiry state.
-        /// </summary>
-        Setup,
-    }
+    /// <summary>
+    /// Setup the expiry state.
+    /// </summary>
+    Setup,
 }
