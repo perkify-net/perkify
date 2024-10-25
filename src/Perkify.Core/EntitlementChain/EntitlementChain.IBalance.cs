@@ -9,9 +9,9 @@ namespace Perkify.Core
     {
         /// <inheritdoc/>
         public long Threshold
-            => this.entitlements
+            => checked(this.entitlements
                 .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
-                .Sum(entitlement => entitlement.Threshold);
+                .Sum(entitlement => entitlement.Threshold));
 
         /// <inheritdoc/>
         public BalanceExceedancePolicy BalanceExceedancePolicy
@@ -30,29 +30,34 @@ namespace Perkify.Core
                 .Max();
 
         /// <inheritdoc/>
-        public long Incoming => this.entitlements
-            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
-            .Sum(entitlement => entitlement.Incoming);
+        public long Incoming
+            => checked(this.entitlements
+                .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+                .Sum(entitlement => entitlement.Incoming));
 
         /// <inheritdoc/>
-        public long Outgoing => this.entitlements
-            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
-            .Sum(entitlement => entitlement.Outgoing);
+        public long Outgoing
+            => checked(this.entitlements
+                .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+                .Sum(entitlement => entitlement.Outgoing));
 
         /// <inheritdoc/>
-        public long Gross => this.entitlements
-            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
-            .Sum(entitlement => entitlement.Gross);
+        public long Gross
+            => checked(this.entitlements
+                .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+                .Sum(entitlement => entitlement.Gross));
 
         /// <inheritdoc/>
-        public long Available => this.entitlements
-            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
-            .Sum(entitlement => entitlement.Available);
+        public long Available
+            => checked(this.entitlements
+                .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+                .Sum(entitlement => entitlement.Available));
 
         /// <inheritdoc/>
-        public long Overspending => this.entitlements
-            .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
-            .Sum(entitlement => entitlement.Overspending);
+        public long Overspending
+            => checked(this.entitlements
+                .Where(entitlement => !this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.EligibleOnlyView) || entitlement.IsEligible)
+                .Sum(entitlement => entitlement.Overspending));
 
         /// <inheritdoc/>
         public void Topup(long delta)
