@@ -28,7 +28,7 @@ public class StateChangeExecutorTests
         mock.Executor.Execute(typeof(StateChangeExecutorTests), () => mock.State = expected);
         mock.State.Should().Be(expected);
         stateChangedEvent.Should().NotBeNull();
-        stateChangedEvent!.Operation.Should().Be(typeof(StateChangeExecutorTests));
+        stateChangedEvent!.Operation.Should().Be<StateChangeExecutorTests>();
         stateChangedEvent!.From.Should().Be(0L);
         stateChangedEvent!.To.Should().Be(expected);
     }
