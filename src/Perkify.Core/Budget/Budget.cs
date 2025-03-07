@@ -6,7 +6,10 @@ namespace Perkify.Core;
 /// <summary>
 /// To control the budget for all incoming/outgoing events.
 /// </summary>
-public class Budget(long upperLimit, long usage = 0, DateTime nextResetUtc = default)
+/// <param name="upperLimit">The upper limit of the budget.</param>
+/// <param name="usage">The current usage amount.</param>
+/// <param name="nextResetUtc">The next UTC reset time for budget smoothing.</param>
+public partial class Budget(long upperLimit, long usage = 0, DateTime nextResetUtc = default)
     : IEligible
 {
     /// <summary>
@@ -33,59 +36,4 @@ public class Budget(long upperLimit, long usage = 0, DateTime nextResetUtc = def
     /// Gets the current usage amount.
     /// </summary>
     public long Usage { get; private set; } = usage;
-
-    /// <inheritdoc/>
-    public bool IsEligible => this.Usage <= this.UpperLimit;
-
-    /// <summary>
-    /// Verify the budget usage and return the amount to be deducted.
-    /// </summary>
-    /// <param name="eventUtc">Event timestamp in UTC.</param>
-    /// <param name="amount">Amount to deduct.</param>
-    /// <returns>Actual deductible amount.</returns>
-    public decimal VerifyBudgetUsage(DateTime eventUtc, long amount)
-    {
-        if (amount < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be non-negative");
-        }
-
-        // Reset usage for budget smooth when required
-        if (this.SmoothInterval != TimeSpan.Zero && eventUtc >= this.NextResetUtc)
-        {
-            this.NextResetUtc = eventUtc.Add(this.SmoothInterval);
-            this.Usage = 0;
-        }
-
-        // Accumulate usage if budget limit not exceeded
-        var available = this.UpperLimit - this.Usage;
-        if (available >= amount)
-        {
-            this.Usage += amount;
-            return amount;
-        }
-
-        // Handle budget exceeded
-        switch (this.Policy)
-        {
-            case BalanceExceedancePolicy.Reject:
-                throw new BudgetExceededException($"Budget exceeded: {this.UpperLimit}");
-
-            case BalanceExceedancePolicy.Overflow:
-                this.Usage += available;
-                return available;
-
-            case BalanceExceedancePolicy.Overdraft:
-                if (this.Usage >= this.UpperLimit)
-                {
-                    throw new BudgetExceededException($"Budget exceeded: {this.UpperLimit}");
-                }
-
-                this.Usage += amount;
-                return amount;
-
-            default:
-                throw new InvalidOperationException($"Unsupported policy: {this.Policy}");
-        }
-    }
 }

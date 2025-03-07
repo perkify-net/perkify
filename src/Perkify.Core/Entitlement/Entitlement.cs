@@ -124,6 +124,16 @@ public partial class Entitlement(AutoRenewalMode autorenewal = AutoRenewalMode.D
     public AutoRenewalMode AutoRenewalMode { get; } = autorenewal;
 
     /// <summary>
+    /// Gets the composite budget for income management.
+    /// </summary>
+    public CompositeBudget IncomeBudget { get; init; } = new CompositeBudget();
+
+    /// <summary>
+    /// Gets the composite budget for outgoing management.
+    /// </summary>
+    public CompositeBudget OutgoingBudget { get; init; } = new CompositeBudget();
+
+    /// <summary>
     /// Sets a new clock instance for the entitlement and updates the clock for expiry and enablement if they exist.
     /// </summary>
     /// <param name="clock">The new clock instance to be used. If null, the system clock will be used.</param>
@@ -143,6 +153,28 @@ public partial class Entitlement(AutoRenewalMode autorenewal = AutoRenewalMode.D
         }
 
         this.Clock = clock;
+        return this;
+    }
+
+    /// <summary>
+    /// Bind a budget strategy for income management.
+    /// </summary>
+    /// <param name="budget">The income budget strategy to add.</param>
+    /// <returns>The updated entitlement instance.</returns>
+    public Entitlement WithIncomeBudget(Budget budget)
+    {
+        this.IncomeBudget.Bind(budget);
+        return this;
+    }
+
+    /// <summary>
+    /// Bind a budget strategy for outgoing management.
+    /// </summary>
+    /// <param name="budget">The outgoing budget strategy to add.</param>
+    /// <returns>The updated entitlement instance.</returns>
+    public Entitlement WithOutgoingBudget(Budget budget)
+    {
+        this.OutgoingBudget.Bind(budget);
         return this;
     }
 }
