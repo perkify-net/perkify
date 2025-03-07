@@ -31,7 +31,7 @@ public partial class Balance : IBalance
     public long Overspending => this.Gross >= this.Threshold ? 0L : this.Threshold - this.Gross;
 
     /// <inheritdoc/>
-    public void Topup(long delta)
+    public long Topup(long delta)
     {
         if (delta < 0)
         {
@@ -45,6 +45,8 @@ public partial class Balance : IBalance
                 this.Incoming += delta;
             }
         });
+
+        return delta;
     }
 
     /// <inheritdoc/>

@@ -52,8 +52,9 @@ public interface IBalance
     /// Topup the balance with incoming revenue.
     /// </summary>
     /// <param name="delta">The amount to top up the balance.</param>
+    /// <returns>The actual topup amount, equals to delta amount if no budget control is applied.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the delta is negative.</exception>
-    public void Topup(long delta);
+    public long Topup(long delta);
 
     /// <summary>
     /// Spend the balance with outgoing expenses.

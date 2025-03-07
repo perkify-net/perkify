@@ -59,12 +59,15 @@ public partial class EntitlementChain : IBalance
             .Sum(entitlement => entitlement.Overspending));
 
     /// <inheritdoc/>
-    public void Topup(long delta)
+    public long Topup(long delta)
     {
         var nowUtc = this.Clock.GetCurrentInstant().ToDateTimeUtc();
         var expiryUtc = this.EntitlementChainPolicy.HasFlag(EntitlementChainPolicy.WithAutoRenewalExpiry) ? nowUtc : (DateTime?)null;
         var entitlement = this.Factory.Invoke(delta, expiryUtc, this.Clock);
         this.entitlements = this.entitlements.Add(entitlement);
+
+        // TODO: Fix amount gap if having budget control
+        return delta;
     }
 
     /// <inheritdoc/>
