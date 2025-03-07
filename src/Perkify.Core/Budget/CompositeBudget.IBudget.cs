@@ -9,7 +9,7 @@ using System.Linq;
 public partial class CompositeBudget : IBudget
 {
     /// <inheritdoc/>
-    public bool IsPaused => this.budgets.Any(s => s.IsPaused);
+    public bool IsPaused => budgets.Any() ? this.budgets.Any(s => s.IsPaused) : false;
 
     /// <inheritdoc/>
     public long Remaining => budgets.Any() ? this.budgets.Min(s => s.Remaining) : 0L;
@@ -17,16 +17,16 @@ public partial class CompositeBudget : IBudget
     /// <inheritdoc/>
     public long Verify(DateTime eventUtc, long amount, bool precheck = false)
     {
-        // TODO: fix if-throw pattern
-        if (amount <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be positive");
-        }
-
         // If no budget strategies are configured, return the amount directly
         if (!this.budgets.Any())
         {
             return amount;
+        }
+
+        // TODO: fix if-throw pattern
+        if (amount <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be positive");
         }
 
         // TODO: fix if-throw pattern
