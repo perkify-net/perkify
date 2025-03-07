@@ -70,10 +70,6 @@ public partial class EntitlementTests
                 () => _ = entitlement.Outgoing,
                 () => _ = entitlement.Gross,
                 () => _ = entitlement.Overspending,
-                () => entitlement.Topup(0L),
-                () => _ = entitlement.Deduct(0L),
-                () => entitlement.Adjust(null, null),
-                () => entitlement.Clear(),
                 // OPs: IExpiry
                 () => _ = entitlement.ExpiryUtc,
                 () => _ = entitlement.GracePeriod,
@@ -91,12 +87,46 @@ public partial class EntitlementTests
                 () => entitlement.Deactivate(),
                 () => entitlement.Activate(),
         };
-
+    
         foreach (var operation in operations)
         {
             operation.Should()
                 .Throw<NullReferenceException>()
                 .WithMessage("Object reference not set to an instance of an object.");
+        }
+    }
+
+    [Theory, CombinatorialData]
+    public void TestCreateEntitlementBalanceNotInitialized
+    (
+        [CombinatorialValues(AutoRenewalMode.None)] AutoRenewalMode renewal,
+        [CombinatorialValues("2024-10-09T15:00:00Z")] string nowUtcString
+    )
+    {
+        var nowUtc = InstantPattern.General.Parse(nowUtcString).Value.ToDateTimeUtc();
+        var clock = new FakeClock(nowUtc.ToInstant());
+        var entitlement = new Entitlement(renewal, clock);
+        entitlement.AutoRenewalMode.Should().Be(renewal);
+        entitlement.Clock.GetCurrentInstant().ToDateTimeUtc().Should().Be(nowUtc);
+
+        entitlement.HasBalance.Should().BeFalse();
+        entitlement.HasExpiry.Should().BeFalse();
+        entitlement.HasEnablement.Should().BeFalse();
+        entitlement.Prerequesite.Should().BeNull();
+
+        var operations = new Action[]
+        {
+                // OPs: IBalance
+                () => entitlement.Topup(0L),
+                () => _ = entitlement.Deduct(0L),
+                () => entitlement.Adjust(null, null),
+                () => entitlement.Clear(),
+        };
+        foreach (var operation in operations)
+        {
+            operation.Should()
+                .Throw<InvalidOperationException>()
+                .WithMessage("Balance is not initialized.");
         }
     }
 
