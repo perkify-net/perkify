@@ -12,7 +12,7 @@ public partial class CompositeBudget : IBudget
     public bool IsPaused => this.budgets.Any(s => s.IsPaused);
 
     /// <inheritdoc/>
-    public long Remaining => this.budgets.Min(s => s.Remaining);
+    public long Remaining => budgets.Any() ? this.budgets.Min(s => s.Remaining) : 0L;
 
     /// <inheritdoc/>
     public long Verify(DateTime eventUtc, long amount, bool precheck = false)
@@ -21,6 +21,12 @@ public partial class CompositeBudget : IBudget
         if (amount <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be positive");
+        }
+
+        // If no budget strategies are configured, return the amount directly
+        if (!this.budgets.Any())
+        {
+            return amount;
         }
 
         // TODO: fix if-throw pattern
