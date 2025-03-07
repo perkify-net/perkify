@@ -39,7 +39,7 @@ public partial class Entitlement : IBalance
         => this.balance!.Overspending;
 
     /// <inheritdoc/>
-    public void Topup(long delta)
+    public long Topup(long delta)
     {
         this.balance!.Topup(delta);
 
@@ -47,6 +47,8 @@ public partial class Entitlement : IBalance
         {
             this.expiry?.Renew();
         }
+
+        return delta;
     }
 
     /// <inheritdoc/>

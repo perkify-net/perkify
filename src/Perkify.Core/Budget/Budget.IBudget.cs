@@ -65,7 +65,7 @@ public partial class Budget : IBudget
                 {
                     this.Usage += amount;
                 }
-                
+
                 return amount;
 
             default:
