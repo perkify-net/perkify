@@ -99,7 +99,7 @@ public partial class Entitlement : IBalance
         // TODO: Fix if-throw pattern
         if (this.balance == null)
         {
-            throw new InvalidOperationException("Balance is not initialized");
+            throw new InvalidOperationException("Balance is not initialized.");
         }
     }
 }
