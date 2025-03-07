@@ -1,0 +1,91 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Publish NuGet Package (.NET)
+
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      deployments: write
+      packages: write
+
+    steps:
+    # Prepare: Enlist + Restore + Build + Test
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release -p:Deterministic=true -p:ContinuousIntegrationBuild=true -v normal --no-restore
+    - name: Test
+      run: dotnet test -c Release -v normal --no-build
+
+    # Extract Version Tag
+    - name: Extract version number
+      run: |
+        # Extract version number & suffix from tag
+        VTAG=${GITHUB_REF#refs/tags/}
+        VERSION=${VTAG#v}
+        VERSION_SUFFIX=${VERSION#*-}
+        if [[ "$VERSION" == "$VERSION_SUFFIX" ]]; then
+          VERSION_SUFFIX=""
+        fi
+        echo "VTAG=${VTAG}" >> $GITHUB_ENV
+        echo "VERSION=${VERSION}" >> $GITHUB_ENV
+        echo "VERSION_SUFFIX=${VERSION_SUFFIX}" >> $GITHUB_ENV
+
+        # Extract Release Notes from description of the tag
+        RELEASE_NOTES=$(git tag -l --format='%(contents)' "$VTAG")
+        RELEASE_NOTES=${RELEASE_NOTES:-"No release notes found for tag $VTAG"}
+        echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+        echo "$RELEASE_NOTES" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    # Publish NuGet package: Pack + Push
+    - name: Pack Nuget package
+      run: dotnet pack -c Release --no-build -o ./artifacts -p:PackageVersion=${{ env.VERSION }}
+    - name: Push Nuget package
+      run: dotnet nuget push ./artifacts/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      if: env.VERSION_SUFFIX == '' || env.VERSION_SUFFIX == 'pre'
+    - name: Push Github package
+      run: dotnet nuget push ./artifacts/*.nupkg -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json -k ${{ secrets.GH_PAT }} --skip-duplicate
+      if: env.VERSION_SUFFIX != '' && env.VERSION_SUFFIX != 'pre'
+
+    # Publish Playground CLI: Publish + Zip + Release
+    - name: Publish Binaries
+      run: |
+        dotnet publish -c Release -r linux-x64
+        dotnet publish -c Release -r osx-arm64
+        dotnet publish -c Release -r win-x64
+    - name: Archive Binaries
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/artifacts
+        tar -czvf $GITHUB_WORKSPACE/artifacts/playground-linux.x64-v${{ env.VERSION }}.tar.gz -C ./publish/linux-x64/Flurl.Http.Spec.Playground .
+        tar -czvf $GITHUB_WORKSPACE/artifacts/playground-osx-arm64-v${{ env.VERSION }}.tar.gz -C ./publish/osx-arm64/Flurl.Http.Spec.Playground .
+        cd ./publish/win-x64/Flurl.Http.Spec.Playground
+        zip -r $GITHUB_WORKSPACE/artifacts/playground-win.x64-v${{ env.VERSION }}.zip .
+    - name: Release Binaries
+      uses: softprops/action-gh-release@v2
+      with:
+        name: Release ${{ env.VERSION }}
+        body: |
+          ## What's New in ${{ env.VERSION }}
+          ${{ env.RELEASE_NOTES }}
+          ## Available Artifacts
+          - Windows(x64)
+          - Linux(x64)
+          - macOS(arm64).
+        files: |
+          ./artifacts/playground-*.zip
+          ./artifacts/playground-*.tar.gz 
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

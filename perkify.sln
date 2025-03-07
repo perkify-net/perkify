@@ -45,9 +45,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 		.github\ISSUE_TEMPLATE\feature_request.md = .github\ISSUE_TEMPLATE\feature_request.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{8B93DCF6-465A-48AC-B82A-ECC4CF99400E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tool", "tool", "{8B93DCF6-465A-48AC-B82A-ECC4CF99400E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Playground", "tools\Perkify.Playground\Perkify.Playground.csproj", "{39EB5154-9FFD-451B-B2E8-E8DCE20CA9E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perkify.Playground", "tool\Perkify.Playground\Perkify.Playground.csproj", "{39EB5154-9FFD-451B-B2E8-E8DCE20CA9E2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{9C9E6228-7CE2-402E-8034-5D3A677D3621}"
 	ProjectSection(SolutionItems) = preProject

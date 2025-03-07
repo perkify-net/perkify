@@ -1,0 +1,50 @@
+<!-- Package authoring best practices: -->
+<!-- https://learn.microsoft.com/en-us/nuget/create-packages/package-authoring-best-practices -->
+
+<Project>
+
+  <!-- Flags to publish package & document -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Version: Overwrite by Git tag version within Github workflow -->
+    <Version>0.1.0</Version>
+    <VersionPrefix></VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+
+    <!-- Copyright & License -->
+    <Authors>@nemossi</Authors>
+    <Company>Microsoft</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+
+    <!-- Project Home & Git Repository -->
+    <PackageProjectUrl>https://github.com/perkify-net/perkify</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/perkify-net/perkify</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- Source Linking -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <!-- Sharing Symbols -->
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!-- Deterministic Build Enforcement -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <!-- Include Debug Symbols: .pdb files-->
+  <ItemGroup Label="Nuget" Condition="'$(ProjectType)' == 'Package'">
+    <None Include="bin\$(Configuration)\$(TargetFramework)\*.pdb" Pack="true" PackagePath="lib\$(TargetFramework)\" />
+  </ItemGroup>
+
+</Project>

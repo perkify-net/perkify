@@ -1,0 +1,51 @@
+<Project>
+
+  <!-- Console CLI -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>    
+    <IsPublishable>true</IsPublishable>
+  </PropertyGroup>
+
+  <!-- Self-Contained & Single File -->
+  <PropertyGroup>
+    <PublishSelfContained>true</PublishSelfContained>
+    <ValidateExecutableReferencesMatchSelfContained>true</ValidateExecutableReferencesMatchSelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>
+
+  <!-- RuntimeIdentifiers, OS Platform Specific -->
+  <!-- https://learn.microsoft.com/en-us/dotnet/core/rid-catalog -->
+  <PropertyGroup>
+    <RuntimeIdentifiers>win-x64;linux-x64;osx-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+    <PublishDir>$(Home)/publish/win-x64/$(MSBuildProjectName)</PublishDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
+    <PublishDir>$(Home)/publish/linux-x64/$(MSBuildProjectName)</PublishDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'osx-arm64'">
+    <PublishDir>$(Home)/publish/osx-arm64/$(MSBuildProjectName)</PublishDir>
+  </PropertyGroup>
+
+  <!-- Optimize Release Size -->
+  <PropertyGroup>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimUnusedDependencies>true</TrimUnusedDependencies>
+
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+  </PropertyGroup>
+
+  <!-- Optimize Loading & Executing Performance -->
+  <PropertyGroup>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <!-- TODO: <PublishAot>true</PublishAot> -->
+  </PropertyGroup>
+
+</Project>

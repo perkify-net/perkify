@@ -20,10 +20,10 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
+    # Prepare: Enlist + Restore + Build
     - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -32,9 +32,13 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build -c Release -p:Deterministic=true -p:ContinuousIntegrationBuild=true -v normal --no-restore
+
+    # Test with Code Coverage
     - name: Test with code coverage
-      run: dotnet test --no-build --configuration Release --verbosity normal --settings ./.build/xunit.coverlet.runsettings --results-directory ./TestResults
+      run: dotnet test -c Release -v normal -s ./.build/xunit.coverlet.runsettings --results-directory ./TestResults --no-build
+
+    # Test Report
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
     - name: Generate code coverage report
@@ -44,3 +48,12 @@ jobs:
       with:
         name: coverage-report
         path: ./coveragereport
+    - name: Upload coverage report to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        fail_ci_if_error: true
+        files: ./TestResults/**/coverage.cobertura.xml
+        flags: unittests
+        name: codecov-umbrella
+        verbose: true
+        token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,0 +1,56 @@
+<Project>
+
+  <!--Source, production -->
+  <ItemGroup Label="Assets" Condition="'$(ProjectType)' == 'Source'">
+    <PackageReference Include="Throw" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
+    <Using Include="System.Globalization" />
+    <Using Include="Throw" />
+  </ItemGroup>
+
+  <!-- Test, non-production -->
+  <ItemGroup Label="Assets" Condition="'$(ProjectType)' == 'Test'">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="ReportGenerator" />
+    <PackageReference Include="xunit.analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Moq.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit" />
+    <PackageReference Include="Xunit.Combinatorial" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="NodaTime" />
+    <PackageReference Include="NodaTime.Testing" />
+    <Using Include="System.Globalization" />
+    <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Moq" />
+  </ItemGroup>
+
+  <!-- Tool, non-production -->
+  <ItemGroup Label="Assets" Condition="'$(ProjectType)' == 'Tool'">
+    <PackageReference Include="Throw" />
+    <Using Include="System.Diagnostics.CodeAnalysis" />
+    <Using Include="System.Globalization" />
+    <Using Include="Throw" />
+  </ItemGroup>
+
+</Project>

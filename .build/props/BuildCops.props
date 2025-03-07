@@ -1,0 +1,48 @@
+<Project>
+
+  <!-- Source, production -->
+  <PropertyGroup Label="BuildCops" Condition="'$(ProjectType)' == 'Source'">
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <NoWarn>
+      <!-- Ignore these IDE warnings for keyword order rules conflicts between IDE0036 and SA1206. -->
+      IDE0036;
+      <!--Ignore these SA warnings for bracket spacing (to support bracket/parameter alignment). -->
+      SA1009;SA1110;SA1111;
+      <!--TODO: Ignore these CA/SA warnings (for documentation styles) before public interfaces are stable. -->
+      <!-- CS1591;SA1600;SA1601;SA1602;SA1633; -->
+    </NoWarn>
+  </PropertyGroup>
+  <ItemGroup Label="BuildCops" Condition="'$(ProjectType)' == 'Source'">
+    <PackageReference Include="StyleCop.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <AdditionalFiles Include="$(BuildDir)/stylecop.json" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Metrics">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>    
+  </ItemGroup>
+
+  <!-- Test, non-production -->
+  <PropertyGroup Label="BuildCops" Condition="'$(ProjectType)' == 'Test'">
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <NoWarn></NoWarn>
+  </PropertyGroup>
+
+  <!-- Tool, non-production -->
+  <PropertyGroup Label="BuildCops" Condition="'$(ProjectType)' == 'Tool'">
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-minimal</AnalysisLevel>
+    <NoWarn></NoWarn>
+  </PropertyGroup>
+
+</Project>
