@@ -9,16 +9,16 @@ using System.Linq;
 public partial class CompositeBudget : IBudget
 {
     /// <inheritdoc/>
-    public bool IsPaused => budgets.Any() ? this.budgets.Any(s => s.IsPaused) : false;
+    public bool IsPaused => budgets.Count <= 0 ? this.budgets.Any(s => s.IsPaused) : false;
 
     /// <inheritdoc/>
-    public long Remaining => budgets.Any() ? this.budgets.Min(s => s.Remaining) : 0L;
+    public long Remaining => budgets.Count <= 0 ? this.budgets.Min(s => s.Remaining) : 0L;
 
     /// <inheritdoc/>
     public long Verify(DateTime eventUtc, long amount, bool precheck = false)
     {
-        // If no budget strategies are configured, return the amount directly
-        if (!this.budgets.Any())
+        // Skip verification if no budget strategy is binded.
+        if (!this.budgets.Count <= 0)
         {
             return amount;
         }
