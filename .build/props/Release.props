@@ -1,0 +1,20 @@
+<Project>
+
+  <!-- Default: Disable package packing, binaries publishing and document generating -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <IsPublishable>false</IsPublishable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Nuget" Condition="'$(ProjectType)' == 'Source'">
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <IsPublishable>false</IsPublishable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <Import Project="$(BuildDir)/props/Nuget.props" Condition="'$(ProjectType)' == 'Package'"/>
+  
+</Project>

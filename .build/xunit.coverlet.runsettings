@@ -16,6 +16,8 @@
     <DataCollectors>
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
+          <Format>cobertura</Format>
+          <OutputDirectory>./TestResults/</OutputDirectory>
           <!-- Test coverage for all runtime/core projects under SourceDir -->
           <Include>
 			      <ModulePath>.*\\src\\.*.dll</ModulePath>
