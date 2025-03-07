@@ -9,14 +9,20 @@ using System.Linq;
 public partial class CompositeBudget : IBudget
 {
     /// <inheritdoc/>
-    public bool IsPaused => this.budgets.Any(s => s.IsPaused);
+    public bool IsPaused => this.budgets.Count > 0 ? this.budgets.Any(s => s.IsPaused) : false;
 
     /// <inheritdoc/>
-    public long Remaining => this.budgets.Min(s => s.Remaining);
+    public long Remaining => this.budgets.Count > 0 ? this.budgets.Min(s => s.Remaining) : 0L;
 
     /// <inheritdoc/>
     public long Verify(DateTime eventUtc, long amount, bool precheck = false)
     {
+        // Skip verification if no budget strategy is binded.
+        if (this.budgets.Count <= 0)
+        {
+            return amount;
+        }
+
         // TODO: fix if-throw pattern
         if (amount <= 0)
         {

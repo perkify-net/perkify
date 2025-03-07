@@ -41,32 +41,41 @@ public partial class Entitlement : IBalance
     /// <inheritdoc/>
     public long Topup(long delta)
     {
-        this.balance!.Topup(delta);
+        this.CheckBalanceInitialized();
 
+        var nowUtc = this.Clock.GetCurrentInstant().ToDateTimeUtc();
+        var allowed = this.IncomeBudget.Verify(nowUtc, delta, precheck: true);
+        var result = this.balance!.Topup(allowed);
         if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Topup))
         {
             this.expiry?.Renew();
         }
 
-        return delta;
+        this.IncomeBudget.Verify(nowUtc, result, precheck: false);
+        return result;
     }
 
     /// <inheritdoc/>
     public long Deduct(long delta)
     {
-        var result = this.balance!.Deduct(delta);
+        this.CheckBalanceInitialized();
 
+        var nowUtc = this.Clock.GetCurrentInstant().ToDateTimeUtc();
+        var allowed = this.OutgoingBudget.Verify(nowUtc, delta, precheck: true);
+        var result = this.balance!.Deduct(allowed);
         if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Deduct))
         {
             this.expiry?.Renew();
         }
 
+        this.OutgoingBudget.Verify(nowUtc, result, precheck: false);
         return result;
     }
 
     /// <inheritdoc/>
     public void Adjust(long? incoming, long? outgoing)
     {
+        this.CheckBalanceInitialized();
         this.balance!.Adjust(incoming, outgoing);
         if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
         {
@@ -77,10 +86,20 @@ public partial class Entitlement : IBalance
     /// <inheritdoc/>
     public void Clear()
     {
+        this.CheckBalanceInitialized();
         this.balance!.Clear();
         if (this.AutoRenewalMode.HasFlag(AutoRenewalMode.Adjust))
         {
             this.expiry?.Renew();
+        }
+    }
+
+    private void CheckBalanceInitialized()
+    {
+        // TODO: Fix if-throw pattern
+        if (this.balance == null)
+        {
+            throw new InvalidOperationException("Balance is not initialized.");
         }
     }
 }
