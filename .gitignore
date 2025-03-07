@@ -55,3 +55,7 @@ BenchmarkDotNet.Artifacts
 # Packages installed during the build
 packages
 coverage
+
+# MSBuild Outputs
+artifacts
+publish
