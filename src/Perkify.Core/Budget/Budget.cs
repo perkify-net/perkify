@@ -6,7 +6,8 @@ namespace Perkify.Core;
 /// <summary>
 /// To control the budget for all incoming/outgoing events.
 /// </summary>
-public class Budget : IEligible
+public class Budget(long upperLimit, long usage = 0, DateTime nextResetUtc = default)
+    : IEligible
 {
     /// <summary>
     /// Gets the policy for handling budget exceedance.
@@ -16,7 +17,7 @@ public class Budget : IEligible
     /// <summary>
     /// Gets the upper limit of the budget.
     /// </summary>
-    public long UpperLimit { get; init; }
+    public long UpperLimit { get; init; } = upperLimit;
 
     /// <summary>
     /// Gets the smoothing interval for budget reset.
@@ -26,12 +27,12 @@ public class Budget : IEligible
     /// <summary>
     /// Gets the next UTC reset time for budget smoothing.
     /// </summary>
-    public DateTime NextResetUtc { get; private set; } = DateTime.MinValue;
+    public DateTime NextResetUtc { get; private set; } = nextResetUtc;
 
     /// <summary>
     /// Gets the current usage amount.
     /// </summary>
-    public long Usage { get; private set; }
+    public long Usage { get; private set; } = usage;
 
     /// <inheritdoc/>
     public bool IsEligible => this.Usage <= this.UpperLimit;
