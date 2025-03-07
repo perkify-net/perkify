@@ -23,7 +23,7 @@ public class ChronoInterval
     /// <param name="iso8601">The ISO8601 duration string.</param>
     public ChronoInterval(string iso8601)
     {
-        string duration = iso8601?.Trim() ?? throw new ArgumentNullException(nameof(iso8601));
+        var duration = iso8601?.Trim() ?? throw new ArgumentNullException(nameof(iso8601));
         var calendar = !duration.EndsWith('!');
 
         var result = PeriodPattern.NormalizingIso.Parse(duration.TrimEnd('!'));
