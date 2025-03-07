@@ -18,7 +18,7 @@ public partial class CompositeBudget : IBudget
     public long Verify(DateTime eventUtc, long amount, bool precheck = false)
     {
         // Skip verification if no budget strategy is binded.
-        if (!this.budgets.Count <= 0)
+        if (this.budgets.Count <= 0)
         {
             return amount;
         }
