@@ -38,8 +38,6 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@v4
-      - name: Setup GitHub CLI
-        uses: actions/setup-cli@v3
       - name: Sync Milestones
         run: |
           chmod +x milestones.sh
