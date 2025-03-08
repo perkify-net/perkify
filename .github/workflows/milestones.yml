@@ -1,0 +1,48 @@
+name: Sync Milestones
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/milestones.yml'
+      - '.github/milestones.sh'
+      - '.github/workflows/milestones.yml'
+  pull_request:
+    paths:
+      - '.github/milestones.yml'
+      - '.github/milestones.sh'
+      - '.github/workflows/milestones.yml'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      dry_run:
+        description: 'Enable dry run mode'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync Milestones
+        run: |
+          chmod +x .github/milestones.sh
+          .github/milestones.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MILESTONES_YAML_FILE: .github/milestones.yml
+          DRY_RUN: ${{ inputs.dry_run }}
