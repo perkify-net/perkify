@@ -1,53 +1,79 @@
 #!/bin/bash
 
-REPO_OWNER="perkify"
-REPO_NAME="perkify"
-YAML_FILE="milestones.yml"
+# Priority: CLI Args > Env Vars > Defaults
+REPO_OWNER="${1:-${GITHUB_REPOSITORY_OWNER:-default_owner}}"
+REPO_NAME="${2:-${GITHUB_REPOSITORY#*/}}"
+MILESTONES_YAML_FILE="${3:-${MILESTONES_YAML_FILE:-milestones.yml}}"
+DRY_RUN="${4:-${DRY_RUN:-false}}"
+[[ "$DRY_RUN" = "true" ]] && DRY_RUN=true || DRY_RUN=false
 
-# Fetch latest milestones from Github
+# Wrapper for Github API call
+call_github_api() {
+  local method=$1
+  local endpoint=$2
+  local data=$3
+
+  if [ "$DRY_RUN" = true ]; then
+    echo "[DRY RUN] Would execute: gh api -X $method $endpoint $data"
+  else
+    gh api -X $method "$endpoint" $data
+  fi
+}
+
+# Start syncing milestones
+echo "Syncing with config:"
+echo "  - Repository: $REPO_OWNER/$REPO_NAME"
+echo "  - Config file: $YAML_FILE"
+echo "  - Dry run: $DRY_RUN"
+
+# Fetch existing milestones from Github
 EXISTING_MILESTONES=$(gh api "/repos/$REPO_OWNER/$REPO_NAME/milestones?state=all" --jq '.[] | {title: .title, number: .number, state: .state}')
 
 # Extract target milestones from YAML
-TARGET_MILESTONES=$(yq e '.milestones[] | .title' "$YAML_FILE")
+TARGET_MILESTONES=$(yq e '.milestones[] | .title' "$MILESTONES_YAML_FILE")
 
-# Go through each milestone in YAML
+# Go through each milestone in YAML file
 while read -r milestone; do
   title=$(yq e '.title' <<< "$milestone")
   description=$(yq e '.description' <<< "$milestone")
   due_on=$(yq e '.due_on' <<< "$milestone")
   state=$(yq e '.state' <<< "$milestone")
 
-  # Check if milestone already exists
+  # Check if milestone exists
   existing=$(jq -r --arg title "$title" 'select(.title == $title)' <<< "$EXISTING_MILESTONES")
+  
   if [ -z "$existing" ]; then
-    # Create new milestone
-    gh api -X POST "/repos/$REPO_OWNER/$REPO_NAME/milestones" \
-      -f title="$title" \
-      -f description="$description" \
-      -f due_on="$due_on" \
-      -f state="$state"
-    echo "Created milestone: $title"
+    echo "→ Create new milestone: $title"
+    call_github_api POST "/repos/$REPO_OWNER/$REPO_NAME/milestones" \
+      "-f title='$title' \
+       -f description='$description' \
+       -f due_on='$due_on' \
+       -f state='$state'"
   else
-    # Update existing milestone
     number=$(jq -r '.number' <<< "$existing")
-    gh api -X PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" \
-      -f title="$title" \
-      -f description="$description" \
-      -f due_on="$due_on" \
-      -f state="$state"
-    echo "Updated milestone: $title"
+    current_state=$(jq -r '.state' <<< "$existing")
+    
+    if [ "$current_state" != "$state" ] || [ "$DRY_RUN" = true ]; then
+      echo "→ Update existing milestone: $title (state: $current_state → $state)"
+      call_github_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" \
+        "-f title='$title' \
+         -f description='$description' \
+         -f due_on='$due_on' \
+         -f state='$state'"
+    fi
   fi
 done < <(yq e '.milestones[]' "$YAML_FILE")
 
-# Close milestones that are not in YAML
+# Close obsolete milestones
 echo "$EXISTING_MILESTONES" | jq -r '.title' | while read -r title; do
-  if ! grep -q "$title" <<< "$TARGET_MILESTONES"; then
+  if ! yq e ".milestones[] | select(.title == \"$title\")" "$YAML_FILE" >/dev/null; then
     number=$(jq -r --arg title "$title" 'select(.title == $title) | .number' <<< "$EXISTING_MILESTONES")
     state=$(jq -r --arg title "$title" 'select(.title == $title) | .state' <<< "$EXISTING_MILESTONES")
-    if [ "$state" == "open" ]; then
-      gh api -X PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" \
-        -f state="closed"
-      echo "Closed milestone: $title"
+    
+    if [ "$state" = "open" ]; then
+      echo "→ Close obsolete milestone: $title"
+      call_github_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" \
+        "-f state='closed'"
     fi
   fi
 done
