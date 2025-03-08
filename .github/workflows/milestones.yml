@@ -44,5 +44,5 @@ jobs:
           .github/milestones.sh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MILESTONES_YAML_FILE: '.github/milestones.yml'
+          MILESTONES_YAML_FILE: .github/milestones.yml
           DRY_RUN: ${{ inputs.dry_run }}

@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Detect if YQ is installed
+if ! command -v yq &> /dev/null; then
+  echo "ERROR: yq is required. Install via: brew install yq"
+  exit 1
+fi
+
+# Detect if GH is installed
+if ! command -v gh &> /dev/null; then
+  echo "ERROR: gh is required. Install via: brew install gh"
+  exit 1
+fi
+
 # Priority: CLI Args > Env Vars > Defaults
 REPO_OWNER="${1:-${GITHUB_REPOSITORY_OWNER:-default_owner}}"
 REPO_NAME="${2:-${GITHUB_REPOSITORY#*/}}"
@@ -23,13 +35,13 @@ call_github_api() {
 # Start syncing milestones
 echo "Syncing with config:"
 echo "  - Repository: $REPO_OWNER/$REPO_NAME"
-echo "  - Config file: $YAML_FILE"
+echo "  - Config file: $MILESTONES_YAML_FILE"
 echo "  - Dry run: $DRY_RUN"
 
 # Fetch existing milestones from Github
 EXISTING_MILESTONES=$(gh api "/repos/$REPO_OWNER/$REPO_NAME/milestones?state=all" --jq '.[] | {title: .title, number: .number, state: .state}')
 
-# Extract target milestones from YAML
+# Extract target milestone titles from YAML
 TARGET_MILESTONES=$(yq e '.milestones[] | .title' "$MILESTONES_YAML_FILE")
 
 # Go through each milestone in YAML file
@@ -62,11 +74,11 @@ while read -r milestone; do
          -f state='$state'"
     fi
   fi
-done < <(yq e '.milestones[]' "$YAML_FILE")
+done < <(yq e '.milestones[]' "$MILESTONES_YAML_FILE")
 
 # Close obsolete milestones
 echo "$EXISTING_MILESTONES" | jq -r '.title' | while read -r title; do
-  if ! yq e ".milestones[] | select(.title == \"$title\")" "$YAML_FILE" >/dev/null; then
+  if ! yq e ".milestones[] | select(.title == \"$title\")" "$MILESTONES_YAML_FILE" >/dev/null; then
     number=$(jq -r --arg title "$title" 'select(.title == $title) | .number' <<< "$EXISTING_MILESTONES")
     state=$(jq -r --arg title "$title" 'select(.title == $title) | .state' <<< "$EXISTING_MILESTONES")
     
