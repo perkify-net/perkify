@@ -59,7 +59,7 @@ fetch_existing_milestones() {
   declare -gA EXISTING_MILESTONES
   local api_response
 
-  # Handle pagination (max 100 items per request)
+  # Handle pagination, max 100 items per request
   api_response=$(gh api "/repos/$GITHUB_REPOSITORY/milestones?state=all&per_page=100" --jq '.[] | @base64' || true)
   [ -z "$api_response" ] && return
   
