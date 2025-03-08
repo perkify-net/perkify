@@ -8,6 +8,11 @@ on:
       - '.github/milestones.yml'
       - '.github/milestones.sh'
       - '.github/workflows/milestones.yml'
+  pull_request:
+    paths:
+      - '.github/milestones.yml'
+      - '.github/milestones.sh'
+      - '.github/workflows/milestones.yml'
 
 jobs:
   sync:
