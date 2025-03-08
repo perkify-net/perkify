@@ -1,0 +1,27 @@
+name: Sync Milestones
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/milestones.yml'
+      - '.github/milestones.sh'
+      - '.github/workflows/milestones.yml'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup GitHub CLI
+        uses: actions/setup-cli@v3
+      - name: Sync Milestones
+        run: |
+          chmod +x milestones.sh
+          ./milestones.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
