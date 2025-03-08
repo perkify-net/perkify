@@ -13,20 +13,21 @@ for cmd in "${required_cmds[@]}"; do
   }
 done
 
-# Configuration parameter handling
-REPO_NAME="${2:-${GITHUB_REPOSITORY#*/:default-repo}}"
-MILESTONES_YAML_FILE="${3:-${MILESTONES_YAML_FILE:-.github/milestones.yml}}"
-DRY_RUN="${4:-${DRY_RUN:-false}}"
-[[ "$DRY_RUN" == "true" ]] && DRY_RUN=true || DRY_RUN=false
-
-# Validate configuration file existence
-validate_config() {
-  [ -f "$MILESTONES_YAML_FILE" ] || {
-    echo "ERROR: Config file $MILESTONES_YAML_FILE not found at: $(pwd)"
-    exit 1
-  }
+# Verify GH_TOKEN environment variable
+[ -z "$GH_TOKEN" ] || {
+  echo "ERROR: GH_TOKEN environment variable is required"
+  exit 1
 }
-validate_config
+
+# Check existence of milestones configuration file
+[ -f "$MILESTONES_YAML_FILE" ] || {
+  echo "ERROR: Config file $MILESTONES_YAML_FILE not found."
+  exit 1
+}
+
+# Configuration parameter handling
+DRY_RUN="${DRY_RUN:-false}"
+[[ "$DRY_RUN" == "true" ]] && DRY_RUN=true || DRY_RUN=false
 
 # GitHub API request handler
 call_github_api() {
