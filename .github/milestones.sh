@@ -74,14 +74,14 @@ for title in "${!TARGET_MILESTONES[@]}"; do
   fi
 done
 
-# Close obsolete milestones
-or title in "${!EXISTING_MILESTONES[@]}"; do
+# Close obsolete milestones if need
+for title in "${!EXISTING_MILESTONES[@]}"; do
   if [[ -z "${TARGET_MILESTONES[$title]}" ]]; then
     number=$(jq -r .number <<< "${EXISTING_MILESTONES[$title]}")
     state=$(jq -r .state <<< "${EXISTING_MILESTONES[$title]}")
     
     if [[ "$state" == "open" ]]; then
-      echo "🚫 关闭多余里程碑: $title"
+      echo "🚫 Close obsolete milestone: $title"
       call_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" '{"state":"closed"}'
     fi
   fi
