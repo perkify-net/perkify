@@ -13,6 +13,12 @@ MILESTONES_YAML_FILE="${3:-${MILESTONES_YAML_FILE:-milestones.yml}}"
 DRY_RUN="${4:-${DRY_RUN:-false}}"
 [[ "$DRY_RUN" = "true" ]] && DRY_RUN=true || DRY_RUN=false
 
+# Check if config file exists
+if [ ! -f "$MILESTONES_YAML_FILE" ]; then
+  echo "ERROR: Config file $MILESTONES_YAML_FILE not found!"
+  exit 1
+fi
+
 # Wrapper for Github API call
 call_github_api() {
   local method=$1
@@ -46,7 +52,7 @@ while IFS= read -r milestone; do
   title=$(echo "$milestone" | base64 --decode | jq -r .title)
   data=$(echo "$milestone" | base64 --decode)
   TARGET_MILESTONES["$title"]="$data"
-done < <(yq -o json '.milestones[]' "$CONFIG_FILE" | jq -c .)
+done < <(yq -o json '.milestones[]' "$MILESTONES_YAML_FILE" | jq -c .)
 
 # Go through each milestone in YAML file
 for title in "${!TARGET_MILESTONES[@]}"; do
@@ -83,7 +89,7 @@ for title in "${!EXISTING_MILESTONES[@]}"; do
     
     if [[ "$state" == "open" ]]; then
       echo "🚫 Close obsolete milestone: $title"
-      call_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" '{"state":"closed"}'
+      call_github_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" '{"state":"closed"}'
     fi
   fi
 done
