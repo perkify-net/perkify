@@ -1,16 +1,9 @@
 #!/bin/bash
 
-# Detect if YQ is installed
-if ! command -v yq &> /dev/null; then
-  echo "ERROR: yq is required. Install via: brew install yq"
-  exit 1
-fi
-
-# Detect if GH is installed
-if ! command -v gh &> /dev/null; then
-  echo "ERROR: gh is required. Install via: brew install gh"
-  exit 1
-fi
+# Detect if jq, yq & Github CLI is installed
+command -v gh >/dev/null || { echo "ERROR: Please install gh: brew install gh"; exit 1; }
+command -v jq >/dev/null || { echo "ERROR: Please install jq: brew install jq"; exit 1; }
+command -v yq >/dev/null || { echo "ERROR: Please install yq: brew install yq"; exit 1; }
 
 # Priority: CLI Args > Env Vars > Defaults
 REPO_OWNER="${1:-${GITHUB_REPOSITORY_OWNER:-default_owner}}"
@@ -39,53 +32,57 @@ echo "  - Config file: $MILESTONES_YAML_FILE"
 echo "  - Dry run: $DRY_RUN"
 
 # Fetch existing milestones from Github
-EXISTING_MILESTONES=$(gh api "/repos/$REPO_OWNER/$REPO_NAME/milestones?state=all" --jq '.[] | {title: .title, number: .number, state: .state}')
+declare -A EXISTING_MILESTONES
+EXISTING_MILESTONES_JSON=$(gh api -q '.[] | @base64' "/repos/$REPO_OWNER/$REPO_NAME/milestones?state=all")
+while IFS= read -r milestone; do
+  title=$(echo "$milestone" | base64 --decode | jq -r .title)
+  EXISTING_MILESTONES["$title"]=$(echo "$milestone" | base64 --decode)
+done <<< "$EXISTING_MILESTONES_JSON"
 
 # Extract target milestone titles from YAML
-TARGET_MILESTONES=$(yq e '.milestones[] | .title' "$MILESTONES_YAML_FILE")
+declare -A TARGET_MILESTONES
+while IFS= read -r milestone; do
+  title=$(echo "$milestone" | base64 --decode | jq -r .title)
+  data=$(echo "$milestone" | base64 --decode)
+  TARGET_MILESTONES["$title"]="$data"
+done < <(yq -j '.milestones[] | @base64' "$CONFIG_FILE")
 
 # Go through each milestone in YAML file
-while read -r milestone; do
-  title=$(yq e '.title' <<< "$milestone")
-  description=$(yq e '.description' <<< "$milestone")
-  due_on=$(yq e '.due_on' <<< "$milestone")
-  state=$(yq e '.state' <<< "$milestone")
+for title in "${!TARGET_MILESTONES[@]}"; do
+  target_data=${TARGET_MILESTONES["$title"]}
+  description=$(jq -r '.description // ""' <<< "$target_data")
+  due_on=$(jq -r '.due_on // ""' <<< "$target_data")
+  state=$(jq -r '.state // "open"' <<< "$target_data")
 
-  # Check if milestone exists
-  existing=$(jq -r --arg title "$title" 'select(.title == $title)' <<< "$EXISTING_MILESTONES")
-  
-  if [ -z "$existing" ]; then
-    echo "→ Create new milestone: $title"
-    call_github_api POST "/repos/$REPO_OWNER/$REPO_NAME/milestones" \
-      "-f title='$title' \
-       -f description='$description' \
-       -f due_on='$due_on' \
-       -f state='$state'"
-  else
-    number=$(jq -r '.number' <<< "$existing")
-    current_state=$(jq -r '.state' <<< "$existing")
-    
-    if [ "$current_state" != "$state" ] || [ "$DRY_RUN" = true ]; then
-      echo "→ Update existing milestone: $title (state: $current_state → $state)"
-      call_github_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" \
-        "-f title='$title' \
-         -f description='$description' \
-         -f due_on='$due_on' \
-         -f state='$state'"
+  request_data=$(jq -n \
+    --arg desc "$description" \
+    --arg due "$due_on" \
+    --arg state "$state" \
+    '{description: $desc, due_on: (if $due == "" then null else $due end), state: $state}')
+
+  if [[ -n "${EXISTING_MILESTONES[$title]}" ]]; then
+    number=$(jq -r .number <<< "${EXISTING_MILESTONES[$title]}")
+    current_data=$(jq -c '{description, due_on, state}' <<< "${EXISTING_MILESTONES[$title]}")
+
+    if ! diff <(jq -S . <<< "$request_data") <(jq -S . <<< "$current_data") &>/dev/null; then
+      echo "🔄 Update existing milestone: $title"
+      call_github_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" "$request_data"
     fi
+  else
+    echo "🆕 Create new milestone: $title"
+    call_github_api POST "/repos/$REPO_OWNER/$REPO_NAME/milestones" "$(jq --arg title "$title" '. + {title: $title}' <<< "$request_data")"
   fi
-done < <(yq e '.milestones[]' "$MILESTONES_YAML_FILE")
+done
 
 # Close obsolete milestones
-echo "$EXISTING_MILESTONES" | jq -r '.title' | while read -r title; do
-  if ! yq e ".milestones[] | select(.title == \"$title\")" "$MILESTONES_YAML_FILE" >/dev/null; then
-    number=$(jq -r --arg title "$title" 'select(.title == $title) | .number' <<< "$EXISTING_MILESTONES")
-    state=$(jq -r --arg title "$title" 'select(.title == $title) | .state' <<< "$EXISTING_MILESTONES")
+or title in "${!EXISTING_MILESTONES[@]}"; do
+  if [[ -z "${TARGET_MILESTONES[$title]}" ]]; then
+    number=$(jq -r .number <<< "${EXISTING_MILESTONES[$title]}")
+    state=$(jq -r .state <<< "${EXISTING_MILESTONES[$title]}")
     
-    if [ "$state" = "open" ]; then
-      echo "→ Close obsolete milestone: $title"
-      call_github_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" \
-        "-f state='closed'"
+    if [[ "$state" == "open" ]]; then
+      echo "🚫 关闭多余里程碑: $title"
+      call_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" '{"state":"closed"}'
     fi
   fi
 done
