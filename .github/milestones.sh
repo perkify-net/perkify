@@ -13,12 +13,6 @@ for cmd in "${required_cmds[@]}"; do
   }
 done
 
-# Verify GH_TOKEN environment variable
-[ -z "$GH_TOKEN" ] || {
-  echo "ERROR: GH_TOKEN environment variable is required"
-  exit 1
-}
-
 # Check existence of milestones configuration file
 [ -f "$MILESTONES_YAML_FILE" ] || {
   echo "ERROR: Config file $MILESTONES_YAML_FILE not found."
