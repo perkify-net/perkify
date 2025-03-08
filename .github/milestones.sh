@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 
 # Detect if jq, yq & Github CLI is installed
 command -v gh >/dev/null || { echo "ERROR: Please install gh: brew install gh"; exit 1; }
@@ -45,7 +46,7 @@ while IFS= read -r milestone; do
   title=$(echo "$milestone" | base64 --decode | jq -r .title)
   data=$(echo "$milestone" | base64 --decode)
   TARGET_MILESTONES["$title"]="$data"
-done < <(yq -j '.milestones[] | @base64' "$CONFIG_FILE")
+done < <(yq -o json '.milestones[]' "$CONFIG_FILE" | jq -c .)
 
 # Go through each milestone in YAML file
 for title in "${!TARGET_MILESTONES[@]}"; do
