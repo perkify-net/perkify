@@ -39,8 +39,9 @@ echo "  - Config file: $MILESTONES_YAML_FILE"
 echo "  - Dry run: $DRY_RUN"
 
 # Fetch existing milestones from Github
+EXISTING_MILESTONES_JSON=$(gh api "/repos/$REPO_OWNER/$REPO_NAME/milestones?state=all" --jq '.[] | @base64' || echo "")
+[ -z "$EXISTING_MILESTONES_JSON" ] && echo "No existing milestones found"
 declare -A EXISTING_MILESTONES
-EXISTING_MILESTONES_JSON=$(gh api -q '.[] | @base64' "/repos/$REPO_OWNER/$REPO_NAME/milestones?state=all")
 while IFS= read -r milestone; do
   title=$(echo "$milestone" | base64 --decode | jq -r .title)
   EXISTING_MILESTONES["$title"]=$(echo "$milestone" | base64 --decode)
@@ -49,10 +50,11 @@ done <<< "$EXISTING_MILESTONES_JSON"
 # Extract target milestone titles from YAML
 declare -A TARGET_MILESTONES
 while IFS= read -r milestone; do
-  title=$(echo "$milestone" | base64 --decode | jq -r .title)
-  data=$(echo "$milestone" | base64 --decode)
-  TARGET_MILESTONES["$title"]="$data"
-done < <(yq -o json '.milestones[]' "$MILESTONES_YAML_FILE" | jq -c .)
+  decoded=$(echo "$milestone" | base64 -d 2>/dev/null || { echo "Skipping invalid milestone data"; continue; })
+  title=$(jq -r '.title // empty' <<< "$decoded")
+  [ -z "$title" ] && continue
+  TARGET_MILESTONES["$title"]="$decoded"
+done < <(yq eval '.milestones[]' "$MILESTONES_YAML_FILE" -o=json | jq -cr '@base64')
 
 # Go through each milestone in YAML file
 for title in "${!TARGET_MILESTONES[@]}"; do
