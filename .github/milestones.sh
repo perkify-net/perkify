@@ -1,7 +1,5 @@
 #!/bin/bash
 set -eo pipefail
-
-# Enable error tracing
 trap 'echo "Error at line $LINENO; exit code $?"' ERR
 
 # Verify required command-line tools
@@ -20,19 +18,29 @@ done
 }
 
 # Configuration parameter handling
-DRY_RUN="${DRY_RUN:-false}"
-[[ "$DRY_RUN" == "true" ]] && DRY_RUN=true || DRY_RUN=false
+DRY_RUN="$(echo "${DRY_RUN:-false}" | tr '[:upper:]' '[:lower:]')"
+[[ "$DRY_RUN" =~ ^(true|1|yes|on)$ ]] && DRY_RUN=true || DRY_RUN=false
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo "Dry-run mode enabled."
+fi
 
 # GitHub API request handler
 call_github_api() {
   local method=$1 endpoint=$2 data=$3
-  local dry_run_msg="[DRY-RUN] Would execute: gh api -X $method $endpoint"
+  local dry_run_msg="[DRY-RUN] gh api -X $method $endpoint"
+
+  # Validate JSON data before transmitting
+  if ! jq empty <<< "$data" &>/dev/null; then
+    echo "ERROR: Invalid JSON data" >&2
+    return 1
+  fi  
   
+  # Simulate API request in dry-run mode  
   if $DRY_RUN; then
     echo "$dry_run_msg with data: $data"
     return 0
   fi
-  
+
   # Transmit data via stdin for better compatibility
   echo "$data" | gh api \
     --method "$method" \
@@ -41,10 +49,10 @@ call_github_api() {
 }
 
 # Main synchronization workflow
-echo "Syncing milestones with configuration:"
-echo "  - Repository: $REPO_NAME"
-echo "  - Config file: $(realpath "$MILESTONES_YAML_FILE")"
-echo "  - Dry run: $DRY_RUN"
+echo "Syncing milestones with configuration..."
+echo "Repository: $GITHUB_REPOSITORY"
+echo "Config file: $(realpath "$MILESTONES_YAML_FILE")"
+echo "Dry run: $DRY_RUN"
 
 # Retrieve existing milestones with pagination support
 fetch_existing_milestones() {
@@ -52,8 +60,7 @@ fetch_existing_milestones() {
   local api_response
 
   # Handle pagination (max 100 items per request)
-  api_response=$(gh api "/repos/$REPO_NAME/milestones?state=all&per_page=100" --jq '.[] | @base64' || true)
-
+  api_response=$(gh api "/repos/$GITHUB_REPOSITORY/milestones?state=all&per_page=100" --jq '.[] | @base64' || true)
   [ -z "$api_response" ] && return
   
   while IFS= read -r b64; do
@@ -125,11 +132,11 @@ execute_sync() {
 
       if ! diff <(jq -S . <<< "$request_data") <(jq -S . <<< "$current_data") &>/dev/null; then
         echo "🔄 Updating existing milestone: \"$title\""
-        call_github_api PATCH "/repos/$REPO_NAME/milestones/$number" "$request_data"
+        call_github_api PATCH "/repos/$GITHUB_REPOSITORY/milestones/$number" "$request_data"
       fi
     else
       echo "🆕 Creating new milestone: \"$title\""
-      call_github_api POST "/repos/$REPO_NAME/milestones" \
+      call_github_api POST "/repos/$GITHUB_REPOSITORY/milestones" \
         "$(jq --arg title "$title" '. + {title: $title}' <<< "$request_data")"
     fi
   done
@@ -147,7 +154,7 @@ purge_obsolete_milestones() {
 
     if [[ "$state" == "open" ]]; then
       echo "🚫 Closing obsolete milestone: \"$title\""
-      call_github_api PATCH "/repos/$REPO_NAME/milestones/$number" \
+      call_github_api PATCH "/repos/$GITHUB_REPOSITORY/milestones/$number" \
         '{"state":"closed"}'
     fi
   done
