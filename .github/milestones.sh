@@ -14,8 +14,7 @@ for cmd in "${required_cmds[@]}"; do
 done
 
 # Configuration parameter handling
-REPO_OWNER="${1:-${GITHUB_REPOSITORY_OWNER:-perkify-net}}"
-REPO_NAME="${2:-${GITHUB_REPOSITORY#*/:-perkify}}"
+REPO_NAME="${2:-${GITHUB_REPOSITORY#*/:default-repo}}"
 MILESTONES_YAML_FILE="${3:-${MILESTONES_YAML_FILE:-.github/milestones.yml}}"
 DRY_RUN="${4:-${DRY_RUN:-false}}"
 [[ "$DRY_RUN" == "true" ]] && DRY_RUN=true || DRY_RUN=false
@@ -48,7 +47,7 @@ call_github_api() {
 
 # Main synchronization workflow
 echo "Syncing milestones with configuration:"
-echo "  - Repository: $REPO_OWNER/$REPO_NAME"
+echo "  - Repository: $REPO_NAME"
 echo "  - Config file: $(realpath "$MILESTONES_YAML_FILE")"
 echo "  - Dry run: $DRY_RUN"
 
@@ -58,7 +57,7 @@ fetch_existing_milestones() {
   local api_response
 
   # Handle pagination (max 100 items per request)
-  api_response=$(gh api "/repos/$REPO_OWNER/$REPO_NAME/milestones?state=all&per_page=100" --jq '.[] | @base64' || true)
+  api_response=$(gh api "/repos/$REPO_NAME/milestones?state=all&per_page=100" --jq '.[] | @base64' || true)
 
   [ -z "$api_response" ] && return
   
@@ -131,11 +130,11 @@ execute_sync() {
 
       if ! diff <(jq -S . <<< "$request_data") <(jq -S . <<< "$current_data") &>/dev/null; then
         echo "🔄 Updating existing milestone: \"$title\""
-        call_github_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" "$request_data"
+        call_github_api PATCH "/repos/$REPO_NAME/milestones/$number" "$request_data"
       fi
     else
       echo "🆕 Creating new milestone: \"$title\""
-      call_github_api POST "/repos/$REPO_OWNER/$REPO_NAME/milestones" \
+      call_github_api POST "/repos/$REPO_NAME/milestones" \
         "$(jq --arg title "$title" '. + {title: $title}' <<< "$request_data")"
     fi
   done
@@ -153,7 +152,7 @@ purge_obsolete_milestones() {
 
     if [[ "$state" == "open" ]]; then
       echo "🚫 Closing obsolete milestone: \"$title\""
-      call_github_api PATCH "/repos/$REPO_OWNER/$REPO_NAME/milestones/$number" \
+      call_github_api PATCH "/repos/$REPO_NAME/milestones/$number" \
         '{"state":"closed"}'
     fi
   done
