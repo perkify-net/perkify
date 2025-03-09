@@ -97,10 +97,10 @@ fetch_github_milestones()
 
   # Parse and store in glabal associative array for easy access
   declare -gA CURRENT_MILESTONES
-  jq -c '.[]' <<< "$response" | while IFS= read -r item; do
+  while IFS= read -r item; do
     title=$(jq -r '.title // empty' <<< "$item")
     [ -n "$title" ] && CURRENT_MILESTONES["$title"]="$item"
-  done
+  done < <(jq -c '.[]' <<< "$response")
 }
 fetch_github_milestones
 echo "Current Milestones: Total=${#CURRENT_MILESTONES[@]}"
