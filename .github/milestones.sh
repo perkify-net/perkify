@@ -165,7 +165,7 @@ execute_sync()
     fi
 
     # Generate API payload with ISO 8601 date handling
-    local request_data=$(jq -n \
+    local request_data=$(jq -nc \
       --arg desc "$description" \
       --arg due "${due_on:-null}" \
       --arg state "$state" \
@@ -178,6 +178,7 @@ execute_sync()
       local current_data=$(jq -c '{description, due_on, state}' <<< "$existing")
 
       # Debugging output for data comparison
+      echo ""
       echo "Comparing milestone: $title"
       echo "Current state: $current_data"
       echo "Desired state: $request_data"
