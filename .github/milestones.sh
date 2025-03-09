@@ -154,6 +154,16 @@ execute_sync()
     due_on=$(jq -r '.due_on? | select(. != null and . != "")' <<< "$target_data")
     state=$(jq -r '.state // "open"' <<< "$target_data")
 
+    # Convert to UTC time if due_on is provided
+    if [ -n "$due_on" ]; then
+      local utc_due_on=$(date -u -d "$due_on" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)
+      if [ $? -ne 0 ]; then
+        echo "ERROR: Invalid due_on format for '$title': $due_on" >&2
+        continue
+      fi
+      due_on=$utc_due_on
+    fi
+
     # Generate API payload with ISO 8601 date handling
     local request_data=$(jq -n \
       --arg desc "$description" \
@@ -161,6 +171,7 @@ execute_sync()
       --arg state "$state" \
       '{description: $desc, due_on: ($due | if . == "null" then null else . end), state: $state}')
 
+    # Check if milestone already exists
     if [[ -n "${CURRENT_MILESTONES[$title]}" ]]; then
       local existing=${CURRENT_MILESTONES[$title]}
       local number=$(jq -r .number <<< "$existing")
@@ -171,11 +182,14 @@ execute_sync()
       echo "Current state: $current_data"
       echo "Desired state: $request_data"
 
+      # Update only if there are changes or create new milestone when missing
       if ! diff <(jq -S . <<< "$request_data") <(jq -S . <<< "$current_data") &>/dev/null; then
         echo "🔄 Updating existing milestone: \"$title\""
         call_github_api PATCH "/repos/$GITHUB_REPOSITORY/milestones/$number" "$request_data"
       fi
+    fi
     else
+      # Create new milestone when missing
       echo "🆕 Creating new milestone: \"$title\""
       call_github_api POST "/repos/$GITHUB_REPOSITORY/milestones" \
         "$(jq --arg title "$title" '. + {title: $title}' <<< "$request_data")"
