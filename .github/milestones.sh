@@ -85,44 +85,37 @@ echo "Config file: $(realpath "$MILESTONES_YAML_FILE")"
 echo "Dry-run: $DRY_RUN"
 echo "Verbose: $VERBOSE"
 
-# Retrieve existing milestones with pagination support
-fetch_existing_milestones()
+# Retrieve current milestones with pagination support
+fetch_github_milestones()
 {
-  declare -gA EXISTING_MILESTONES
-  local api_response
+  # Fetch all milestones with pagination support
+  local response
+  if ! response=$(gh api --paginate "https://api.github.com/repos/$GITHUB_REPOSITORY/milestones?state=all" 2>&1); then
+    echo "Error: Failed to fetch milestones. $response" >&2
+    exit 1
+  fi
 
-  # Handle pagination, max 100 items per request
-  api_response=$(gh api "/repos/$GITHUB_REPOSITORY/milestones?state=all&per_page=100" --jq '.[] | @base64' || true)
-  [ -z "$api_response" ] && return
-  
-  while IFS= read -r b64; do
-    # Validate base64 decoding
-    decoded=$(base64 -d <<< "$b64" 2>/dev/null) || {
-      echo "Warning: Failed to decode milestone data: $b64"
-      continue
-    }
-    
-    title=$(jq -r '.title // empty' <<< "$decoded")
-    [ -n "$title" ] || continue
-    
-    EXISTING_MILESTONES["$title"]="$decoded"
-  done <<< "$api_response"
+  # Parse and store in glabal associative array for easy access
+  declare -gA CURRENT_MILESTONES
+  jq -c '.[]' <<< "$response" | while IFS= read -r item; do
+    title=$(jq -r '.title // empty' <<< "$item")
+    [ -n "$title" ] && CURRENT_MILESTONES["$title"]="$item"
+  done
 }
-fetch_existing_milestones
+fetch_github_milestones
 
-# Process target milestones from YAML configuration
-parse_target_milestones()
+# Load target milestones from YAML configuration
+load_target_milestones()
 {
-  declare -gA TARGET_MILESTONES
-  local yaml_data
-
   # Validate YAML syntax
-  yaml_data=$(yq eval -o json '.' "$MILESTONES_YAML_FILE") ||
+  local yaml_data=$(yq eval -o json '.' "$MILESTONES_YAML_FILE") ||
   {
     echo "ERROR: Invalid YAML structure in $MILESTONES_YAML_FILE"
     exit 1
   }
 
+  # Parse and store in glabal associative array for easy access
+  declare -gA TARGET_MILESTONES
   while IFS= read -r b64; do
     decoded=$(base64 -d <<< "$b64" 2>/dev/null) ||
     {
@@ -136,9 +129,9 @@ parse_target_milestones()
     TARGET_MILESTONES["$title"]="$decoded"
   done < <(jq -cr '.milestones[] | @base64' <<< "$yaml_data")
 }
-parse_target_milestones
+load_target_milestones
 
-# Synchronization engine core logic
+# Synchronize
 execute_sync()
 {
   for title in "${!TARGET_MILESTONES[@]}"; do
@@ -156,8 +149,8 @@ execute_sync()
       --arg state "$state" \
       '{description: $desc, due_on: ($due | if . == "null" then null else . end), state: $state}')
 
-    if [[ -n "${EXISTING_MILESTONES[$title]}" ]]; then
-      local existing=${EXISTING_MILESTONES[$title]}
+    if [[ -n "${CURRENT_MILESTONES[$title]}" ]]; then
+      local existing=${CURRENT_MILESTONES[$title]}
       local number=$(jq -r .number <<< "$existing")
       local current_data=$(jq -c '{description, due_on, state}' <<< "$existing")
 
