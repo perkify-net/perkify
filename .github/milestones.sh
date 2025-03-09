@@ -103,6 +103,12 @@ fetch_github_milestones()
   done
 }
 fetch_github_milestones
+echo "Current Milestones: Total=${#CURRENT_MILESTONES[@]}"
+if [ "$VERBOSE" = "true" ]; then
+  for title in "${!CURRENT_MILESTONES[@]}"; do
+    echo " - $title"
+  done
+fi
 
 # Load target milestones from YAML configuration
 load_target_milestones()
@@ -130,6 +136,12 @@ load_target_milestones()
   done < <(jq -cr '.milestones[] | @base64' <<< "$yaml_data")
 }
 load_target_milestones
+echo "Target Milestones: Total=${#TARGET_MILESTONES[@]}"
+if [ "$VERBOSE" = "true" ]; then
+  for title in "${!TARGET_MILESTONES[@]}"; do
+    echo " - $title"
+  done
+fi
 
 # Synchronize
 execute_sync()
