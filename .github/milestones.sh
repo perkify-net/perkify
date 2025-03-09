@@ -1,33 +1,62 @@
 #!/bin/bash
 set -eo pipefail
-trap 'echo "Error at line $LINENO; exit code $?"' ERR
+trap 'error_handler $LINENO' ERR
+error_handler()
+{
+  local line=$1
+  local exit_code=${2:-$?}
+  echo "Error at line $line; exit code $exit_code" >&2
+  exit "$exit_code"
+}
 
 # Verify required command-line tools
-required_cmds=(gh jq yq)
-for cmd in "${required_cmds[@]}"; do
-  command -v "$cmd" >/dev/null || { 
-    echo "ERROR: Missing $cmd. Install with: brew install $cmd"
-    exit 1
-  }
-done
+check_dependencies()
+{
+  local required_cmds=("$@")
+  for cmd in "${required_cmds[@]}"; do
+    command -v "$cmd" >/dev/null ||
+    {
+      echo "ERROR: Missing $cmd." >&2
+      return 1
+    }
+  done
+}
+check_dependencies gh jq yq || exit 1
 
 # Check existence of milestones configuration file
-[ -f "$MILESTONES_YAML_FILE" ] || {
+[ -f "$MILESTONES_YAML_FILE" ] ||
+{
   echo "ERROR: Config file $MILESTONES_YAML_FILE not found."
   exit 1
 }
 
-# Configuration parameter handling
-DRY_RUN="$(echo "${DRY_RUN:-false}" | tr '[:upper:]' '[:lower:]')"
-[[ "$DRY_RUN" =~ ^(true|1|yes|on)$ ]] && DRY_RUN=true || DRY_RUN=false
-if [[ "$DRY_RUN" == "true" ]]; then
-    echo "Dry-run mode enabled."
+# Detect dry-run mode and verbose mode
+to_boolean()
+{
+  local default="${2:-false}"
+  local input="${1:default}"
+  local normalized=$(echo -n "${input}" | xargs | tr '[:upper:]' '[:lower:]')
+  case "$normalized" in
+    true|t|1|yes|y|on)   echo "true" ;;
+    false|f|0|no|n|off)  echo "false" ;;
+    *)                   echo "false" ;;
+  esac
+}
+DRY_RUN=$(to_boolean "${DRY_RUN}" false)
+VERBOSE=$(to_boolean "${VERBOSE}" false)
+if [ "$DRY_RUN" = "true" ]; then
+  echo "Dry run mode enabled."
+fi
+if [ "$VERBOSE" = "true" ]; then
+  echo "Verbose mode enabled."
 fi
 
-# GitHub API request handler
-call_github_api() {
-  local method=$1 endpoint=$2 data=$3
-  local dry_run_msg="[DRY-RUN] gh api -X $method $endpoint"
+# Utility to call GitHub API with dry-run & verbose support
+call_github_api()
+{
+  local method=$1
+  local endpoint=$2
+  local data=$3
 
   # Validate JSON data before transmitting
   if ! jq empty <<< "$data" &>/dev/null; then
@@ -36,8 +65,9 @@ call_github_api() {
   fi  
   
   # Simulate API request in dry-run mode  
-  if $DRY_RUN; then
-    echo "$dry_run_msg with data: $data"
+  if [ "$DRY_RUN" = "true" ]; then
+    echo "[DRY-RUN] gh api -X $method $endpoint"
+    echo "[DRY-RUN] $data"
     return 0
   fi
 
@@ -52,10 +82,12 @@ call_github_api() {
 echo "Syncing milestones with configuration..."
 echo "Repository: $GITHUB_REPOSITORY"
 echo "Config file: $(realpath "$MILESTONES_YAML_FILE")"
-echo "Dry run: $DRY_RUN"
+echo "Dry-run: $DRY_RUN"
+echo "Verbose: $VERBOSE"
 
 # Retrieve existing milestones with pagination support
-fetch_existing_milestones() {
+fetch_existing_milestones()
+{
   declare -gA EXISTING_MILESTONES
   local api_response
 
@@ -79,18 +111,21 @@ fetch_existing_milestones() {
 fetch_existing_milestones
 
 # Process target milestones from YAML configuration
-parse_target_milestones() {
+parse_target_milestones()
+{
   declare -gA TARGET_MILESTONES
   local yaml_data
 
   # Validate YAML syntax
-  yaml_data=$(yq eval -o json '.' "$MILESTONES_YAML_FILE") || {
+  yaml_data=$(yq eval -o json '.' "$MILESTONES_YAML_FILE") ||
+  {
     echo "ERROR: Invalid YAML structure in $MILESTONES_YAML_FILE"
     exit 1
   }
 
   while IFS= read -r b64; do
-    decoded=$(base64 -d <<< "$b64" 2>/dev/null) || {
+    decoded=$(base64 -d <<< "$b64" 2>/dev/null) ||
+    {
       echo "Warning: Invalid target milestone data: $b64"
       continue
     }
@@ -104,7 +139,8 @@ parse_target_milestones() {
 parse_target_milestones
 
 # Synchronization engine core logic
-execute_sync() {
+execute_sync()
+{
   for title in "${!TARGET_MILESTONES[@]}"; do
     local target_data=${TARGET_MILESTONES[$title]}
     
@@ -144,7 +180,8 @@ execute_sync() {
 execute_sync
 
 # Cleanup obsolete milestones
-purge_obsolete_milestones() {
+purge_obsolete_milestones()
+{
   for title in "${!EXISTING_MILESTONES[@]}"; do
     [ -n "${TARGET_MILESTONES[$title]}" ] && continue
     
