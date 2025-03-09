@@ -200,10 +200,10 @@ execute_sync
 # Cleanup obsolete milestones
 purge_obsolete_milestones()
 {
-  for title in "${!EXISTING_MILESTONES[@]}"; do
+  for title in "${!CURRENT_MILESTONES[@]}"; do
     [ -n "${TARGET_MILESTONES[$title]}" ] && continue
     
-    local existing=${EXISTING_MILESTONES[$title]}
+    local existing=${CURRENT_MILESTONES[$title]}
     local number=$(jq -r .number <<< "$existing")
     local state=$(jq -r .state <<< "$existing")
 
