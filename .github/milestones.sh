@@ -163,7 +163,7 @@ execute_sync()
 
       # Debugging output for data comparison
       echo "Comparing milestone: $title"
-      echo "Existing configuration: $current_data"
+      echo "Current state: $current_data"
       echo "Desired state: $request_data"
 
       if ! diff <(jq -S . <<< "$request_data") <(jq -S . <<< "$current_data") &>/dev/null; then
