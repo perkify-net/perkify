@@ -178,7 +178,6 @@ execute_sync()
       local current_data=$(jq -c '{description, due_on, state}' <<< "$existing")
 
       # Debugging output for data comparison
-      echo ""
       echo "Comparing milestone: $title"
       echo "Current state: $current_data"
       echo "Desired state: $request_data"
@@ -194,6 +193,7 @@ execute_sync()
       call_github_api POST "/repos/$GITHUB_REPOSITORY/milestones" \
         "$(jq --arg title "$title" '. + {title: $title}' <<< "$request_data")"
     fi
+    echo ""
   done
 }
 execute_sync
