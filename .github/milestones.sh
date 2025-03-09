@@ -187,7 +187,6 @@ execute_sync()
         echo "🔄 Updating existing milestone: \"$title\""
         call_github_api PATCH "/repos/$GITHUB_REPOSITORY/milestones/$number" "$request_data"
       fi
-    fi
     else
       # Create new milestone when missing
       echo "🆕 Creating new milestone: \"$title\""
