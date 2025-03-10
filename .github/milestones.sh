@@ -156,12 +156,14 @@ execute_sync()
 
     # Convert to UTC time if due_on is provided
     if [ -n "$due_on" ]; then
-      local utc_due_on=$(date -u -d "$due_on" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)
-      if [ $? -ne 0 ]; then
-        echo "ERROR: Invalid due_on format for '$title': $due_on" >&2
-        continue
+      if [[ "$due_on" != *Z ]]; then
+        local utc_due_on=$(date -u -d "$due_on" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)
+        if [ $? -ne 0 ]; then
+          echo "ERROR: Invalid due_on format for '$title': $due_on" >&2
+          continue
+        fi
+        due_on=$utc_due_on
       fi
-      due_on=$utc_due_on
     fi
 
     # Generate API payload with ISO 8601 date handling
