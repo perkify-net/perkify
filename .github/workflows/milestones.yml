@@ -15,17 +15,13 @@ on:
       - '.github/workflows/milestones.yml'
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
       dry_run:
         description: 'Enable dry run mode'
+        required: false
+        default: 'false'
+        type: boolean
+      verbose:
+        description: 'Enable verbose logging'
         required: false
         default: 'false'
         type: boolean
@@ -40,9 +36,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Sync Milestones
         run: |
+          set -e
           chmod +x .github/milestones.sh
           .github/milestones.sh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MILESTONES_YAML_FILE: .github/milestones.yml
-          DRY_RUN: ${{ inputs.dry_run }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+          VERBOSE: ${{ github.event.inputs.verbose }}
