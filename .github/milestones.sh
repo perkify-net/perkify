@@ -91,7 +91,7 @@ fetch_github_milestones()
 {
   # Fetch all milestones with pagination support
   local response
-  if ! response=$(gh api --verbose "/repos/$GITHUB_REPOSITORY/milestones?state=all&per_page=100" 2>&1); then
+  if ! response=$(gh api "/repos/$GITHUB_REPOSITORY/milestones?state=all&per_page=100" 2>&1); then
     echo "Error: Failed to fetch milestones. $response" >&2
     exit 1
   fi
