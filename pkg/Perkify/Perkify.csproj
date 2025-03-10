@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Nuget">
+    <PackageId>Perkify</PackageId>
+    <Description>Perkify is a NuGet package that facilitates management of balances, budgets, authorizations, delegations, and expirations, helping developers integrate core functionalities quickly.</Description>
+    <PackageTags>balance;budget;authorization;delegation;expiration</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>perkify.png</PackageIcon>
+  </PropertyGroup>
+  <ItemGroup Label="Nuget">
+    <None Include="README.md" pack="true" PackagePath="." />
+    <None Include="perkify.png" Pack="true" PackagePath="."/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(SourceDir)/Perkify.Core/Perkify.Core.csproj" />
+  </ItemGroup>
+  
+</Project>
