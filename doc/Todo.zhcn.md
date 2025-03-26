@@ -27,15 +27,11 @@
 - 系统架构设计
   - [ ] 时序图
 - 核心模块和接口设计
-  - [ ] Entitlement Builder
   - [ ] Taxonomy
 
 ## 工程项目
 
 - Perkify.Core（运行时，内核）
-  - [x] Eligible, Delegation
-  - [x] Balance, Expiry, Enablement
-  - [x] Entitlement, Entitlement Chain
   - [ ] Entitlement Builder
 
 ## 文档和演示代码
